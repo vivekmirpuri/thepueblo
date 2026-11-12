@@ -15,5 +15,6 @@ Read before editing: `CONTEXT.md` (what and why), `ARCHITECTURE.md` (how), `PLAN
 - Only edit folders owned by the current user's track (ARCHITECTURE → Routes and folders). Shared files (`package.json`, `src/app/layout.tsx`, `globals.css`, `src/lib/*` outside `src/lib/ai`, `src/components/ui`, `src/components/shared`, configs, workflows) need the user's explicit OK.
 - Branch from `develop`, PR into `develop`. Never commit to `main` or `develop` directly.
 - Static export only: no API routes, server actions, request-time server APIs, or dynamic route segments (`[id]`); use `?id=` query params.
+- UI: use the components in `src/components/ui/` (shadcn/ui, preset `base-nova`, built on Base UI — no `asChild`, use the `render` prop). Add missing ones with `npx shadcn@latest add <name>`. Icons: `lucide-react`. Animation: `motion/react`, sparingly. Toasts: `sonner`. Map: `react-map-gl/maplibre`. Style with theme tokens (`bg-background`, `text-muted-foreground`), never hex colours. Do not add another UI kit.
 - Keep the contracts in `PLAN.md` stable; if one must change, say so before changing it.
 - Never commit service-account keys or read them into the conversation.

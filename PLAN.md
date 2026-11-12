@@ -13,8 +13,9 @@ Everything three people would otherwise fight over is laid down once, in one PR 
 
 **Code**
 - [ ] **AI spike first** (30 min, biggest unknown): load Transformers.js in a Web Worker under Next 16, embed one sentence, generate one reply. If the chat model won't run, keep embeddings only and ship the assistant without generated wording.
-- [ ] `npx shadcn@latest init` and add the components listed in ARCHITECTURE.
-- [ ] Install `maplibre-gl`, `react-map-gl`, `@huggingface/transformers`.
+- [x] shadcn/ui initialised and components added (see ARCHITECTURE).
+- [x] `motion`, `maplibre-gl`, `react-map-gl` installed.
+- [ ] Install `@huggingface/transformers` with the AI spike.
 - [ ] `src/lib/`: `types.ts`, `db.ts`, `auth.tsx`, `categories.ts`, `languages.ts`, `islands.ts`, `geo.ts` (haversine).
 - [ ] `src/lib/ai/index.ts` with the **contract** below, returning empty results until Track C fills it in.
 - [ ] `src/components/shared/`: `AppShell`, `BottomNav` (Map · Chats · Assistant · People · Profile), `EventCard`, `LanguageFlags`.

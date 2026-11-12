@@ -32,15 +32,26 @@ Versions checked on npm on 2026-11-12. All support React 19.
 |---|---|---|
 | Framework | **Next.js 16** (already installed), static export | Already deployed; free hosting |
 | Styling | **Tailwind 4** (already installed) | — |
-| UI components | **shadcn/ui** (`npx shadcn@latest add …`) | Components are copied into `src/components/ui/`, so no heavy dependency and the look stays minimal. Use: button, input, textarea, card, badge, dialog, sheet, tabs, avatar, select, toggle-group, form, sonner, skeleton |
+| UI components | **shadcn/ui**, preset `base-nova` (built on **Base UI**) | The current shadcn default. Components are copied into `src/components/ui/`, so we own the code and the look stays minimal. Installed: button, input, textarea, label, field, card, badge, dialog, sheet, drawer, tabs, avatar, select, toggle, toggle-group, separator, skeleton, sonner. Add more with `npx shadcn@latest add <name>` |
 | Icons | **lucide-react** | Comes with shadcn |
+| Animation | **motion** (`import { motion } from "motion/react"`) | The standard React animation library (formerly Framer Motion). Use it for small touches only: list items appearing, sheet and card transitions |
+| Toasts | **sonner** | Via the shadcn `sonner` component |
+| Mobile bottom sheet | shadcn **drawer** | Gives the "app" feel for event previews on phones |
+| Font | **Geist** via `next/font` | Already wired in `layout.tsx` |
 | Map | **maplibre-gl** + **react-map-gl** (`react-map-gl/maplibre`) | Open source, smooth on phones |
 | Map tiles | **OpenFreeMap** — style `https://tiles.openfreemap.org/styles/liberty` | Free, no API key, no signup |
 | Auth, database, chat | **firebase** (already installed) | Firestore `onSnapshot` gives realtime chat with no extra library |
 | Local AI | **@huggingface/transformers** (Transformers.js 4) | One library for both the embedding model and the chat model; WebGPU when available, WASM otherwise |
-| Forms / validation | shadcn `form` (react-hook-form + zod) | Comes with shadcn |
+| Forms | shadcn `field` + plain React state | Our forms are small; add react-hook-form + zod only if one grows |
 | Dates | `Intl.DateTimeFormat` | Built into the browser |
 | Flags | Emoji flags from a language → flag table | No package. *Limit: Windows shows letters instead of flags; swap to `flag-icons` if that matters for the demo* |
+
+**Look and feel rules**
+- Build screens from `src/components/ui/` first; write a new component only when none fits.
+- Colours come from the theme tokens in `globals.css` (`bg-background`, `text-muted-foreground`, `border`, `bg-primary`…). No hex colours in components.
+- One accent colour, generous white space, rounded cards, at most two text sizes per screen.
+- Base UI is not Radix: there is no `asChild`; compose with the `render` prop.
+- For a showpiece element (landing hero, empty states) you may copy a single component from **Magic UI**, **Aceternity UI** or **React Bits** — they are copy-paste like shadcn. Do not install another full UI kit (MUI, Chakra, Mantine, HeroUI): two kits never look like one app.
 
 Deliberately **not** used: a state library (React state + Firestore listeners are enough), a chat UI kit, a geo-query library, Firebase Storage (needs the paid plan on new projects — so no image uploads; avatars come from the Google account).
 

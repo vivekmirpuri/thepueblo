@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function me() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function isAttendee(eventId) {
+      return signedIn() && request.auth.uid in get(/databases/$(database)/documents/events/$(eventId)).data.attendeeIds;
+    }
+    function changedKeys() { return request.resource.data.diff(resource.data).affectedKeys(); }
+
+    match /users/{uid} {
+      allow read: if signedIn();
+      // "verified" (institutions) is only ever set by hand in the console
+      allow create: if signedIn() && request.auth.uid == uid && request.resource.data.get('verified', false) == false;
+      allow update: if signedIn() && request.auth.uid == uid && !changedKeys().hasAny(['verified']);
+    }
+
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.organizerId == request.auth.uid
+        && (request.resource.data.official == false || me().get('verified', false) == true);
+      allow delete: if signedIn() && resource.data.organizerId == request.auth.uid;
+      allow update: if signedIn() && (
+        (resource.data.organizerId == request.auth.uid && !changedKeys().hasAny(['organizerId', 'official']))
+        || isJoinOrLeave()
+        // shortcut: rating totals are trusted from attendees' clients, move to a Cloud Function if abused
+        || (changedKeys().hasOnly(['ratingSum', 'ratingCount']) && request.auth.uid in resource.data.attendeeIds)
+      );
+
+      // a user may only add or remove themselves
+      function isJoinOrLeave() {
+        let before = resource.data.attendeeIds.toSet();
+        let after = request.resource.data.attendeeIds.toSet();
+        let delta = after.difference(before).union(before.difference(after));
+        return changedKeys().hasOnly(['attendeeIds', 'languageCounts'])
+          && delta.size() == 1 && delta.hasOnly([request.auth.uid]);
+      }
+
+      match /messages/{messageId} {
+        allow read: if isAttendee(eventId);
+        allow create: if isAttendee(eventId) && request.resource.data.uid == request.auth.uid;
+      }
+      match /reviews/{uid} {
+        allow read: if true;
+        allow write: if isAttendee(eventId) && request.auth.uid == uid;
+      }
+    }
+  }
+}

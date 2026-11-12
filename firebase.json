@@ -4,5 +4,8 @@
     "ignore": ["firebase.json", "**/.*"],
     "trailingSlash": true,
     "cleanUrls": true
-  }
+  },
+  "firestore": { "rules": "firestore.rules", "location": "europe-southwest1" },
+  "storage": { "rules": "storage.rules" },
+  "auth": { "providers": { "emailPassword": true } }
 }
