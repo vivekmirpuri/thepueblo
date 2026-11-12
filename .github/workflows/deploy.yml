@@ -1,8 +1,8 @@
-# push to main -> live site; pull request -> temporary preview URL commented on the PR
+# push to main -> live; push to develop -> staging channel; pull request -> temporary preview URL on the PR
 name: Deploy to Firebase Hosting
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
 
 permissions:
@@ -31,4 +31,5 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: thepueblo-6f94e
-          channelId: ${{ github.event_name == 'push' && 'live' || '' }}
+          channelId: ${{ github.event_name == 'push' && (github.ref_name == 'main' && 'live' || 'develop') || '' }}
+          expires: 30d
