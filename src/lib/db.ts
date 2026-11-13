@@ -2,7 +2,7 @@
  * Firestore reads and writes — SHARED file. Every screen goes through these functions instead
  * of calling Firestore directly, so the document shapes live in one place.
  *
- * Built:      joinEvent, leaveEvent (their shape is verified by scripts/rules-check.mjs)
+ * Built:      joinEvent, leaveEvent, uploadEventImage (all verified by scripts/rules-check.mjs)
  * Not built:  everything that calls todo() — the task id says who picks it up (see PLAN.md)
  *
  * Notes for whoever fills these in:
@@ -12,7 +12,8 @@
  *  - Add the document id yourself: `{ id: snap.id, ...snap.data() } as Meetup`.
  */
 import { arrayRemove, arrayUnion, deleteField, doc, updateDoc } from "firebase/firestore";
-import { db } from "./firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { db, storage } from "./firebase";
 import { todo } from "./todo";
 import type { ChatMessage, Meetup, Review, UserProfile } from "./types";
 
@@ -25,6 +26,17 @@ export const listProfiles = (): Promise<UserProfile[]> => todo("C7 listProfiles"
 export const listUpcomingEvents = (): Promise<Meetup[]> => todo("A1 listUpcomingEvents");
 export const getEvent = (id: string): Promise<Meetup | null> => todo("B2 getEvent", id);
 export const createEvent = (event: Omit<Meetup, "id" | "createdAt">): Promise<string> => todo("B1 createEvent", event);
+
+/**
+ * Uploads a cover image and returns its download link; save that link as `imageUrl` on the event.
+ * storage.rules allow images only, under 5 MB, and only inside your own `events/{uid}/` folder.
+ * shortcut: the image of a deleted or edited event is left behind in the bucket; clean up by hand if it grows.
+ */
+export async function uploadEventImage(uid: string, file: Blob & { name?: string }): Promise<string> {
+  const target = ref(storage, `events/${uid}/${crypto.randomUUID()}-${file.name ?? "image"}`);
+  await uploadBytes(target, file);
+  return getDownloadURL(target);
+}
 
 /** One atomic update, no transaction needed. The rules only let you add yourself, and not past capacity. */
 export const joinEvent = (eventId: string, me: Pick<UserProfile, "uid" | "languages">) =>

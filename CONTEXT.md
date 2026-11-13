@@ -36,7 +36,7 @@ Each feature has an ID so branches, PRs and team files can refer to it.
 - **F7 Event list.** The same events as cards under the map.
 
 ### Events
-- **F8 Create event.** Title, description, category, date/time, in person (place on map) or online (link), optional capacity, optional image (a pasted link).
+- **F8 Create event.** Title, description, category, date/time, in person (place on map) or online (link), optional capacity, optional cover image (uploaded).
 - **F9 Similar-event check.** Before posting, a small model running **on the device** looks for similar existing events and suggests joining one instead of creating a duplicate.
 - **F10 Join / leave.**
 - **F11 Language flags.** Every event shows the flags of the languages spoken by the people who joined, with counts, so you can see whether someone there speaks your language.
@@ -65,7 +65,7 @@ One list, defined once in code, used by onboarding interests, the chips and the 
 
 ## Out of scope for the hackathon
 
-Payments, push notifications, direct one-to-one messages, image uploads, moderation tools, native apps, translating the interface into several languages (interface is in one language; content is whatever people write).
+Payments, push notifications, direct one-to-one messages, profile photo uploads, moderation tools, native apps, translating the interface into several languages (interface is in one language; content is whatever people write).
 
 ## Glossary
 

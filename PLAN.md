@@ -10,9 +10,14 @@ Everything three people would otherwise fight over is laid down once.
 - [x] Firestore database created (Madrid), email + password sign-in enabled.
 - [x] `firestore.rules` deployed and tested (`node scripts/rules-check.mjs`, 14 checks).
 - [x] shadcn/ui, `motion`, `maplibre-gl`, `react-map-gl`, `@huggingface/transformers` installed.
-- [x] `src/lib/`: `types.ts`, `categories.ts`, `languages.ts`, `islands.ts`, `geo.ts`, `firebase.ts`; `joinEvent` / `leaveEvent` in `db.ts`.
+- [x] `src/lib/`: `types.ts`, `categories.ts`, `languages.ts`, `islands.ts`, `geo.ts`, `firebase.ts`; `joinEvent` / `leaveEvent` / `uploadEventImage` in `db.ts`.
 - [x] `AppShell`, `BottomNav`, `LanguageFlags`.
 - [x] A placeholder page for every route and a placeholder component for every track, each with a header comment that says what to build.
+
+**Project owner, in the Firebase console (needed for image uploads)**
+- [ ] Upgrade the project to the **Blaze** (pay-as-you-go) plan and set a small budget alert.
+- [ ] Storage → **Get started** → pick the bucket region (it cannot be changed later).
+- [ ] Then: `firebase deploy --only storage && node scripts/rules-check.mjs`.
 
 **Still to do before the tracks split (one person)**
 - [ ] **AI spike first** (30 min, biggest unknown): load Transformers.js in a Web Worker under Next 16, embed one sentence. If the chat model won't run, keep embeddings only.

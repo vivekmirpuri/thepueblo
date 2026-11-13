@@ -16,8 +16,9 @@ What we are building: [CONTEXT.md](CONTEXT.md). Who builds what: [PLAN.md](PLAN.
  └──────────────┬────────────────────────────────────────────┘
                 │ Firebase web SDK (no server of our own)
  ┌──────────────▼────────────────────────────────────────────┐
- │ Firebase project thepueblo-6f94e (free Spark plan)        │
+ │ Firebase project thepueblo-6f94e (pay-as-you-go plan)     │
  │  Auth (email + password) · Firestore (data + chat)        │
+ │  Storage (event images)                                   │
  │  Hosting (static files, CDN)                              │
  └───────────────────────────────────────────────────────────┘
 ```
@@ -40,7 +41,7 @@ Versions checked on npm on 2026-11-12. All support React 19.
 | Font | **Geist** via `next/font` | Already wired in `layout.tsx` |
 | Map | **maplibre-gl** + **react-map-gl** (`react-map-gl/maplibre`) | Open source, smooth on phones |
 | Map tiles | **OpenFreeMap** — style `https://tiles.openfreemap.org/styles/liberty` | Free, no API key, no signup |
-| Auth, database, chat | **firebase** (already installed) | Firestore `onSnapshot` gives realtime chat with no extra library |
+| Auth, database, chat, images | **firebase** (already installed) | Firestore `onSnapshot` gives realtime chat with no extra library; Cloud Storage holds event images |
 | Local AI | **@huggingface/transformers** (Transformers.js 4) | One library for both the embedding model and the chat model; WebGPU when available, WASM otherwise |
 | Forms | shadcn `field` + plain React state | Our forms are small; add react-hook-form + zod only if one grows |
 | Dates | `Intl.DateTimeFormat` | Built into the browser |
@@ -53,7 +54,7 @@ Versions checked on npm on 2026-11-12. All support React 19.
 - Base UI is not Radix: there is no `asChild`; compose with the `render` prop.
 - For a showpiece element (landing hero, empty states) you may copy a single component from **Magic UI**, **Aceternity UI** or **React Bits** — they are copy-paste like shadcn. Do not install another full UI kit (MUI, Chakra, Mantine, HeroUI): two kits never look like one app.
 
-Deliberately **not** used: a state library (React state + Firestore listeners are enough), a chat UI kit, a geo-query library, Firebase Storage (needs the paid plan; we stay on the free Spark plan — so an event image is a **link** saved in `imageUrl`, not an upload).
+Deliberately **not** used: a state library (React state + Firestore listeners are enough), a chat UI kit, a geo-query library.
 
 ## Code pattern: containers and presentational components
 
@@ -94,17 +95,18 @@ src/
     event/  chat/         Track B
     people/  assistant/   Track C
   lib/
-    firebase.ts           Firebase app, auth, db                (shared, built)
+    firebase.ts           Firebase app, auth, db, storage       (shared, built)
     firebase.config.json  public web config, also read by scripts
     types.ts              UserProfile, Meetup, ChatMessage, Review  (shared, built)
-    db.ts                 Firestore read/write helpers          (shared; join/leave built, rest todo)
+    db.ts                 Firestore + Storage helpers           (shared; join/leave/upload built, rest todo)
     auth.tsx              AuthProvider + useUser()              (shared, placeholder)
     categories.ts  languages.ts  islands.ts  geo.ts             (shared, built)
     todo.ts               marks functions that are not built yet
     ai/                   Track C  (config.ts built; index.ts is the contract, returns nothing yet)
 scripts/rules-check.mjs   tests the deployed security rules (built)
 scripts/seed.mjs          fake people and events for the demo (placeholder)
-firestore.rules           security rules, deployed BY HAND (see Hosting)
+firestore.rules           database security rules, deployed BY HAND (see Hosting)
+storage.rules             image upload rules, deployed BY HAND
 ```
 
 "Shared" files are built once in the foundation phase and afterwards change only through small, announced PRs.
@@ -127,7 +129,7 @@ users/{uid}
 events/{eventId}                 // type `Meetup` in code (`Event` is a browser built-in)
   title, description
   category: string
-  imageUrl: string | null        // a link to an image hosted elsewhere (no uploads)
+  imageUrl: string | null        // download link of the cover image in Cloud Storage
   official: boolean              // true only if the organiser is a verified institution
   organizerId, organizerName
   mode: "in_person" | "online"
@@ -162,6 +164,7 @@ Live in `firestore.rules`, deployed, and covered by `node scripts/rules-check.mj
 - **events**: anyone can read. Signed-in users can create with `organizerId == their uid`; `official: true` is allowed only when the creator's user document has `verified == true`. Only the organiser can edit or delete. Any signed-in user may update **only** `attendeeIds` and `attendeeLanguages` (to join or leave), only by adding or removing themselves, and never past `capacity`.
 - **messages**: read and create only if your uid is in the event's `attendeeIds`; you can delete your own.
 - **reviews**: anyone can read; create only as yourself, only if you are an attendee.
+- **Storage** (`storage.rules`): event images live at `events/{uid}/{file}`. Anyone can read; you can write only inside your own folder, images only, under 5 MB.
 
 ## Local AI
 
@@ -209,10 +212,12 @@ Note for e5 models: prefix texts with `query: ` (searches) or `passage: ` (store
 
 One workflow, [.github/workflows/deploy.yml](.github/workflows/deploy.yml), runs lint + build and then deploys. Both `main` and `develop` require a pull request with a green build. The service-account key is the GitHub secret `FIREBASE_SERVICE_ACCOUNT`; it is never in the repo. Delete that key in the Firebase console after the hackathon.
 
+**Images.** The create-event form uploads the file with `uploadEventImage(uid, file)` (`src/lib/db.ts`), which stores it at `events/{uid}/…` and returns a download link; that link is saved on the event as `imageUrl`. Storage needs the pay-as-you-go (Blaze) plan and a bucket created once in the console.
+
 **Security rules are not deployed by CI.** Live, staging and previews all share one database, so a rules change reaches everyone at once. The project owner deploys by hand and checks:
 
 ```bash
-firebase deploy --only firestore && node scripts/rules-check.mjs
+firebase deploy --only firestore,storage && node scripts/rules-check.mjs
 ```
 
 New rules can take a few minutes to become active everywhere; if the check fails right after a deploy, wait and run it again.

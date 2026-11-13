@@ -4,7 +4,8 @@
  * To build (B1, then B5):
  *  - shadcn <Field>, <Input>, <Textarea>, <Select> (category), date and time inputs, capacity.
  *  - In person: pick the place by tapping <EventMap onPick>. Online: a link field instead.
- *  - `imageUrl` is a pasted link (no uploads on the Spark plan). Show a preview.
+ *  - Cover image: an <input type="file" accept="image/*">; on submit call `uploadEventImage(uid, file)`
+ *    from "@/lib/db" and save the link it returns as `imageUrl`. Show a preview; max 5 MB (the rules enforce it).
  *  - `endsAt` is required; default it to two hours after `startsAt`.
  *  - B5: as the title and description change (debounced), call `findSimilarEvents` from "@/lib/ai"
  *    and show the results as <EventCard>s above the submit button: "Similar events — join one instead?"

@@ -34,7 +34,7 @@ export interface Meetup {
   title: string;
   description: string;
   category: CategoryId;
-  /** A link to an image hosted elsewhere. No uploads: the project is on the free Spark plan. */
+  /** Download link of the cover image in Cloud Storage, from `uploadEventImage` in ./db. */
   imageUrl: string | null;
   /** True only when the organiser is a verified institution (F13). */
   official: boolean;

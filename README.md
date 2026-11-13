@@ -21,7 +21,7 @@ npm install
 npm run dev   # http://localhost:3000
 ```
 
-Firebase is ready to use from `src/lib/firebase.ts` (`auth`, `db`). Storage is not used: it needs the paid plan.
+Firebase is ready to use from `src/lib/firebase.ts` (`auth`, `db`, `storage`).
 
 ## How 3 of us work without colliding
 
@@ -39,7 +39,7 @@ npm run lint && npm run build    # what CI runs
 node scripts/rules-check.mjs     # test the deployed security rules
 ```
 
-Security rules are deployed by hand by the project owner, never by CI: `firebase deploy --only firestore`.
+Security rules are deployed by hand by the project owner, never by CI: `firebase deploy --only firestore,storage`.
 
 ## Rules of the static site
 

@@ -1,18 +1,21 @@
 /**
- * Checks the DEPLOYED Firestore rules with three throwaway accounts, then deletes everything it made.
- * Run after every change to firestore.rules (new rules can take a minute to become active):
- *   firebase deploy --only firestore && node scripts/rules-check.mjs
+ * Checks the DEPLOYED Firestore and Storage rules with three throwaway accounts, then deletes
+ * everything it made. Run after every change to firestore.rules or storage.rules (new rules can
+ * take a few minutes to become active):
+ *   firebase deploy --only firestore,storage && node scripts/rules-check.mjs
  */
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser } from "firebase/auth";
 import { getFirestore, doc, collection, setDoc, updateDoc, deleteDoc, getDoc, getDocs, addDoc, arrayUnion, arrayRemove, deleteField } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import config from "../src/lib/firebase.config.json" with { type: "json" };
 
 const app = initializeApp(config);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // One app, one signed-in user at a time, switched with as().
 const signUp = async () => {
@@ -22,14 +25,16 @@ const signUp = async () => {
 };
 const as = (who) => (who ? signInWithEmailAndPassword(auth, who.email, who.password) : signOut(auth));
 const allowed = (promise, what) => promise.catch((e) => { throw new Error(`should be allowed: ${what} (${e.code})`); });
-const denied = (promise, what) => assert.rejects(promise, { code: "permission-denied" }, `should be denied: ${what}`);
+const denied = (promise, what, code = "permission-denied") => assert.rejects(promise, { code }, `should be denied: ${what}`);
 
 const a = await signUp(), b = await signUp(), c = await signUp();
 const eventRef = doc(db, "events", `rules-check-${randomUUID()}`);
 const messages = collection(eventRef, "messages");
 const event = { title: "rules check", organizerId: a.uid, official: false, capacity: 2, attendeeIds: [a.uid], attendeeLanguages: { [a.uid]: ["es"] } };
 const join = (uid) => updateDoc(eventRef, { attendeeIds: arrayUnion(uid), [`attendeeLanguages.${uid}`]: ["en"] });
-let message;
+const png = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+const image = ref(storage, `events/${a.uid}/rules-check.png`);
+let message, uploaded;
 
 try {
   await as(a);
@@ -58,8 +63,19 @@ try {
   await as(b);
   await allowed(updateDoc(eventRef, { attendeeIds: arrayRemove(b.uid), [`attendeeLanguages.${b.uid}`]: deleteField() }), "leave an event");
 
-  console.log("rules OK: 14 checks passed");
+  // Storage: event images
+  await as(a);
+  await allowed(uploadBytes(image, png, { contentType: "image/png" }), "upload an image to your own folder");
+  uploaded = true;
+  await denied(uploadBytes(ref(storage, `events/${a.uid}/notes.txt`), png, { contentType: "text/plain" }), "upload a non-image", "storage/unauthorized");
+  await as(b);
+  await denied(uploadBytes(ref(storage, `events/${a.uid}/intruder.png`), png, { contentType: "image/png" }), "upload into someone else's folder", "storage/unauthorized");
+  await as(null);
+  await allowed(getDownloadURL(image), "see an event image without an account");
+
+  console.log("rules OK: 18 checks passed");
 } finally {
+  if (uploaded) await as(a).then(() => deleteObject(image)).catch(() => {});
   if (message) await as(b).then(() => deleteDoc(message)).catch(() => {});
   await as(a).then(() => Promise.all([deleteDoc(eventRef), deleteDoc(doc(db, "users", a.uid))])).catch(() => {});
   for (const who of [a, b, c]) await as(who).then(({ user }) => deleteUser(user)).catch(() => {});
