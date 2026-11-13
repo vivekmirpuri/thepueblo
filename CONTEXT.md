@@ -51,6 +51,14 @@ Cada funcionalidad tiene un identificador para poder citarla en ramas y PR.
 - **F17 Iconos de inclusión y accesibilidad.** Al crear un evento, quien organiza marca lo que ofrece: accesible en silla de ruedas, lengua de signos, adaptado a personas ciegas o con baja visión, subtítulos o bucle magnético, lenguaje inclusivo, perspectiva de género. Se muestran como iconos SVG pequeños junto a las banderas de idiomas, y en el mapa se puede filtrar por ellos.
 - **F18 Pronombres.** Al registrarse, cada persona puede añadir sus pronombres (opcional). Aparecen junto a su nombre en todas partes: chat, asistentes, "Gente como tú" y perfil.
 
+### Comunidad y seguridad
+- **F19 Intercambio de saberes.** Encuentros donde alguien enseña algo que sabe y otras personas aprenden.
+- **F20 Conecta ahora.** Eventos que empiezan pronto o ya están en marcha cerca de ti, y encuentros rápidos de pocas horas.
+- **F21 Auto-moderación y strikes.** El modelo local avisa antes de publicar un texto que parece ofensivo; los reportes confirmados suman strikes y a los tres se bloquea la publicación.
+- **F22 Píldoras informativas.** Tarjetas cortas sobre lenguaje inclusivo y trato respetuoso en momentos clave.
+- **F23 Lectura fácil y pictogramas.** Textos simples y un pictograma por categoría.
+- **F24 Protección de datos.** Página de privacidad, consentimiento al registrarse y borrar la cuenta.
+
 ### Asistente
 - **F16 Chatbot.** Dos modos: "Sugiéreme algo" (usa tu perfil) y búsqueda libre ("algo al aire libre este fin de semana en Tenerife, en inglés"). Se ejecuta en el dispositivo.
 
@@ -70,7 +78,7 @@ Una sola lista, definida una vez en el código, que usan los intereses del alta,
 
 ## Fuera del alcance del hackathon
 
-Pagos, notificaciones push, mensajes privados uno a uno, subida de foto de perfil, herramientas de moderación, apps nativas, traducir la interfaz a varios idiomas (la interfaz está en un idioma; el contenido es lo que escriba cada persona).
+Pagos, notificaciones push, mensajes privados uno a uno, subida de foto de perfil, panel de moderación (los strikes se revisan en la consola), apps nativas, traducir la interfaz a varios idiomas (la interfaz está en un idioma; el contenido es lo que escriba cada persona).
 
 ## Glosario
 

@@ -10,6 +10,7 @@ Next.js (React + TypeScript + Tailwind) → exportación estática → Firebase 
 |---|---|
 | [CONTEXT.md](CONTEXT.md) | Qué construimos y por qué |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Stack, paquetes, modelo de datos, IA local, hosting |
+| [TODO.md](TODO.md) | La lista de tareas pendientes, por apartado |
 | [PLAN.md](PLAN.md) | Fases, los tres bloques de tareas, guion de la demo |
 
 ## Puesta en marcha (una vez)
