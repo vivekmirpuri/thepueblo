@@ -8,8 +8,10 @@
  * It uses the normal web SDK (no admin key), so every write passes the real security rules.
  * Accounts are *.comunidad@example.com and use SEED_PASSWORD from .env.local (gitignored).
  *
- * Images are drawn here, not downloaded: a gradient in the category's colours with the
- * category's icon, uploaded to Storage like a real photo would be. No stock photos, no licences.
+ * Photos are real ones from Wikimedia Commons (scripts/seed-photos.json), chosen by hand per
+ * category, under CC BY / CC BY-SA / public domain: each activity stores its credit, and the app
+ * shows it on the image as those licences require. A category without photos falls back to a
+ * drawn image (gradient + icon) uploaded to Storage.
  * Everything is random but seeded, so each run produces the same community.
  */
 import { createElement } from "react";
@@ -23,6 +25,7 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import config from "../src/lib/firebase.config.json" with { type: "json" };
+import PHOTOS from "./seed-photos.json" with { type: "json" };
 
 const password = process.env.SEED_PASSWORD;
 if (!password) {
@@ -229,11 +232,17 @@ for (const person of PEOPLE) {
     startsAt.setHours(pick([10, 11, 17, 18, 19]), pick([0, 30]), 0, 0);
     const hours = pick([1, 2, 2, 3]);
 
-    const image = ref(storage, `events/${user.uid}/seed-${created.length}.svg`);
-    await uploadBytes(image, new TextEncoder().encode(drawImage(category, created.length)), { contentType: "image/svg+xml" });
+    const pool = PHOTOS[(extra.inclusion ?? []).includes("lgtbiq") ? "lgtbiq" : category] ?? [];
+    const photo = pool.length ? pool[created.length % pool.length] : null;
+    let imageUrl = photo?.url ?? null;
+    if (!photo) {
+      const image = ref(storage, `events/${user.uid}/seed-${created.length}.svg`);
+      await uploadBytes(image, new TextEncoder().encode(drawImage(category, created.length)), { contentType: "image/svg+xml" });
+      imageUrl = await getDownloadURL(image);
+    }
 
     const event = await addDoc(collection(db, "events"), {
-      title, description, category, imageUrl: await getDownloadURL(image), official: false,
+      title, description, category, imageUrl, imageCredit: photo?.credit ?? null, imageCreditUrl: photo?.source ?? null, official: false,
       organizerId: user.uid, organizerName: person.displayName,
       mode: online ? "online" : "in_person",
       // A little jitter so pins in the same square do not sit exactly on top of each other.

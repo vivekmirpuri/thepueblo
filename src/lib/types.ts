@@ -46,8 +46,11 @@ export interface Meetup {
   category: CategoryId;
   /** Inclusion and accessibility features the organiser offers (F17), shown as small icons. */
   inclusion: InclusionId[];
-  /** Download link of the cover image in Cloud Storage, from `uploadEventImage` in ./db. */
+  /** Link of the cover image: an upload to Cloud Storage, or a demo photo from Wikimedia Commons. */
   imageUrl: string | null;
+  /** Author and licence of a borrowed photo (shown on the image); null for people's own uploads. */
+  imageCredit?: string | null;
+  imageCreditUrl?: string | null;
   /** True only when the organiser is a verified institution (F13). */
   official: boolean;
   organizerId: string;

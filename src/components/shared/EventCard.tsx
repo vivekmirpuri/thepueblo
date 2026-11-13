@@ -10,6 +10,7 @@ import Link from "next/link";
 import { CalendarDaysIcon, GlobeIcon, MapPinIcon, UsersIcon } from "lucide-react";
 import { InclusionBadges } from "@/components/shared/InclusionBadges";
 import { LanguageFlags } from "@/components/shared/LanguageFlags";
+import { PhotoCredit } from "@/components/shared/PhotoCredit";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { onlineLabel } from "@/lib/platforms";
@@ -31,14 +32,15 @@ export function EventCard({ event, distanceKm }: { event: Meetup; distanceKm?: n
   return (
     <Link href={`/event/?id=${event.id}`} className="block rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
       <Card className="overflow-hidden py-0 transition-colors hover:bg-muted/40">
-        <div className="flex items-center justify-center bg-muted" aria-hidden>
+        <div className="relative flex items-center justify-center bg-muted">
           {event.imageUrl ? (
             // Plain <img>: the site is a static export, so next/image optimisation is off anyway.
             // eslint-disable-next-line @next/next/no-img-element
             <img src={event.imageUrl} alt="" className="h-32 w-full object-cover" loading="lazy" />
           ) : (
-            Icon && <Icon className="my-8 size-10 text-muted-foreground" />
+            Icon && <Icon className="my-8 size-10 text-muted-foreground" aria-hidden />
           )}
+          <PhotoCredit credit={event.imageCredit} />
         </div>
 
         <CardContent className="space-y-2 px-4 py-3">

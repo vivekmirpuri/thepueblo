@@ -16,6 +16,7 @@ import Link from "next/link";
 import { ArrowLeftIcon, CalendarDaysIcon, GlobeIcon, HeartIcon, InfoIcon, MapPinIcon, Undo2Icon, UndoIcon, UsersIcon, XIcon } from "lucide-react";
 import { InclusionBadges } from "@/components/shared/InclusionBadges";
 import { LanguageFlags } from "@/components/shared/LanguageFlags";
+import { PhotoCredit } from "@/components/shared/PhotoCredit";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { onlineLabel } from "@/lib/platforms";
@@ -59,6 +60,7 @@ function Card({ event, onDecide }: { event: Meetup; onDecide: (join: boolean) =>
         ) : (
           Icon && <Icon className="absolute inset-0 m-auto size-16 text-muted-foreground" aria-hidden />
         )}
+        <PhotoCredit credit={event.imageCredit} />
         <motion.span style={{ opacity: yes }} className="absolute top-5 left-5 rotate-[-12deg] rounded-lg border-4 border-green-600 bg-white/90 px-3 py-1 text-2xl font-extrabold text-green-700" aria-hidden>
           ME APUNTO
         </motion.span>

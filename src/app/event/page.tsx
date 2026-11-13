@@ -14,6 +14,7 @@ import { Suspense, useEffect, useState } from "react";
 import { CalendarDaysIcon, GlobeIcon, MapPinIcon, MessageCircleIcon, UsersIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Reviews } from "@/components/event/Reviews";
+import { PhotoCredit } from "@/components/shared/PhotoCredit";
 import { LanguageFlags } from "@/components/shared/LanguageFlags";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -92,8 +93,11 @@ function EventDetail() {
   return (
     <article className="space-y-4 p-4">
       {event.imageUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={event.imageUrl} alt="" className="h-48 w-full rounded-xl object-cover" />
+        <div className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={event.imageUrl} alt="" className="h-48 w-full rounded-xl object-cover" />
+          <PhotoCredit credit={event.imageCredit} href={event.imageCreditUrl} />
+        </div>
       )}
 
       <div className="flex flex-wrap items-center gap-2">
