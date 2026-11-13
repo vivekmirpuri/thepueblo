@@ -7,11 +7,13 @@
  * examples are real sentences, not categories, so you learn you can just write what you feel like.
  *
  * Every answer is a compact list of real activities, the same rows as "Mis grupos". xatsí never writes an activity of its own, so it
- * cannot invent one.
+ * cannot invent one. The AI text comes from a Cloudflare Worker that comments on the results the client already found.
  *
- * Presentational: it holds the text you are typing and reports it; the page does the searching.
+ * Presentational: it holds the text you are typing and reports it; the page does the searching
+ * and the streaming.
  */
-import { SearchIcon, SparklesIcon, WandSparklesIcon } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import { BotMessageSquareIcon, SearchIcon, SparklesIcon, WandSparklesIcon } from "lucide-react";
 import { useState } from "react";
 import { AiDisclaimer } from "@/components/assistant/AiDisclaimer";
 import { EventRow } from "@/components/shared/EventRow";
@@ -32,6 +34,7 @@ export function AssistantChat({
   asked,
   busy,
   canSuggest,
+  aiText,
   onAsk,
   onSuggest,
 }: {
@@ -41,10 +44,13 @@ export function AssistantChat({
   asked: string;
   busy: boolean;
   canSuggest: boolean;
+  /** The AI-generated response, accumulated token by token from the Worker. */
+  aiText: string;
   onAsk: (query: string) => void;
   onSuggest: () => void;
 }) {
   const [query, setQuery] = useState("");
+  const still = useReducedMotion();
 
   return (
     <div className="flex min-h-[70vh] flex-col gap-4 p-4">
@@ -92,18 +98,48 @@ export function AssistantChat({
             <AiDisclaimer />
           </section>
         ) : results.length === 0 ? (
-          <section className="space-y-3 py-10 text-center">
-            <h2 className="text-lg font-semibold">No he encontrado nada para «{asked}»</h2>
-            <p className="mx-auto max-w-xs text-sm text-muted-foreground">
-              Prueba con menos palabras, por ejemplo «música» o «caminar». O crea tú la actividad
-              que te gustaría que existiera.
-            </p>
+          <section className="space-y-4 py-8">
+            {aiText && (
+              <motion.div
+                initial={{ opacity: 0, y: still ? 0 : 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: still ? 0 : 0.25 }}
+                className="flex gap-2.5 rounded-2xl bg-muted/60 p-3"
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <BotMessageSquareIcon className="size-4" aria-hidden />
+                </span>
+                <p className="text-sm leading-relaxed">{aiText}</p>
+              </motion.div>
+            )}
+            <div className="text-center space-y-2">
+              <h2 className="text-lg font-semibold">No he encontrado actividades exactas para «{asked}»</h2>
+              <p className="mx-auto max-w-xs text-sm text-muted-foreground">
+                Prueba con palabras como «música», «caminar» o «familias». O crea tú la actividad
+                que te gustaría que existiera.
+              </p>
+            </div>
           </section>
         ) : (
           <section className="space-y-3">
             <h2 className="text-sm text-muted-foreground">
               Esto es lo que he encontrado para «{asked}»
             </h2>
+            {/* AI response bubble */}
+            {aiText && (
+              <motion.div
+                initial={{ opacity: 0, y: still ? 0 : 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: still ? 0 : 0.25 }}
+                className="flex gap-2.5 rounded-2xl bg-muted/60 p-3"
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <BotMessageSquareIcon className="size-4" aria-hidden />
+                </span>
+                <p className="text-sm leading-relaxed">{aiText}</p>
+              </motion.div>
+            )}
+
             <AiDisclaimer />
             <ul className="divide-y rounded-xl border">
               {results.map(({ event }) => (

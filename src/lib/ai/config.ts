@@ -17,3 +17,11 @@ export const CHAT_MODEL_LAPTOP = { id: "onnx-community/gemma-3-1b-it-ONNX-GQA", 
 
 /** Cosine similarity above which two events count as "similar" (F9). Tune with real data. */
 export const SIMILAR_THRESHOLD = 0.82;
+
+/**
+ * URL of the xatsí Cloudflare Worker. Set this after deploying with `npx wrangler deploy`
+ * inside `workers/xatsi/`. Leave empty ("") to disable AI responses and use fixed fallbacks.
+ *
+ * Example: "https://xatsi.your-subdomain.workers.dev"
+ */
+export const XATSI_WORKER_URL = "https://xatsi.xatsi.workers.dev";

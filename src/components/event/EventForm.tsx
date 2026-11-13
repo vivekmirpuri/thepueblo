@@ -1,7 +1,11 @@
 "use client";
 /**
- * The form to create an activity (F8) — Track B. Built (not a placeholder).
- * Still to come: B5, the warning about similar activities (it will call `findSimilarEvents`).
+ * The form to create an activity (F8) + similar-events check (F9) — Track B.
+ * Built (not a placeholder).
+ *
+ * When the person types a title and description, a debounced search finds activities that
+ * already exist with similar words (findSimilarEvents from src/lib/ai). If any are found, a
+ * friendly panel appears suggesting the person joins one instead of creating a duplicate.
  *
  * The place is chosen by tapping the map, because searching an address would need a geocoding
  * service we do not have. Accessibility (F17) is part of the form, not an afterthought.
@@ -12,14 +16,25 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { BotMessageSquareIcon } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import { Bubble } from "@/components/shared/Bubble";
+import { EventCard } from "@/components/shared/EventCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { CATEGORIES, type CategoryId } from "@/lib/categories";
+import { CATEGORIES, findCategory, type CategoryId } from "@/lib/categories";
 import { INCLUSION, type InclusionId } from "@/lib/inclusion";
 import { PLATFORMS, type PlatformId } from "@/lib/platforms";
+import {
+  findSimilarEvents,
+  streamXatsiChat,
+  toEventSummary,
+  toProfileSummary,
+  type ScoredEvent,
+} from "@/lib/ai";
+import type { Meetup, UserProfile } from "@/lib/types";
 import type { Point } from "@/components/map/EventMap";
 
 const PickMap = dynamic(() => import("@/components/map/EventMap").then((module) => module.EventMap), {
@@ -63,10 +78,16 @@ function Question({ title, hint, children }: { title: string; hint?: string; chi
 
 export function EventForm({
   canPublishOfficial = false,
+  events,
+  profile,
   onSubmit,
 }: {
   /** True only for a verified institution; the security rules check it again on the server. */
   canPublishOfficial?: boolean;
+  /** Upcoming events used for the similar-events check (F9). */
+  events?: Meetup[];
+  /** Profile used by xatsí to tailor similar event suggestions. */
+  profile?: UserProfile | null;
   onSubmit: (values: EventFormValues) => Promise<void>;
 }) {
   const [title, setTitle] = useState("");
@@ -89,6 +110,50 @@ export function EventForm({
     if (preview) URL.revokeObjectURL(preview);
   }, [preview]);
   const [saving, setSaving] = useState(false);
+
+  // ── F9: similar-events check & xatsí chatbot suggestion ─────────────────
+  const [similar, setSimilar] = useState<ScoredEvent[]>([]);
+  const [similarAiText, setSimilarAiText] = useState("");
+  const [loadingAi, setLoadingAi] = useState(false);
+  const still = useReducedMotion();
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (!events?.length || !title.trim()) {
+        setSimilar([]);
+        setSimilarAiText("");
+        return;
+      }
+      const text = [title, description, findCategory(category ?? "")?.label]
+        .filter(Boolean)
+        .join(" ");
+      const results = await findSimilarEvents(text, events, 3);
+      setSimilar(results);
+
+      if (results.length > 0) {
+        setSimilarAiText("");
+        setLoadingAi(true);
+        try {
+          await streamXatsiChat(
+            {
+              prompt: `Quiero crear una actividad sobre: "${title}". ${
+                description ? `Detalles: "${description}".` : ""
+              }`,
+              events: results.map(({ event }) => toEventSummary(event)),
+              profile: profile ? toProfileSummary(profile) : null,
+              mode: "similar",
+            },
+            (token) => setSimilarAiText((prev) => prev + token),
+          );
+        } finally {
+          setLoadingAi(false);
+        }
+      } else {
+        setSimilarAiText("");
+      }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [title, description, category, events, profile]);
 
   async function submit(formEvent: React.FormEvent) {
     formEvent.preventDefault();
@@ -156,6 +221,42 @@ export function EventForm({
           ))}
         </div>
       </Question>
+
+      {/* ── F9: similar events warning & xatsí suggestion ─────────────────── */}
+      {similar.length > 0 && (
+        <motion.section
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          transition={{ duration: still ? 0 : 0.3 }}
+          className="space-y-3 overflow-hidden rounded-2xl border border-primary/30 bg-primary/5 p-4"
+          aria-label="Actividades parecidas"
+        >
+          <div className="flex items-start gap-2.5">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <BotMessageSquareIcon className="size-4" aria-hidden />
+            </span>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold">xatsí te sugiere actividades parecidas</p>
+              {similarAiText ? (
+                <p className="text-sm text-foreground/90 leading-relaxed">{similarAiText}</p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {loadingAi
+                    ? "xatsí está analizando las coincidencias…"
+                    : "Ya existen actividades parecidas. ¿Quizás prefieras unirte a una de ellas para que se junte más gente?"}
+                </p>
+              )}
+            </div>
+          </div>
+          <ul className="space-y-3">
+            {similar.map(({ event }) => (
+              <li key={event.id}>
+                <EventCard event={event} />
+              </li>
+            ))}
+          </ul>
+        </motion.section>
+      )}
 
       <Question title="¿En persona o en línea?">
         <div className="grid grid-cols-2 gap-2">

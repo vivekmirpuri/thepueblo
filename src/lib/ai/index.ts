@@ -18,6 +18,35 @@ import { findCategory } from "../categories";
 import { homeName } from "../islands";
 import type { Meetup, UserProfile } from "../types";
 
+export { streamXatsiChat } from "./cloudflare";
+export type { EventSummary, ProfileSummary, XatsiMode } from "./cloudflare";
+import type { EventSummary, ProfileSummary } from "./cloudflare";
+
+/** Strips a Meetup to the lightweight shape the xatsí Worker expects. */
+export function toEventSummary(event: Meetup): EventSummary {
+  return {
+    title: event.title,
+    category: findCategory(event.category)?.label ?? event.category,
+    startsAt: event.startsAt.toDate().toLocaleDateString("es-ES", {
+      weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+    }),
+    placeName: event.placeName || "En línea",
+    island: event.island,
+    attendeeCount: event.attendeeIds.length,
+    languages: [...new Set(Object.values(event.attendeeLanguages ?? {}).flat())],
+  };
+}
+
+/** Strips a UserProfile to the lightweight shape the xatsí Worker expects. */
+export function toProfileSummary(profile: UserProfile): ProfileSummary {
+  return {
+    displayName: profile.displayName,
+    interests: profile.interests.map((id) => findCategory(id)?.label ?? id),
+    languages: [...profile.languages],
+    island: homeName(profile.island) ?? profile.island,
+  };
+}
+
 export interface ScoredEvent {
   event: Meetup;
   /** 0–1, higher is closer. */
@@ -43,12 +72,14 @@ const words = (text: string) =>
     .split(/[^\p{L}\p{N}]+/u)
     .filter((word) => word.length > 2 && !FILLER.has(word));
 
-const haystack = (event: Meetup) =>
-  plain(
-    [event.title, event.description, event.placeName, findCategory(event.category)?.label ?? ""]
+const haystack = (event: Meetup) => {
+  const cat = findCategory(event.category);
+  return plain(
+    [event.title, event.description, event.placeName, cat?.label ?? "", cat?.description ?? ""]
       .filter(Boolean)
       .join(" "),
   );
+};
 
 /** True when every meaningful word typed appears in the activity. Used by the search bar on the map. */
 export function matchesText(query: string, event: Meetup): boolean {

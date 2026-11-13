@@ -27,7 +27,7 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 ### Actividades del pueblo — eventos creados por personas
 - [x] B1 Formulario de crear actividad (lugar en el mapa, foto subida a Storage).
 - [x] B2 Detalle de la actividad: unirse / salir.
-- [ ] B5 Aviso de eventos parecidos antes de publicar (modelo local).
+- [x] B5 Aviso de eventos parecidos antes de publicar (sugerencias con xatsí).
 
 ### Actividades institucionales
 - [ ] B7 Insignia "Oficial"; las instituciones verificadas publican eventos oficiales.
@@ -63,7 +63,7 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 - [ ] C3 Worker de IA y embeddings: que xatsí reordene por significado ("moverme" → "caminata").
 - [x] C4 xatsí: búsqueda libre → tarjetas (por palabras, sin descargar nada).
 - [x] C5 xatsí: "Sugiéreme algo" según el perfil.
-- [ ] C6 Redacción con el modelo de chat (opcional).
+- [x] C6 Redacción con Cloudflare Workers AI (@cf/meta/llama-3.1-8b-instruct).
 
 ## 3. Desarrollo transversal
 

@@ -1,21 +1,31 @@
 "use client";
 /**
- * Create an activity (F8) — Track B. Built (not a placeholder).
+ * Create an activity (F8) + similar-events check (F9) — Track B. Built (not a placeholder).
  * Pattern: this page is the CONTAINER (uploads the photo, writes to Firestore and goes to the new
- * activity); <EventForm> draws the form.
+ * activity); <EventForm> draws the form and checks for similar events.
  *
  * Whoever creates an activity is counted as going to it, so the flags already show their languages.
  */
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Timestamp } from "firebase/firestore";
 import { toast } from "sonner";
 import { EventForm } from "@/components/event/EventForm";
 import { RequireUser } from "@/components/shared/RequireUser";
-import { createEvent, uploadEventImage } from "@/lib/db";
+import { createEvent, listUpcomingEvents, uploadEventImage } from "@/lib/db";
 import { shrinkImage } from "@/lib/image";
+import type { Meetup } from "@/lib/types";
 
 export default function NewEventPage() {
   const router = useRouter();
+  const [events, setEvents] = useState<Meetup[]>([]);
+
+  // Load upcoming events once so EventForm can check for similar ones (F9).
+  useEffect(() => {
+    listUpcomingEvents()
+      .then(setEvents)
+      .catch(() => setEvents([]));
+  }, []);
 
   return (
     <RequireUser>
@@ -30,6 +40,8 @@ export default function NewEventPage() {
             </header>
             <EventForm
               canPublishOfficial={profile.role === "institution" && profile.verified}
+              events={events}
+              profile={profile}
               onSubmit={async (values) => {
                 const imageUrl = values.image ? await uploadEventImage(user.uid, await shrinkImage(values.image)) : null;
                 const id = await createEvent({
