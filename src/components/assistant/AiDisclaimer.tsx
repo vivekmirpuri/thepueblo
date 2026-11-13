@@ -6,8 +6,10 @@
  * person (EU AI Act, transparency duties). So xatsí always shows a short line, and a tap opens the
  * full explanation in lectura fácil.
  *
- * Keep this text TRUE: today xatsí finds activities by matching words, on the device. When the
- * language model (C3/C6) is switched on, update "Cómo funciona" to say so.
+ * Keep this text TRUE. Today: the search runs in the browser (by words); then the question, a
+ * summary of the activities found and, if signed in, name, interests, languages and island are
+ * sent to the xatsí Worker (Cloudflare Workers AI, Llama 3.2 3B) to write a short reply
+ * (src/lib/ai/cloudflare.ts). Change this text whenever that changes.
  */
 import { InfoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,9 +25,10 @@ import {
 
 const POINTS = [
   ["Es automático, no una persona", "xatsí es un programa. Nadie lee lo que escribes ni te contesta a mano."],
-  ["Funciona en tu móvil", "Busca dentro de tu dispositivo. Lo que escribes a xatsí no se envía ni se guarda."],
-  ["Solo enseña actividades reales", "Todo lo que te propone son actividades publicadas en la app. No se inventa planes."],
-  ["Puede equivocarse", "Antes de ir, mira la fecha, el lugar y la accesibilidad en la página de la actividad."],
+  ["Qué se envía", "Para escribirte la respuesta, xatsí envía tu pregunta y un resumen de las actividades encontradas a un servicio de inteligencia artificial (Cloudflare Workers AI). Si has entrado en tu cuenta, también tu nombre, tus intereses, tus idiomas y tu isla. FlejeThePueblo no guarda tus preguntas."],
+  ["No escribas datos personales", "No pongas en tus preguntas datos de salud, documentos, direcciones ni nada que no quieras compartir."],
+  ["Las tarjetas son reales", "Las actividades que ves en tarjetas están publicadas en la app. El texto que las acompaña lo escribe una inteligencia artificial."],
+  ["Puede equivocarse", "El texto puede tener errores. Antes de ir, mira la fecha, el lugar y la accesibilidad en la página de la actividad."],
   ["No decide por ti", "Te sugiere opciones. Apuntarte o no siempre lo decides tú."],
   ["No es para urgencias", "Para emergencias llama al 112. Para salud o temas legales, habla con profesionales."],
 ] as const;
@@ -40,7 +43,7 @@ export function AiDisclaimer() {
       >
         <InfoIcon className="size-4 shrink-0" aria-hidden />
         <span>
-          xatsí es un asistente automático y puede equivocarse. <span className="underline">Saber más</span>
+          xatsí usa inteligencia artificial y puede equivocarse. <span className="underline">Saber más</span>
         </span>
       </DialogTrigger>
       <DialogContent className="max-h-[85dvh] overflow-y-auto">
@@ -58,8 +61,9 @@ export function AiDisclaimer() {
           <div>
             <dt className="font-semibold">Cómo funciona</dt>
             <dd className="text-muted-foreground">
-              Hoy compara las palabras que escribes con las de cada actividad. Más adelante usará un
-              pequeño modelo de inteligencia artificial que también funcionará en tu móvil.
+              Primero busca en tu móvil las actividades cuyas palabras coinciden con lo que escribes.
+              Después un modelo de inteligencia artificial (Llama 3.2) escribe dos o tres frases sobre
+              lo que ha encontrado. Si ese servicio no responde, verás una frase fija.
             </dd>
           </div>
         </dl>
