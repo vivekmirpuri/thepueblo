@@ -88,6 +88,9 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 - [x] B8 Iconos de inclusión en el formulario, la tarjeta y el detalle.
 - [ ] Revisión: contraste, tamaño de toque, navegación con teclado, lector de pantalla (textos alternativos).
 
+### Avatares
+- [x] 9 avatares canarios (pintadera, papas, millo, vieja, sombrero, plátano, naife, lagarto, cabra) en el alta y en el perfil; salen en el chat. Se recortan con `python3 scripts/crop-avatars.py logo/avatares.webp`.
+
 ### Pronombres
 - [x] `PersonName` hecho.
 - [x] Pronombres opcionales en el alta y en el perfil.

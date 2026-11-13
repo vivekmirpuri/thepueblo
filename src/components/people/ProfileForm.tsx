@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CATEGORIES, type CategoryId } from "@/lib/categories";
+import { AVATARS, avatarSrc } from "@/lib/avatars";
 import { PRONOUN_SUGGESTIONS } from "@/lib/inclusion";
 import { HOMES, type HomeId } from "@/lib/islands";
 import { LANGUAGES, type LanguageCode } from "@/lib/languages";
@@ -50,6 +51,7 @@ export function ProfileForm({
     displayName: initial?.displayName ?? "",
     pronouns: initial?.pronouns ?? null,
     photoURL: initial?.photoURL ?? null,
+    avatar: initial?.avatar ?? null,
     role: initial?.role ?? "user",
     bio: initial?.bio ?? "",
     interests: initial?.interests ?? [],
@@ -81,6 +83,41 @@ export function ProfileForm({
           aria-label="Tu nombre"
           autoFocus={mode === "wizard"}
         />
+      ),
+    },
+    {
+      id: "avatar",
+      title: "Elige tu avatar",
+      hint: "Es opcional. Son cosas de las islas; se verá junto a tu nombre.",
+      optional: true,
+      missing: null,
+      content: (
+        <div className="grid grid-cols-3 gap-3">
+          {AVATARS.map((avatar) => {
+            const chosen = draft.avatar === avatar.id;
+            return (
+              <button
+                key={avatar.id}
+                type="button"
+                aria-pressed={chosen}
+                onClick={() => change({ avatar: chosen ? null : avatar.id })}
+                className="group flex flex-col items-center gap-1.5 rounded-2xl p-1.5 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              >
+                <span
+                  className={`block aspect-square w-full overflow-hidden rounded-full ring-offset-2 ring-offset-background transition-shadow ${
+                    chosen ? "ring-4 ring-primary" : "ring-1 ring-border group-hover:ring-2"
+                  }`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={avatarSrc(avatar.id)} alt="" className="size-full object-cover" />
+                </span>
+                <span className={`text-center text-xs leading-tight ${chosen ? "font-semibold" : "text-muted-foreground"}`}>
+                  {avatar.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       ),
     },
     {

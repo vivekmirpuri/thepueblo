@@ -11,6 +11,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { SendHorizontalIcon } from "lucide-react";
+import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import { PersonName } from "@/components/shared/PersonName";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,7 +66,8 @@ export function ChatThread({
             return (
               <li key={message.id} className={cn("flex flex-col", mine ? "items-end" : "items-start")}>
                 {!mine && first && (
-                  <span className="px-1 pb-0.5 text-xs font-medium">
+                  <span className="flex items-center gap-1.5 px-1 pb-0.5 text-xs font-medium">
+                    <PersonAvatar name={message.name} avatar={message.avatar} className="size-6 text-[10px]" />
                     <PersonName name={message.name} pronouns={message.pronouns} />
                   </span>
                 )}

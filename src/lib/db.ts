@@ -143,13 +143,14 @@ export function watchMessages(
 
 export async function sendMessage(
   eventId: string,
-  me: Pick<UserProfile, "uid" | "displayName" | "pronouns">,
+  me: Pick<UserProfile, "uid" | "displayName" | "pronouns" | "avatar">,
   text: string,
 ): Promise<void> {
   await addDoc(collection(db, "events", eventId, "messages"), {
     uid: me.uid,
     name: me.displayName,
     pronouns: me.pronouns ?? null,
+    avatar: me.avatar ?? null,
     text,
     createdAt: serverTimestamp(),
   });

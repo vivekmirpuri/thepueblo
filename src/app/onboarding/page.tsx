@@ -25,7 +25,7 @@ export default function OnboardingPage() {
           <header className="space-y-1 px-4 pt-4">
             <h1 className="text-2xl font-semibold">Te damos la bienvenida</h1>
             <p className="text-sm text-muted-foreground">
-              Siete preguntas cortas. Puedes volver atrás cuando quieras.
+              Ocho preguntas cortas. Puedes volver atrás cuando quieras.
             </p>
           </header>
           <ProfileForm

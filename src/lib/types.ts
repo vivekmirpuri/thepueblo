@@ -6,6 +6,7 @@
  * The event type is called `Meetup` because `Event` is already a browser built-in.
  */
 import type { Timestamp } from "firebase/firestore";
+import type { AvatarId } from "./avatars";
 import type { CategoryId } from "./categories";
 import type { InclusionId } from "./inclusion";
 import type { HomeId, IslandId } from "./islands";
@@ -19,6 +20,8 @@ export interface UserProfile {
   /** Optional, free text (e.g. "ella"), asked at sign-up and shown next to the name (F18). */
   pronouns: string | null;
   photoURL: string | null;
+  /** Chosen Canarian avatar (src/lib/avatars.ts); null shows initials. */
+  avatar: AvatarId | null;
   role: "user" | "institution";
   /** Institutions only. Set by hand in the Firebase console; the rules stop users changing it. */
   verified: boolean;
@@ -76,6 +79,7 @@ export interface ChatMessage {
   name: string;
   /** Copied from the sender's profile when the message is sent. */
   pronouns: string | null;
+  avatar: AvatarId | null;
   text: string;
   createdAt: Timestamp;
 }

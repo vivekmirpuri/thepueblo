@@ -10,9 +10,9 @@ import { signOut } from "firebase/auth";
 import { BadgeCheckIcon, LogOutIcon, MapPinIcon, PencilIcon } from "lucide-react";
 import { toast } from "sonner";
 import { ProfileForm } from "@/components/people/ProfileForm";
+import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import { PersonName } from "@/components/shared/PersonName";
 import { RequireUser } from "@/components/shared/RequireUser";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/lib/auth";
@@ -24,9 +24,6 @@ import { LANGUAGES } from "@/lib/languages";
 import { AVAILABILITY, PREFERS } from "@/lib/profile";
 import type { UserProfile } from "@/lib/types";
 
-const initials = (name: string) =>
-  name.trim().split(/\s+/).slice(0, 2).map((word) => word[0]?.toUpperCase() ?? "").join("") || "?";
-
 function ProfileView({ profile, onEdit }: { profile: UserProfile; onEdit: () => void }) {
   const router = useRouter();
   const island = homeName(profile.island);
@@ -35,9 +32,7 @@ function ProfileView({ profile, onEdit }: { profile: UserProfile; onEdit: () => 
   return (
     <div className="space-y-6 p-4">
       <header className="flex items-center gap-4">
-        <Avatar className="size-16">
-          <AvatarFallback className="text-lg">{initials(profile.displayName)}</AvatarFallback>
-        </Avatar>
+        <PersonAvatar name={profile.displayName} avatar={profile.avatar} className="size-20 text-xl" />
         <div className="min-w-0 space-y-1">
           <h1 className="truncate text-xl font-semibold">
             <PersonName name={profile.displayName} pronouns={profile.pronouns} />

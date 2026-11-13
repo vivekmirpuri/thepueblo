@@ -116,7 +116,7 @@ function Chat({ eventId, uid, profile }: { eventId: string; uid: string; profile
           myUid={uid}
           onSend={async (text) => {
             try {
-              await sendMessage(eventId, { uid, displayName: profile.displayName, pronouns: profile.pronouns }, text);
+              await sendMessage(eventId, { uid, displayName: profile.displayName, pronouns: profile.pronouns, avatar: profile.avatar ?? null }, text);
             } catch {
               toast.error("No se ha podido enviar. Inténtalo otra vez.");
               throw new Error("send failed");

@@ -131,6 +131,7 @@ Los archivos "compartidos" los usan todos los bloques: cámbialos con commits pe
 users/{uid}
   displayName, photoURL
   pronouns: string | null        // opcional, texto libre ("ella", "elle"…)
+  avatar: string | null          // avatar canario elegido (src/lib/avatars.ts); null = iniciales
   role: "user" | "institution"
   verified: boolean              // solo instituciones; se marca a mano en la consola
   bio: string

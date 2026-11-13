@@ -203,6 +203,7 @@ async function enter(person) {
   }
 }
 
+const AVATAR_IDS = ["pintadera", "papas", "millo", "vieja", "sombrero", "platano", "naife", "lagarto", "cabra"];
 const day = 24 * 60 * 60 * 1000;
 const created = []; // { id, owner, past, capacity, attendees: Set<index> }
 const uids = [];
@@ -212,6 +213,7 @@ for (const person of PEOPLE) {
   uids[person.index] = user.uid;
   await setDoc(doc(db, "users", user.uid), {
     displayName: person.displayName, pronouns: person.pronouns, photoURL: null, role: "user",
+    avatar: AVATAR_IDS[person.index % AVATAR_IDS.length],
     bio: person.bio, interests: person.interests, languages: person.languages, island: person.island,
     prefers: pick(["in_person", "both", "both"]), availability: person.availability, createdAt: serverTimestamp(),
   }, { merge: true });
@@ -277,7 +279,7 @@ for (const person of PEOPLE) {
     const lines = busiest.includes(activity) ? Math.floor(random() * 3) + (random() < 0.8 ? 1 : 0) : 0;
     for (let line = 0; line < lines; line += 1) {
       await addDoc(collection(db, "events", activity.id, "messages"), {
-        uid: user.uid, name: person.displayName, pronouns: person.pronouns, text: pick(CHAT), createdAt: serverTimestamp(),
+        uid: user.uid, name: person.displayName, pronouns: person.pronouns, avatar: AVATAR_IDS[person.index % AVATAR_IDS.length], text: pick(CHAT), createdAt: serverTimestamp(),
       });
       messages += 1;
     }
