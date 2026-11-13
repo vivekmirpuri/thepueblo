@@ -293,6 +293,7 @@ h2 { font-size: clamp(32px, 4.6vw, 60px); }
 .tbl td:first-child { font-weight: 700; white-space: nowrap; }
 .tl { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .tl .card { border-top: 4px solid var(--primary); }
+.tl .grow { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: var(--brand-text); }
 .tl .when { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brand-text); }
 .kpi { list-style: none; padding: 0; display: grid; gap: 6px; font-size: 15px; }
 .kpi li::before { content: "→ "; color: var(--brand-text); font-weight: 700; }
@@ -656,22 +657,20 @@ h2 { font-size: clamp(32px, 4.6vw, 60px); }
       <h2>Qué cuesta <span class="accent">y cuándo.</span></h2>
     </div>
     <table class="tbl">
-      <thead><tr><th>Concepto</th><th>Primer año (estimación)</th><th>Nota</th></tr></thead>
+      <thead><tr><th>Concepto</th><th>Al mes (aprox.)</th><th>Cómo crece</th></tr></thead>
       <tbody>
-        <tr><td>Web, base de datos y fotos</td><td>0–600 €</td><td>Firebase: capa gratuita al principio; unos 25–50 € al mes con miles de personas activas.</td></tr>
-        <tr><td>IA de xatsí</td><td>0–240 €</td><td>Cloudflare Workers AI: capa gratuita diaria; pago por uso al crecer.</td></tr>
-        <tr><td>Mapa y dominio</td><td>15 €</td><td>OpenFreeMap es gratuito; solo el dominio propio.</td></tr>
-        <tr><td>Dinamización y moderación</td><td>12.000 €</td><td>Media jornada: acompañar a la comunidad y a las instituciones. Es el coste principal.</td></tr>
-        <tr><td>Accesibilidad y traducción</td><td>2.000 €</td><td>Revisión con personas usuarias, lectura fácil y lengua de signos.</td></tr>
+        <tr><td>Tecnología: web, datos, fotos, IA y mapa</td><td>Casi 0 € al empezar</td><td>Capas gratuitas; con miles de personas, unas decenas de euros.</td></tr>
+        <tr><td>Dinamización y moderación</td><td>Unos 1.000 €</td><td>Media jornada. Es el coste principal y el que más importa.</td></tr>
+        <tr><td>Accesibilidad y traducción</td><td>Unos 150 €</td><td>Revisiones con personas usuarias, lectura fácil y lengua de signos.</td></tr>
       </tbody>
     </table>
     <div class="tl">
-      <div class="card"><span class="when">Hackathon</span><b>MVP publicado</b><span class="small muted">Mapa, actividades, chat, reseñas, xatsí, inclusión.</span></div>
-      <div class="card"><span class="when">Meses 1–3</span><b>Piloto</b><span class="small muted">Tenerife y Gran Canaria con asociaciones y un ayuntamiento. Moderación y reportes.</span></div>
-      <div class="card"><span class="when">Meses 4–6</span><b>Todas las islas</b><span class="small muted">Conecta ahora, intercambio de saberes, app instalable.</span></div>
-      <div class="card"><span class="when">Meses 7–12</span><b>Convenios y medición</b><span class="small muted">Cabildos, encuesta de impacto y preparación para otras regiones.</span></div>
+      <div class="card"><span class="when">Hackathon</span><b>MVP publicado</b><span class="grow">Primeras pruebas</span><span class="small muted">Mapa, actividades, chat, reseñas, xatsí, inclusión.</span></div>
+      <div class="card"><span class="when">Meses 1–3</span><b>Piloto</b><span class="grow">≈ 300 personas</span><span class="small muted">Tenerife y Gran Canaria con asociaciones y un ayuntamiento.</span></div>
+      <div class="card"><span class="when">Meses 4–6</span><b>Todas las islas</b><span class="grow">≈ 1.500 personas</span><span class="small muted">Conecta ahora, intercambio de saberes, app instalable.</span></div>
+      <div class="card"><span class="when">Meses 7–12</span><b>Convenios y medición</b><span class="grow">≈ 5.000 personas</span><span class="small muted">Cabildos, encuesta de impacto y otras regiones.</span></div>
     </div>
-    <p class="src">Importes orientativos, sin IVA, para unas 5.000 personas activas. Se ajustarán con el piloto.</p>
+    <p class="src">Cifras orientativas, sin IVA. El coste técnico sube poco aunque crezca mucho la gente; se ajustará con el piloto.</p>
   </div>
   <span class="num">13</span>
 </section>
