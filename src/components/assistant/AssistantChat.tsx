@@ -1,76 +1,91 @@
 "use client";
 /**
- * xatsí, the assistant (F16) — Track C. Built (not a placeholder).
+ * xatsí, the assistant chatbot (F16) — Track C. Built (not a placeholder).
  *
- * Three states, and the empty one matters most: a screen with a bare text box tells you nothing,
- * so when there is nothing to show xatsí says what it can do and offers examples you can tap. The
- * examples are real sentences, not categories, so you learn you can just write what you feel like.
+ * A conversation like a messaging app: your messages on the right, xatsí's on the left. xatsí
+ * answers normal questions too, and when it suggests activities they appear under its message as
+ * the same compact rows as "Mis grupos" — real activities only, it cannot invent one.
  *
- * Every answer is a compact list of real activities, the same rows as "Mis grupos". xatsí never writes an activity of its own, so it
- * cannot invent one. The AI text comes from a Cloudflare Worker that comments on the results the client already found.
+ * The empty state matters most: a bare text box tells you nothing, so before the first message
+ * xatsí says what it can do and offers example questions you can tap.
  *
- * Presentational: it holds the text you are typing and reports it; the page does the searching
- * and the streaming.
+ * Presentational: it holds the text you are typing; the page keeps the conversation and streams.
  */
-import { motion, useReducedMotion } from "motion/react";
-import { BotMessageSquareIcon, SearchIcon, SparklesIcon, WandSparklesIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { MessageCirclePlusIcon, SendHorizontalIcon, SparklesIcon, WandSparklesIcon } from "lucide-react";
 import { AiDisclaimer } from "@/components/assistant/AiDisclaimer";
 import { EventRow } from "@/components/shared/EventRow";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { ScoredEvent } from "@/lib/ai";
+import { cn } from "@/lib/utils";
+import type { Meetup } from "@/lib/types";
+
+export interface ChatEntry {
+  role: "user" | "assistant";
+  text: string;
+  /** Activities xatsí suggested with this message. */
+  events?: Meetup[];
+}
 
 const EXAMPLES = [
+  "¿Cómo funciona FlejeThePueblo?",
+  "Acabo de llegar a Tenerife, ¿qué me recomiendas?",
   "Algo al aire libre este fin de semana",
-  "Para practicar español",
-  "Un plan con niños",
-  "Algo en línea esta semana",
+  "Planes en inglés para conocer gente",
 ];
 
+function XatsiMark() {
+  return (
+    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary" aria-hidden>
+      <SparklesIcon className="size-4" />
+    </span>
+  );
+}
+
 export function AssistantChat({
-  results,
-  asked,
+  entries,
   busy,
   canSuggest,
-  aiText,
   onAsk,
   onSuggest,
+  onReset,
 }: {
-  /** null until the first question is asked. */
-  results: ScoredEvent[] | null;
-  /** What was asked, shown back so you can see what xatsí answered. */
-  asked: string;
+  entries: ChatEntry[];
   busy: boolean;
   canSuggest: boolean;
-  /** The AI-generated response, accumulated token by token from the Worker. */
-  aiText: string;
-  onAsk: (query: string) => void;
+  onAsk: (question: string) => void;
   onSuggest: () => void;
+  onReset: () => void;
 }) {
-  const [query, setQuery] = useState("");
-  const still = useReducedMotion();
+  const [text, setText] = useState("");
+  const end = useRef<HTMLDivElement>(null);
+  const last = entries[entries.length - 1];
+
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: "end" });
+  }, [entries.length, last?.text, last?.events]);
+
+  function send(event: React.FormEvent) {
+    event.preventDefault();
+    const question = text.trim();
+    if (!question || busy) return;
+    onAsk(question);
+    setText("");
+  }
 
   return (
     <div className="flex min-h-[70vh] flex-col gap-4 p-4">
       <div className="flex-1">
-        {busy ? (
-          <div className="space-y-3" aria-busy="true">
-            <span className="sr-only">Buscando…</span>
-            <Skeleton className="h-44 w-full" />
-            <Skeleton className="h-44 w-full" />
-          </div>
-        ) : results === null ? (
-          <section className="flex flex-col items-center gap-4 py-10 text-center">
+        {entries.length === 0 ? (
+          <section className="flex flex-col items-center gap-4 py-8 text-center">
             <span className="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary">
               <SparklesIcon className="size-8" aria-hidden />
             </span>
             <div className="space-y-2">
               <h1 className="text-2xl font-semibold">Habla con xatsí</h1>
               <p className="mx-auto max-w-xs text-sm text-muted-foreground">
-                Dile qué te apetece hacer y te busca actividades cerca de ti. Escríbelo como lo
-                dirías en voz alta.
+                Pregúntale lo que quieras sobre la app o las islas, o dile qué te apetece hacer y te
+                propone actividades reales.
               </p>
             </div>
 
@@ -82,7 +97,7 @@ export function AssistantChat({
                     className="h-auto min-h-11 w-full justify-start rounded-xl px-3 py-2.5 text-left whitespace-normal"
                     onClick={() => onAsk(example)}
                   >
-                    <SearchIcon className="shrink-0 text-muted-foreground" aria-hidden />
+                    <SparklesIcon className="shrink-0 text-muted-foreground" aria-hidden />
                     {example}
                   </Button>
                 </li>
@@ -97,75 +112,63 @@ export function AssistantChat({
 
             <AiDisclaimer />
           </section>
-        ) : results.length === 0 ? (
-          <section className="space-y-4 py-8">
-            {aiText && (
-              <motion.div
-                initial={{ opacity: 0, y: still ? 0 : 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: still ? 0 : 0.25 }}
-                className="flex gap-2.5 rounded-2xl bg-muted/60 p-3"
-              >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <BotMessageSquareIcon className="size-4" aria-hidden />
-                </span>
-                <p className="text-sm leading-relaxed">{aiText}</p>
-              </motion.div>
-            )}
-            <div className="text-center space-y-2">
-              <h2 className="text-lg font-semibold">No he encontrado actividades exactas para «{asked}»</h2>
-              <p className="mx-auto max-w-xs text-sm text-muted-foreground">
-                Prueba con palabras como «música», «caminar» o «familias». O crea tú la actividad
-                que te gustaría que existiera.
-              </p>
-            </div>
-          </section>
         ) : (
-          <section className="space-y-3">
-            <h2 className="text-sm text-muted-foreground">
-              Esto es lo que he encontrado para «{asked}»
-            </h2>
-            {/* AI response bubble */}
-            {aiText && (
-              <motion.div
-                initial={{ opacity: 0, y: still ? 0 : 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: still ? 0 : 0.25 }}
-                className="flex gap-2.5 rounded-2xl bg-muted/60 p-3"
-              >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <BotMessageSquareIcon className="size-4" aria-hidden />
-                </span>
-                <p className="text-sm leading-relaxed">{aiText}</p>
-              </motion.div>
-            )}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between gap-2">
+              <AiDisclaimer />
+              <Button variant="ghost" size="sm" className="h-11 shrink-0" onClick={onReset} disabled={busy}>
+                <MessageCirclePlusIcon aria-hidden /> Nueva
+              </Button>
+            </div>
 
-            <AiDisclaimer />
-            <ul className="divide-y rounded-xl border">
-              {results.map(({ event }) => (
-                <EventRow key={event.id} event={event} href={`/event/?id=${event.id}`} showFlags />
-              ))}
-            </ul>
+            <ol className="space-y-4" aria-label="Conversación con xatsí" aria-live="polite">
+              {entries.map((entry, index) =>
+                entry.role === "user" ? (
+                  <li key={index} className="flex justify-end">
+                    <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 text-sm whitespace-pre-line break-words text-primary-foreground">
+                      {entry.text}
+                    </p>
+                  </li>
+                ) : (
+                  <li key={index} className="space-y-2">
+                    <div className="flex gap-2">
+                      <XatsiMark />
+                      <p
+                        className={cn(
+                          "max-w-[85%] rounded-2xl rounded-bl-sm bg-muted px-3 py-2 text-sm leading-relaxed whitespace-pre-line break-words",
+                          !entry.text && "text-muted-foreground",
+                        )}
+                      >
+                        {entry.text || "xatsí está escribiendo…"}
+                      </p>
+                    </div>
+                    {entry.events && entry.events.length > 0 && (
+                      <ul className="ml-10 divide-y rounded-xl border" aria-label="Actividades que propone xatsí">
+                        {entry.events.map((event) => (
+                          <EventRow key={event.id} event={event} href={`/event/?id=${event.id}`} showFlags />
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ),
+              )}
+            </ol>
           </section>
         )}
+        <div ref={end} />
       </div>
 
-      <form
-        className="sticky bottom-20 flex gap-2 bg-background pt-2"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (query.trim()) onAsk(query.trim());
-        }}
-      >
+      <form onSubmit={send} className="sticky bottom-20 flex gap-2 bg-background pt-2">
         <Input
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="¿Qué te apetece hacer?"
-          aria-label="Pregúntale a xatsí"
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          placeholder="Escribe a xatsí"
+          aria-label="Mensaje para xatsí"
+          maxLength={1000}
           className="h-11"
         />
-        <Button type="submit" size="lg" disabled={busy || !query.trim()} aria-label="Buscar">
-          <SearchIcon aria-hidden />
+        <Button type="submit" size="lg" className="h-11" disabled={busy || !text.trim()} aria-label="Enviar">
+          <SendHorizontalIcon aria-hidden />
         </Button>
       </form>
     </div>

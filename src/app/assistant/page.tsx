@@ -1,25 +1,25 @@
 "use client";
 /**
- * xatsí, the assistant: free-text search, "Sugiéreme algo" and AI responses (F16) — Track C.
- * Built (not a placeholder).
+ * xatsí, the assistant chatbot (F16) — Track C. Built (not a placeholder).
  *
- * Pattern: this page is the CONTAINER. It loads the upcoming activities once, asks "@/lib/ai"
- * to rank them, then streams a short AI response from the xatsí Cloudflare Worker.
- * <AssistantChat> only draws. This page never imports a model.
+ * Pattern: this page is the CONTAINER. It keeps the conversation, loads the upcoming activities
+ * once, builds the catalogue for each question ("@/lib/ai") and streams xatsí's reply from the
+ * Worker. <AssistantChat> only draws. This page never imports a model.
  *
- * Open to everyone: you do not need an account to search, only for "Sugiéreme algo".
+ * Open to everyone: you do not need an account to chat; with one, xatsí also knows your
+ * interests, languages and island (never your name).
  */
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { AssistantChat } from "@/components/assistant/AssistantChat";
+import { AssistantChat, type ChatEntry } from "@/components/assistant/AssistantChat";
 import {
-  recommendEvents,
-  searchEvents,
-  streamXatsiChat,
+  buildCatalog,
+  keywordMatches,
+  parseRefs,
+  streamXatsiConversation,
+  toCatalogItem,
+  toChatProfile,
   toEventSummary,
-  toProfileSummary,
-  type ScoredEvent,
-  type XatsiMode,
 } from "@/lib/ai";
 import { useUser } from "@/lib/auth";
 import { listUpcomingEvents } from "@/lib/db";
@@ -28,10 +28,8 @@ import type { Meetup } from "@/lib/types";
 export default function AssistantPage() {
   const { profile } = useUser();
   const [events, setEvents] = useState<Meetup[] | null>(null);
-  const [results, setResults] = useState<ScoredEvent[] | null>(null);
-  const [asked, setAsked] = useState("");
+  const [entries, setEntries] = useState<ChatEntry[]>([]);
   const [busy, setBusy] = useState(false);
-  const [aiText, setAiText] = useState("");
 
   useEffect(() => {
     listUpcomingEvents()
@@ -42,47 +40,47 @@ export default function AssistantPage() {
       });
   }, []);
 
-  async function answer(
-    question: string,
-    mode: XatsiMode,
-    find: (all: Meetup[]) => Promise<ScoredEvent[]>,
-  ) {
-    setAsked(question);
+  async function ask(question: string) {
+    if (busy) return;
+    const history = [...entries, { role: "user" as const, text: question }];
+    setEntries([...history, { role: "assistant", text: "" }]);
     setBusy(true);
-    setAiText("");
-    try {
-      const all = events ?? (await listUpcomingEvents());
-      const found = await find(all);
-      setResults(found);
-      setBusy(false);
 
-      // Stream an AI comment about the results (gracefully falls back to a fixed sentence).
-      const toSend = found.length > 0 ? found : all.slice(0, 4).map((event) => ({ event, score: 0 }));
-      await streamXatsiChat(
-        {
-          prompt: question,
-          events: toSend.map(({ event }) => toEventSummary(event)),
-          profile: profile ? toProfileSummary(profile) : null,
-          mode,
-        },
-        (token) => setAiText((prev) => prev + token),
-      );
-    } catch {
-      setBusy(false);
-    }
+    const all = events ?? (await listUpcomingEvents().catch(() => []));
+    // The last two questions, so a follow-up like "¿y en Lanzarote?" keeps its topic.
+    const query = history.filter((entry) => entry.role === "user").slice(-2).map((entry) => entry.text).join(" ");
+    const catalog = buildCatalog(query, profile, all);
+    const updateReply = (patch: Partial<ChatEntry>) =>
+      setEntries((list) => [...list.slice(0, -1), { ...list[list.length - 1], ...patch }]);
+
+    let raw = "";
+    await streamXatsiConversation(
+      {
+        messages: history.map((entry) => ({ role: entry.role, content: entry.text })),
+        catalog: catalog.map((event, index) => toCatalogItem(event, index + 1)),
+        profile: profile ? toChatProfile(profile) : null,
+        events: catalog.slice(0, 6).map(toEventSummary),
+      },
+      (token) => {
+        raw += token;
+        updateReply({ text: parseRefs(raw, catalog).clean });
+      },
+    );
+
+    const { clean, picked } = parseRefs(raw, catalog);
+    // An older Worker (or a reply that cites nothing) still gets cards when the words matched.
+    updateReply({ text: clean, events: picked.length ? picked : keywordMatches(query, all) });
+    setBusy(false);
   }
 
   return (
     <AssistantChat
-      results={results}
-      asked={asked}
+      entries={entries}
       busy={busy}
-      aiText={aiText}
       canSuggest={!!profile}
-      onAsk={(query) => answer(query, "search", (all) => searchEvents(query, all))}
-      onSuggest={() =>
-        profile && answer("lo que te puede gustar", "suggest", (all) => recommendEvents(profile, all))
-      }
+      onAsk={ask}
+      onSuggest={() => ask("Sugiéreme algo que encaje conmigo")}
+      onReset={() => setEntries([])}
     />
   );
 }

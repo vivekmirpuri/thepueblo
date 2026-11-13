@@ -38,39 +38,39 @@ const FALLBACK: Record<XatsiMode, string> = {
 
 // ── SSE stream parser ────────────────────────────────────────────────────────
 
-/**
- * Calls the xatsí Worker and yields tokens as they arrive.
- *
- * @param onToken Called once per token with the new text fragment.
- * @returns The full accumulated response, or a fallback if the Worker failed.
- */
-export async function streamXatsiChat(
-  params: {
-    prompt: string;
-    events: EventSummary[];
-    profile: ProfileSummary | null;
-    mode: XatsiMode;
-  },
-  onToken: (token: string) => void,
-): Promise<string> {
-  if (!XATSI_WORKER_URL) {
-    const fb = FALLBACK[params.mode];
-    onToken(fb);
-    return fb;
-  }
+/** A chat turn sent to the Worker (text only). */
+export interface ChatTurn {
+  role: "user" | "assistant";
+  content: string;
+}
+
+/** One activity in the catalogue xatsí may cite, by its number, as [[ref]]. */
+export interface CatalogItem {
+  ref: number;
+  title: string;
+  category: string;
+  when: string;
+  where: string;
+  people: string;
+  languages: string[];
+  inclusion: string[];
+}
+
+/** POSTs to the Worker and passes each streamed token to `onToken`; returns the whole text, or `fallback`. */
+async function streamFromWorker(body: unknown, fallback: string, onToken: (token: string) => void): Promise<string> {
+  const fail = () => {
+    onToken(fallback);
+    return fallback;
+  };
+  if (!XATSI_WORKER_URL) return fail();
 
   try {
     const response = await fetch(`${XATSI_WORKER_URL}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(params),
+      body: JSON.stringify(body),
     });
-
-    if (!response.ok || !response.body) {
-      const fb = FALLBACK[params.mode];
-      onToken(fb);
-      return fb;
-    }
+    if (!response.ok || !response.body) return fail();
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
@@ -90,7 +90,7 @@ export async function streamXatsiChat(
         if (!trimmed.startsWith("data: ")) continue;
 
         const data = trimmed.slice(6);
-        if (data === "[DONE]") return full;
+        if (data === "[DONE]") return full || fail();
 
         try {
           const parsed = JSON.parse(data) as {
@@ -108,10 +108,48 @@ export async function streamXatsiChat(
       }
     }
 
-    return full || FALLBACK[params.mode];
+    return full || fail();
   } catch {
-    const fb = FALLBACK[params.mode];
-    onToken(fb);
-    return fb;
+    return fail();
   }
+}
+
+/**
+ * Calls the xatsí Worker and yields tokens as they arrive (one-shot comment on found events).
+ *
+ * @param onToken Called once per token with the new text fragment.
+ * @returns The full accumulated response, or a fallback if the Worker failed.
+ */
+export function streamXatsiChat(
+  params: {
+    prompt: string;
+    events: EventSummary[];
+    profile: ProfileSummary | null;
+    mode: XatsiMode;
+  },
+  onToken: (token: string) => void,
+): Promise<string> {
+  return streamFromWorker(params, FALLBACK[params.mode], onToken);
+}
+
+/**
+ * xatsí as a chatbot: sends the conversation, a catalogue of real activities it may cite as
+ * [[ref]], and the profile WITHOUT the person's name. The legacy `prompt`/`events` fields go too,
+ * so an older deployed Worker (which ignores `messages`) still answers in its one-shot style.
+ */
+export function streamXatsiConversation(
+  params: {
+    messages: ChatTurn[];
+    catalog: CatalogItem[];
+    profile: Omit<ProfileSummary, "displayName"> & { prefers?: string } | null;
+    events: EventSummary[];
+  },
+  onToken: (token: string) => void,
+): Promise<string> {
+  const prompt = [...params.messages].reverse().find((turn) => turn.role === "user")?.content ?? "";
+  return streamFromWorker(
+    { ...params, prompt, mode: "search", profile: params.profile && { displayName: "", ...params.profile } },
+    "Ahora mismo no puedo responder. Mira las actividades de abajo o inténtalo en un momento.",
+    onToken,
+  );
 }

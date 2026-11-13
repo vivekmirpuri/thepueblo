@@ -6,10 +6,11 @@
  * person (EU AI Act, transparency duties). So xatsí always shows a short line, and a tap opens the
  * full explanation in lectura fácil.
  *
- * Keep this text TRUE. Today: the search runs in the browser (by words); then the question, a
- * summary of the activities found and, if signed in, name, interests, languages and island are
- * sent to the xatsí Worker (Cloudflare Workers AI, Llama 3.2 3B) to write a short reply
- * (src/lib/ai/cloudflare.ts). Change this text whenever that changes.
+ * Keep this text TRUE. Today: activities are ranked in the browser (by words); then the last
+ * turns of the conversation, a numbered list of real activities and, if signed in, interests,
+ * languages and island (never the name) go to the xatsí Worker (Cloudflare Workers AI, Llama 3.2
+ * 3B), which replies and cites activities from that list (src/lib/ai/cloudflare.ts). Change this
+ * text whenever that changes.
  */
 import { InfoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,7 @@ import {
 
 const POINTS = [
   ["Es automático, no una persona", "xatsí es un programa. Nadie lee lo que escribes ni te contesta a mano."],
-  ["Qué se envía", "Para escribirte la respuesta, xatsí envía tu pregunta y un resumen de las actividades encontradas a un servicio de inteligencia artificial (Cloudflare Workers AI). Si has entrado en tu cuenta, también tu nombre, tus intereses, tus idiomas y tu isla. FlejeThePueblo no guarda tus preguntas."],
+  ["Qué se envía", "Para responderte, xatsí envía tus últimos mensajes de esta conversación y una lista de actividades de la app a un servicio de inteligencia artificial (Cloudflare Workers AI). Si has entrado en tu cuenta, también tus intereses, tus idiomas y tu isla. Tu nombre no se envía. FlejeThePueblo no guarda la conversación: al salir de la pantalla se borra."],
   ["No escribas datos personales", "No pongas en tus preguntas datos de salud, documentos, direcciones ni nada que no quieras compartir."],
   ["Las tarjetas son reales", "Las actividades que ves en tarjetas están publicadas en la app. El texto que las acompaña lo escribe una inteligencia artificial."],
   ["Puede equivocarse", "El texto puede tener errores. Antes de ir, mira la fecha, el lugar y la accesibilidad en la página de la actividad."],
@@ -61,9 +62,10 @@ export function AiDisclaimer() {
           <div>
             <dt className="font-semibold">Cómo funciona</dt>
             <dd className="text-muted-foreground">
-              Primero busca en tu móvil las actividades cuyas palabras coinciden con lo que escribes.
-              Después un modelo de inteligencia artificial (Llama 3.2) escribe dos o tres frases sobre
-              lo que ha encontrado. Si ese servicio no responde, verás una frase fija.
+              Primero tu móvil elige entre las actividades de la app las que más se parecen a lo que
+              escribes. Después un modelo de inteligencia artificial (Llama 3.2) te responde y, si
+              quieres planes, escoge actividades de esa lista. Si ese servicio no responde, verás un
+              aviso y las actividades que coinciden con tus palabras.
             </dd>
           </div>
         </dl>
