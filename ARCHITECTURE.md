@@ -1,225 +1,225 @@
-# The Pueblo — architecture
+# The Pueblo — arquitectura
 
-What we are building: [CONTEXT.md](CONTEXT.md). Who builds what: [PLAN.md](PLAN.md).
+Qué construimos: [CONTEXT.md](CONTEXT.md). Tareas y orden: [PLAN.md](PLAN.md).
 
-## Overview
+## Visión general
 
 ```
- Browser (phone / tablet / laptop)
+ Navegador (móvil / tableta / portátil)
  ┌───────────────────────────────────────────────────────────┐
- │ Next.js static app (React)                                │
- │  ├─ UI: shadcn/ui + Tailwind                              │
- │  ├─ Map: MapLibre + OpenFreeMap tiles                     │
- │  └─ Local AI (Web Worker): Transformers.js                │
- │       ├─ embedding model  → similar events, search        │
- │       └─ small chat model → assistant wording (optional)  │
+ │ App estática de Next.js (React)                           │
+ │  ├─ Interfaz: shadcn/ui + Tailwind                        │
+ │  ├─ Mapa: MapLibre + teselas de OpenFreeMap               │
+ │  └─ IA local (Web Worker): Transformers.js                │
+ │       ├─ modelo de embeddings → eventos parecidos, búsqueda│
+ │       └─ modelo de chat pequeño → redacción (opcional)    │
  └──────────────┬────────────────────────────────────────────┘
-                │ Firebase web SDK (no server of our own)
+                │ SDK web de Firebase (sin servidor propio)
  ┌──────────────▼────────────────────────────────────────────┐
- │ Firebase project thepueblo-6f94e (pay-as-you-go plan)     │
- │  Auth (email + password) · Firestore (data + chat)        │
- │  Storage (event images)                                   │
- │  Hosting (static files, CDN)                              │
+ │ Proyecto Firebase thepueblo-6f94e (plan de pago por uso)  │
+ │  Auth (correo + contraseña) · Firestore (datos + chat)    │
+ │  Storage (imágenes de eventos)                            │
+ │  Hosting (archivos estáticos, CDN)                        │
  └───────────────────────────────────────────────────────────┘
 ```
 
-There is **no backend code**. The app is static files; all data access goes from the browser to Firestore and is guarded by security rules. The AI runs on the user's device.
+**No hay código de servidor.** La app son archivos estáticos; todo acceso a datos va del navegador a Firestore y lo protegen las reglas de seguridad. La IA se ejecuta en el dispositivo del usuario.
 
-## Stack and packages
+## Stack y paquetes
 
-Versions checked on npm on 2026-11-12. All support React 19.
+Versiones comprobadas en npm el 12-11-2026. Todas son compatibles con React 19.
 
-| Need | Choice | Why |
+| Necesidad | Elección | Por qué |
 |---|---|---|
-| Framework | **Next.js 16** (already installed), static export | Already deployed; free hosting |
-| Styling | **Tailwind 4** (already installed) | — |
-| UI components | **[shadcn/ui](https://ui.shadcn.com/docs/components)**, preset `base-nova` (built on **Base UI**) | The current shadcn default. Components are copied into `src/components/ui/`, so we own the code and the look stays minimal. Installed: button, input, textarea, label, field, card, badge, dialog, sheet, drawer, tabs, avatar, select, toggle, toggle-group, separator, skeleton, sonner. Add more with `npx shadcn@latest add <name>` |
-| Icons | **lucide-react** | Comes with shadcn |
-| Animation | **motion** (`import { motion } from "motion/react"`) | The standard React animation library (formerly Framer Motion). Use it for small touches only: list items appearing, sheet and card transitions |
-| Toasts | **sonner** | Via the shadcn `sonner` component |
-| Mobile bottom sheet | shadcn **drawer** | Gives the "app" feel for event previews on phones |
-| Font | **Geist** via `next/font` | Already wired in `layout.tsx` |
-| Map | **maplibre-gl** + **react-map-gl** (`react-map-gl/maplibre`) | Open source, smooth on phones |
-| Map tiles | **OpenFreeMap** — style `https://tiles.openfreemap.org/styles/liberty` | Free, no API key, no signup |
-| Auth, database, chat, images | **firebase** (already installed) | Firestore `onSnapshot` gives realtime chat with no extra library; Cloud Storage holds event images |
-| Local AI | **@huggingface/transformers** (Transformers.js 4) | One library for both the embedding model and the chat model; WebGPU when available, WASM otherwise |
-| Forms | shadcn `field` + plain React state | Our forms are small; add react-hook-form + zod only if one grows |
-| Dates | `Intl.DateTimeFormat` | Built into the browser |
-| Flags | Emoji flags from a language → flag table | No package. *Limit: Windows shows letters instead of flags; swap to `flag-icons` if that matters for the demo* |
+| Framework | **Next.js 16** (instalado), exportación estática | Ya desplegado; hosting gratuito |
+| Estilos | **Tailwind 4** (instalado) | — |
+| Componentes de interfaz | **[shadcn/ui](https://ui.shadcn.com/docs/components)**, preset `base-nova` (sobre **Base UI**) | Es el valor por defecto actual de shadcn. Los componentes se copian en `src/components/ui/`, así que el código es nuestro y el aspecto sigue siendo minimalista. Instalados: button, input, textarea, label, field, card, badge, dialog, sheet, drawer, tabs, avatar, select, toggle, toggle-group, separator, skeleton, sonner. Añade más con `npx shadcn@latest add <nombre>` |
+| Iconos | **lucide-react** | Viene con shadcn |
+| Animación | **motion** (`import { motion } from "motion/react"`) | La librería de animación estándar de React (antes Framer Motion). Solo para toques pequeños: elementos de lista que aparecen, transiciones de paneles y tarjetas |
+| Avisos (toasts) | **sonner** | A través del componente `sonner` de shadcn |
+| Panel inferior en móvil | **drawer** de shadcn | Da la sensación de "app" al previsualizar eventos en el móvil |
+| Tipografía | **Geist** con `next/font` | Ya conectada en `layout.tsx` |
+| Mapa | **maplibre-gl** + **react-map-gl** (`react-map-gl/maplibre`) | Código abierto, fluido en móviles |
+| Teselas del mapa | **OpenFreeMap** — estilo `https://tiles.openfreemap.org/styles/liberty` | Gratis, sin clave de API ni registro |
+| Auth, base de datos, chat, imágenes | **firebase** (instalado) | `onSnapshot` de Firestore da chat en tiempo real sin otra librería; Cloud Storage guarda las imágenes de los eventos |
+| IA local | **@huggingface/transformers** (Transformers.js 4) | Una sola librería para el modelo de embeddings y el de chat; usa WebGPU si existe y WASM si no |
+| Formularios | `field` de shadcn + estado de React | Los formularios son pequeños; añade react-hook-form + zod solo si alguno crece |
+| Fechas | `Intl.DateTimeFormat` | Viene con el navegador |
+| Banderas | Emojis de bandera desde una tabla idioma → bandera | Sin paquete. *Límite: Windows muestra letras en vez de banderas; cambia a `flag-icons` si eso importa en la demo* |
 
-**Look and feel rules**
-- Build screens from `src/components/ui/` first; write a new component only when none fits.
-- Colours come from the theme tokens in `globals.css` (`bg-background`, `text-muted-foreground`, `border`, `bg-primary`…). No hex colours in components.
-- One accent colour, generous white space, rounded cards, at most two text sizes per screen.
-- Base UI is not Radix: there is no `asChild`; compose with the `render` prop.
-- For a showpiece element (landing hero, empty states) you may copy a single component from **Magic UI**, **Aceternity UI** or **React Bits** — they are copy-paste like shadcn. Do not install another full UI kit (MUI, Chakra, Mantine, HeroUI): two kits never look like one app.
+**Reglas de aspecto**
+- Construye las pantallas primero con `src/components/ui/`; escribe un componente nuevo solo cuando ninguno encaje.
+- Los colores salen de los tokens del tema en `globals.css` (`bg-background`, `text-muted-foreground`, `border`, `bg-primary`…). Nada de colores hexadecimales en los componentes.
+- Un solo color de acento, mucho espacio en blanco, tarjetas redondeadas, como mucho dos tamaños de texto por pantalla.
+- Base UI no es Radix: no existe `asChild`; se compone con la prop `render`.
+- Para un elemento de lucimiento (portada, estados vacíos) puedes copiar un único componente de **Magic UI**, **Aceternity UI** o **React Bits**, que también se copian y pegan como shadcn. No instales otro kit de interfaz completo (MUI, Chakra, Mantine, HeroUI): dos kits nunca parecen una sola app.
 
-Deliberately **not** used: a state library (React state + Firestore listeners are enough), a chat UI kit, a geo-query library.
+Se evita **a propósito**: una librería de estado (bastan el estado de React y los listeners de Firestore), un kit de interfaz de chat, una librería de consultas geográficas.
 
-## Code pattern: containers and presentational components
+## Patrón de código: contenedores y componentes de presentación
 
-- **Pages are containers.** A file in `src/app/**/page.tsx` loads data (through `src/lib/db.ts`), holds the state, and passes plain props down.
-- **Components are presentational.** Files in `src/components/` receive props and draw. They never call Firestore.
-- **`src/lib/` is the only place that talks to Firebase or to the model.**
+- **Las páginas son contenedores.** Un archivo `src/app/**/page.tsx` carga los datos (a través de `src/lib/db.ts`), guarda el estado y pasa props simples hacia abajo.
+- **Los componentes son de presentación.** Los archivos de `src/components/` reciben props y pintan. Nunca llaman a Firestore.
+- **`src/lib/` es el único sitio que habla con Firebase o con el modelo.**
 
-Every placeholder file starts with a comment that says what it is, which track and feature it belongs to, and how to build it with the libraries above.
+Cada archivo provisional (marcado PLACEHOLDER) empieza con un comentario que dice qué es, a qué bloque y funcionalidad pertenece y cómo construirlo con las librerías de arriba. Esos comentarios están en inglés, como el resto del código.
 
-## Rules that come from the static export
+## Reglas que impone la exportación estática
 
-- No API routes, no server actions, no `cookies()` / `headers()`.
-- **No dynamic route segments** (`/event/[id]` cannot be exported for IDs unknown at build time). Use a query parameter: `/event/?id=abc`, read with `useSearchParams()` inside a `<Suspense>`.
-- Anything touching Firebase, the map, location or the AI is a `"use client"` component. Load the map and the AI lazily (`next/dynamic` with `ssr: false`, or `import()` inside an effect) — they need `window`.
-- This is Next.js 16: read `node_modules/next/dist/docs/` before using an API from memory (see [AGENTS.md](AGENTS.md)).
+- Sin rutas de API, sin server actions, sin `cookies()` / `headers()`.
+- **Sin segmentos de ruta dinámicos** (`/event/[id]` no se puede exportar para identificadores desconocidos al compilar). Usa un parámetro de consulta: `/event/?id=abc`, leído con `useSearchParams()` dentro de un `<Suspense>`.
+- Todo lo que toque Firebase, el mapa, la ubicación o la IA es un componente `"use client"`. Carga el mapa y la IA de forma diferida (`next/dynamic` con `ssr: false`, o `import()` dentro de un efecto): necesitan `window`.
+- Esto es Next.js 16: lee `node_modules/next/dist/docs/` antes de usar una API de memoria (ver [AGENTS.md](AGENTS.md)).
 
-## Routes and folders
+## Rutas y carpetas
 
-| Route | Screen | Track |
+| Ruta | Pantalla | Bloque |
 |---|---|---|
-| `/` | Map + category chips + event list | A |
-| `/event/?id=` | Event detail: join, flags, reviews | B |
-| `/event/new/` | Create event (+ similar-event suggestions) | B |
-| `/chats/` and `/chats/?event=` | My group chats / one chat | B |
-| `/onboarding/` | Interests, languages, island, questions | C |
-| `/profile/` | My profile | C |
-| `/people/` | People like you | C |
+| `/` | Mapa + botones de categoría + lista de eventos | A |
+| `/event/?id=` | Detalle del evento: unirse, banderas, reseñas | B |
+| `/event/new/` | Crear evento (+ sugerencias de eventos parecidos) | B |
+| `/chats/` y `/chats/?event=` | Mis chats de grupo / un chat | B |
+| `/onboarding/` | Intereses, idiomas, isla, preguntas | C |
+| `/profile/` | Mi perfil | C |
+| `/people/` | Gente como tú | C |
 | `/assistant/` | Chatbot | C |
-| `/login/` | Sign in | Foundation |
+| `/login/` | Acceso | Base |
 
 ```
 src/
-  app/                    one folder per route above
+  app/                    una carpeta por ruta de la tabla
   components/
-    ui/                   shadcn components        (shared — add via PR to develop)
-    shared/               AppShell, BottomNav, LanguageFlags (built) · EventCard, Placeholder  (shared)
-    map/  discover/       Track A
-    event/  chat/         Track B
-    people/  assistant/   Track C
+    ui/                   componentes de shadcn            (compartido)
+    shared/               AppShell, BottomNav, LanguageFlags (hechos) · EventCard, Placeholder  (compartido)
+    map/  discover/       Bloque A
+    event/  chat/         Bloque B
+    people/  assistant/   Bloque C
   lib/
-    firebase.ts           Firebase app, auth, db, storage       (shared, built)
-    firebase.config.json  public web config, also read by scripts
-    types.ts              UserProfile, Meetup, ChatMessage, Review  (shared, built)
-    db.ts                 Firestore + Storage helpers           (shared; join/leave/upload built, rest todo)
-    auth.tsx              AuthProvider + useUser()              (shared, placeholder)
-    categories.ts  languages.ts  islands.ts  geo.ts             (shared, built)
-    todo.ts               marks functions that are not built yet
-    ai/                   Track C  (config.ts built; index.ts is the contract, returns nothing yet)
-scripts/rules-check.mjs   tests the deployed security rules (built)
-scripts/seed.mjs          fake people and events for the demo (placeholder)
-firestore.rules           database security rules, deployed BY HAND (see Hosting)
-storage.rules             image upload rules, deployed BY HAND
+    firebase.ts           app de Firebase, auth, db, storage    (compartido, hecho)
+    firebase.config.json  configuración web pública, la leen también los scripts
+    types.ts              UserProfile, Meetup, ChatMessage, Review  (compartido, hecho)
+    db.ts                 funciones de Firestore y Storage      (compartido; unirse/salir/subir hechas, resto pendiente)
+    auth.tsx              AuthProvider + useUser()              (compartido, provisional)
+    categories.ts  languages.ts  islands.ts  geo.ts             (compartido, hechos)
+    todo.ts               marca las funciones que aún no existen
+    ai/                   Bloque C  (config.ts hecho; index.ts es el contrato y aún no devuelve nada)
+scripts/rules-check.mjs   prueba las reglas de seguridad desplegadas (hecho)
+scripts/seed.mjs          personas y eventos falsos para la demo (provisional)
+firestore.rules           reglas de seguridad de la base de datos, se despliegan A MANO (ver Hosting)
+storage.rules             reglas de subida de imágenes, se despliegan A MANO
 ```
 
-"Shared" files are built once in the foundation phase and afterwards change only through small, announced PRs.
+Los archivos "compartidos" los usan todos los bloques: cámbialos con PR pequeños y avisa antes.
 
-## Data model (Firestore)
+## Modelo de datos (Firestore)
 
 ```
 users/{uid}
   displayName, photoURL
   role: "user" | "institution"
-  verified: boolean              // institutions only; set by hand in the console
+  verified: boolean              // solo instituciones; se marca a mano en la consola
   bio: string
-  interests: string[]            // category ids
-  languages: string[]            // ISO 639-1 codes: "es", "en", "ar", "wo"…
-  island: string                 // never an exact location
+  interests: string[]            // ids de categoría
+  languages: string[]            // códigos ISO 639-1: "es", "en", "ar", "wo"…
+  island: string                 // nunca una ubicación exacta
   prefers: "in_person" | "online" | "both"
   availability: string[]         // "weekday_evenings", "weekends"…
   createdAt
 
-events/{eventId}                 // type `Meetup` in code (`Event` is a browser built-in)
+events/{eventId}                 // tipo `Meetup` en el código (`Event` ya existe en el navegador)
   title, description
   category: string
-  imageUrl: string | null        // download link of the cover image in Cloud Storage
-  official: boolean              // true only if the organiser is a verified institution
+  imageUrl: string | null        // enlace de descarga de la portada en Cloud Storage
+  official: boolean              // true solo si quien organiza es una institución verificada
   organizerId, organizerName
   mode: "in_person" | "online"
-  location: { lat, lng } | null  // null for online
+  location: { lat, lng } | null  // null si es en línea
   placeName, island
   onlineUrl: string | null
-  startsAt, endsAt               // endsAt is required (default: start + 2 h)
+  startsAt, endsAt               // endsAt es obligatorio (por defecto: inicio + 2 h)
   capacity: number | null
   attendeeIds: string[]
-  attendeeLanguages: { uid: ["es", "en"] } // drives the flags; counted in the browser
-  ratingSum, ratingCount         // average = sum / count
-  embedding: number[] | null     // 384 numbers from the embedding model
+  attendeeLanguages: { uid: ["es", "en"] } // alimenta las banderas; se cuenta en el navegador
+  ratingSum, ratingCount         // media = suma / número
+  embedding: number[] | null     // 384 números del modelo de embeddings
   createdAt
 
-events/{eventId}/messages/{messageId}     // group chat
+events/{eventId}/messages/{messageId}     // chat de grupo
   uid, name, text, createdAt
 
-events/{eventId}/reviews/{uid}            // one review per attendee
+events/{eventId}/reviews/{uid}            // una reseña por asistente
   rating: 1..5, text, name, createdAt
 ```
 
-Join and leave are **one atomic update** each (`arrayUnion` / `arrayRemove` plus one map key), so no transaction is needed and there are no counters to drift. A review updates the review document and the rating totals together, so that one uses a transaction.
+Unirse y salir son **una sola actualización atómica** cada una (`arrayUnion` / `arrayRemove` más una clave del mapa), así que no hace falta transacción ni hay contadores que se desajusten. Una reseña actualiza a la vez el documento de la reseña y los totales de valoración, así que esa sí usa una transacción.
 
-**Queries.** The home screen loads every event that has not ended (`endsAt >= now`, ordered by `endsAt`) once and filters, sorts and measures distance in the browser. "My chats" is `where("attendeeIds", "array-contains", uid)`.
-*Shortcut: fine up to a few hundred events (each carries ~4 KB of embedding). Beyond that, add geohash queries with `geofire-common` and move embeddings out of the event document.*
+**Consultas.** La pantalla de inicio carga una vez todos los eventos que no han terminado (`endsAt >= ahora`, ordenados por `endsAt`) y filtra, ordena y calcula distancias en el navegador. "Mis chats" es `where("attendeeIds", "array-contains", uid)`.
+*Atajo: vale para unos cientos de eventos (cada uno lleva ~4 KB de embedding). Más allá, añade consultas por geohash con `geofire-common` y saca los embeddings del documento del evento.*
 
-## Security rules (outline)
+## Reglas de seguridad (resumen)
 
-Live in `firestore.rules`, deployed, and covered by `node scripts/rules-check.mjs` (14 checks).
+Están en `firestore.rules`, desplegadas y cubiertas por `node scripts/rules-check.mjs`.
 
-- **users**: any signed-in user can read; you can write only your own document; you cannot set `verified` yourself.
-- **events**: anyone can read. Signed-in users can create with `organizerId == their uid`; `official: true` is allowed only when the creator's user document has `verified == true`. Only the organiser can edit or delete. Any signed-in user may update **only** `attendeeIds` and `attendeeLanguages` (to join or leave), only by adding or removing themselves, and never past `capacity`.
-- **messages**: read and create only if your uid is in the event's `attendeeIds`; you can delete your own.
-- **reviews**: anyone can read; create only as yourself, only if you are an attendee.
-- **Storage** (`storage.rules`): event images live at `events/{uid}/{file}`. Anyone can read; you can write only inside your own folder, images only, under 5 MB.
+- **users**: cualquier usuario con sesión puede leer; solo puedes escribir tu propio documento; no puedes marcarte `verified`.
+- **events**: lectura pública. Con sesión puedes crear con `organizerId == tu uid`; `official: true` solo se permite si tu documento de usuario tiene `verified == true`. Solo quien organiza edita o borra. Cualquier usuario con sesión puede actualizar **solo** `attendeeIds` y `attendeeLanguages` (para unirse o salir), solo añadiéndose o quitándose a sí mismo y nunca por encima de `capacity`.
+- **messages**: leer y crear solo si tu uid está en `attendeeIds` del evento; puedes borrar los tuyos.
+- **reviews**: lectura pública; crear solo en tu nombre y solo si eres asistente.
+- **Storage** (`storage.rules`): las imágenes de eventos van en `events/{uid}/{archivo}`. Lectura pública; solo puedes escribir en tu propia carpeta, solo imágenes y de menos de 5 MB.
 
-## Local AI
+## IA local
 
-Everything lives in `src/lib/ai/` and runs in one Web Worker so the interface never freezes. Models are downloaded on first use and then cached by the browser.
+Todo vive en `src/lib/ai/` y se ejecuta en un único Web Worker para que la interfaz nunca se congele. Los modelos se descargan la primera vez y luego el navegador los guarda en caché.
 
-| Job | Model | Download | Runs on |
+| Tarea | Modelo | Descarga | Funciona en |
 |---|---|---|---|
-| Embeddings | `Xenova/multilingual-e5-small` (quantized, 384 dims, ~100 languages) | 118 MB | Any device (WASM) |
-| Chat, default | `onnx-community/LFM2-350M-ONNX` (`q4f16`) | 255 MB | Devices with WebGPU |
-| Chat, demo laptop | `onnx-community/gemma-3-1b-it-ONNX-GQA` (`q4f16`) | 763 MB | Laptop with WebGPU |
+| Embeddings | `Xenova/multilingual-e5-small` (cuantizado, 384 dims, ~100 idiomas) | 118 MB | Cualquier dispositivo (WASM) |
+| Chat, por defecto | `onnx-community/LFM2-350M-ONNX` (`q4f16`) | 255 MB | Dispositivos con WebGPU |
+| Chat, portátil de la demo | `onnx-community/gemma-3-1b-it-ONNX-GQA` (`q4f16`) | 763 MB | Portátil con WebGPU |
 
-The chat model is one constant in `src/lib/ai/config.ts`; alternatives of similar size are `onnx-community/gemma-3-270m-it-ONNX` (273 MB) and `onnx-community/Qwen3-0.6B-ONNX` (570 MB).
+El modelo de chat es una constante en `src/lib/ai/config.ts`; alternativas de tamaño parecido: `onnx-community/gemma-3-270m-it-ONNX` (273 MB) y `onnx-community/Qwen3-0.6B-ONNX` (570 MB).
 
-**How each feature uses it**
+**Cómo lo usa cada funcionalidad**
 
-- **Similar-event check (F9).** Show an instant guess first (same category, same day, within 5 km — no model, no download), then, once the model has loaded: embed `title + description`, compare by cosine similarity with the `embedding` of every loaded upcoming event, show the top 3 above a threshold. The embedding is saved on the new event when it is posted.
-- **Assistant (F16).** Retrieval first, wording second:
-  1. Build the query — the user's text, or a sentence made from their profile for "Suggest for me".
-  2. Embed it and take the closest events (pre-filtered by island, date, languages).
-  3. Show those events as cards. **This step alone answers the question.**
-  4. If the device can run the chat model, it writes two or three friendly sentences about those events in the user's language. If it can't (no WebGPU, low memory, still downloading), a fixed sentence is shown instead.
+- **Aviso de eventos parecidos (F9).** Primero una sugerencia instantánea (misma categoría, mismo día, a menos de 5 km: sin modelo ni descarga). Cuando el modelo ha cargado: calcula el embedding de `título + descripción`, compáralo por similitud de coseno con el `embedding` de cada evento próximo cargado y muestra los 3 mejores por encima de un umbral. El embedding se guarda en el evento nuevo al publicarlo.
+- **Asistente (F16).** Primero buscar, después redactar:
+  1. Construir la consulta: el texto del usuario o, para "Sugiéreme algo", una frase hecha a partir de su perfil.
+  2. Calcular su embedding y tomar los eventos más cercanos (prefiltrados por isla, fecha e idiomas).
+  3. Mostrar esos eventos como tarjetas. **Este paso por sí solo ya responde.**
+  4. Si el dispositivo puede ejecutar el modelo de chat, este escribe dos o tres frases amables sobre esos eventos en el idioma del usuario. Si no puede (sin WebGPU, poca memoria, aún descargando), se muestra una frase fija.
 
-  The cards always come from real data, so a small model that words things badly can never invent an event.
-- **People like you (F15).** No model: score = shared interests + shared languages (+ same island), sorted. Add bio embeddings later only if the simple score feels weak.
+  Las tarjetas siempre salen de datos reales, así que un modelo pequeño que redacte mal nunca puede inventarse un evento.
+- **Gente como tú (F15).** Sin modelo: puntuación = intereses en común + idiomas en común (+ misma isla), ordenada. Añade embeddings de la bio más adelante solo si la puntuación simple se queda corta.
 
-Note for e5 models: prefix texts with `query: ` (searches) or `passage: ` (stored events) before embedding.
+Nota para los modelos e5: antepón `query: ` (búsquedas) o `passage: ` (eventos guardados) al texto antes de calcular el embedding.
 
-**Not yet verified:** Transformers.js 4 bundling under Next 16 + Turbopack, and the real speed and answer quality of the chat models on a phone. This is the first thing to try in the foundation phase; the design above still works if the chat model is dropped entirely.
+**Sin verificar todavía:** que Transformers.js 4 se empaquete bien con Next 16 + Turbopack, y la velocidad y calidad reales de los modelos de chat en un móvil. Es lo primero que hay que probar en la fase base; el diseño de arriba sigue funcionando aunque se quite del todo el modelo de chat.
 
-## Map and location
+## Mapa y ubicación
 
-- Initial view fits the archipelago: bounds `[[-18.3, 27.5], [-13.2, 29.5]]`.
-- One marker per in-person event, coloured by category; tapping opens a small card linking to the event.
-- Online events have no pin; they appear in the list with an "Online" badge.
-- Device location comes from the browser Geolocation API and stays in memory. If permission is refused, distance is measured from the centre of the user's island.
-- Picking a place when creating an event = tapping the map. No address search (would need a geocoding service).
+- La vista inicial encuadra el archipiélago: límites `[[-18.3, 27.5], [-13.2, 29.5]]`.
+- Un marcador por evento presencial, con color según la categoría; al pulsarlo se abre una tarjeta pequeña con enlace al evento.
+- Los eventos en línea no tienen pin; aparecen en la lista con la insignia "En línea".
+- La ubicación del dispositivo viene de la API de geolocalización del navegador y solo se guarda en memoria. Si se deniega el permiso, la distancia se mide desde el centro de la isla del usuario.
+- Elegir el lugar al crear un evento = pulsar en el mapa. Sin búsqueda de direcciones (necesitaría un servicio de geocodificación).
 
-## Hosting, branches and deploys
+## Hosting, ramas y despliegues
 
-| Branch | Purpose | Deploys to |
+| Rama | Para qué | Se despliega en |
 |---|---|---|
-| `main` | What the judges see. Only receives merges from `develop`. | **Live** — https://thepueblo-6f94e.web.app |
-| `develop` | Integration. Everyone's work meets here. Default branch. | **Staging** — https://thepueblo-6f94e--develop-1ttzfnbg.web.app |
-| `<name>/<feature>` | One person, one feature. | A temporary preview URL per pull request |
+| `main` | Lo que ve el jurado. Solo recibe fusiones desde `develop`. | **Producción** — https://thepueblo-6f94e.web.app |
+| `develop` | Integración: aquí se junta el trabajo de todos. Rama por defecto. | **Pruebas** — https://thepueblo-6f94e--develop-1ttzfnbg.web.app |
+| `<nombre>/<funcionalidad>` | Una persona, una funcionalidad. | Una URL de vista previa temporal por pull request |
 
-One workflow, [.github/workflows/deploy.yml](.github/workflows/deploy.yml), runs lint + build and then deploys. Both `main` and `develop` require a pull request with a green build. The service-account key is the GitHub secret `FIREBASE_SERVICE_ACCOUNT`; it is never in the repo. Delete that key in the Firebase console after the hackathon.
+Un único workflow, [.github/workflows/deploy.yml](.github/workflows/deploy.yml), ejecuta lint + build y luego despliega. `main` y `develop` exigen un pull request con la compilación en verde. La clave de la cuenta de servicio es el secreto de GitHub `FIREBASE_SERVICE_ACCOUNT`; nunca está en el repositorio. Bórrala en la consola de Firebase después del hackathon.
 
-**Images.** The create-event form uploads the file with `uploadEventImage(uid, file)` (`src/lib/db.ts`), which stores it at `events/{uid}/…` and returns a download link; that link is saved on the event as `imageUrl`. Storage needs the pay-as-you-go (Blaze) plan and a bucket created once in the console.
+**Imágenes.** El formulario de crear evento sube el archivo con `uploadEventImage(uid, file)` (`src/lib/db.ts`), que lo guarda en `events/{uid}/…` y devuelve un enlace de descarga; ese enlace se guarda en el evento como `imageUrl`. Storage necesita el plan de pago por uso (Blaze) y crear el bucket una vez en la consola.
 
-**Security rules are not deployed by CI.** Live, staging and previews all share one database, so a rules change reaches everyone at once. The project owner deploys by hand and checks:
+**El CI no despliega las reglas de seguridad.** Producción, pruebas y vistas previas comparten una misma base de datos, así que un cambio de reglas llega a todos a la vez. La persona responsable del proyecto las despliega a mano y comprueba:
 
 ```bash
 firebase deploy --only firestore,storage && node scripts/rules-check.mjs
 ```
 
-New rules can take a few minutes to become active everywhere; if the check fails right after a deploy, wait and run it again.
+Las reglas nuevas pueden tardar unos minutos en estar activas en todas partes; si la comprobación falla justo después de desplegar, espera y vuelve a ejecutarla.
 
-Firestore: the `(default)` database is in **`europe-southwest1` (Madrid)**, the closest region to the islands.
+Firestore: la base de datos `(default)` está en **`europe-southwest1` (Madrid)**, la región más cercana a las islas.

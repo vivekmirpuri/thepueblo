@@ -1,114 +1,114 @@
-# The Pueblo — implementation plan
+# The Pueblo — plan de implementación
 
-Product: [CONTEXT.md](CONTEXT.md) (feature IDs F1–F16). Design: [ARCHITECTURE.md](ARCHITECTURE.md).
+Producto: [CONTEXT.md](CONTEXT.md) (funcionalidades F1–F16). Diseño: [ARCHITECTURE.md](ARCHITECTURE.md).
 
-## Phase 0 — Foundation
+## Fase 0 — Base
 
-Everything three people would otherwise fight over is laid down once.
+Todo lo que de otro modo pisaríamos entre varias personas se prepara una sola vez.
 
-**Done**
-- [x] Firestore database created (Madrid), email + password sign-in enabled.
-- [x] `firestore.rules` deployed and tested (`node scripts/rules-check.mjs`, 14 checks).
-- [x] shadcn/ui, `motion`, `maplibre-gl`, `react-map-gl`, `@huggingface/transformers` installed.
-- [x] `src/lib/`: `types.ts`, `categories.ts`, `languages.ts`, `islands.ts`, `geo.ts`, `firebase.ts`; `joinEvent` / `leaveEvent` / `uploadEventImage` in `db.ts`.
+**Hecho**
+- [x] Base de datos Firestore creada (Madrid) y acceso con correo y contraseña activado.
+- [x] `firestore.rules` desplegado y probado (`node scripts/rules-check.mjs`).
+- [x] shadcn/ui, `motion`, `maplibre-gl`, `react-map-gl` y `@huggingface/transformers` instalados.
+- [x] `src/lib/`: `types.ts`, `categories.ts`, `languages.ts`, `islands.ts`, `geo.ts`, `firebase.ts`; `joinEvent` / `leaveEvent` / `uploadEventImage` en `db.ts`.
 - [x] `AppShell`, `BottomNav`, `LanguageFlags`.
-- [x] A placeholder page for every route and a placeholder component for every track, each with a header comment that says what to build.
+- [x] Una página provisional por ruta y un componente provisional por bloque, cada uno con un comentario inicial que dice qué construir.
 
-**Project owner, in the Firebase console (needed for image uploads)**
-- [ ] Upgrade the project to the **Blaze** (pay-as-you-go) plan and set a small budget alert.
-- [ ] Storage → **Get started** → pick the bucket region (it cannot be changed later).
-- [ ] Then: `firebase deploy --only storage && node scripts/rules-check.mjs`.
+**Responsable del proyecto, en la consola de Firebase (necesario para subir imágenes)**
+- [ ] Pasar el proyecto al plan **Blaze** (pago por uso) y poner una alerta de presupuesto pequeña.
+- [ ] Storage → **Comenzar** → elegir la región del bucket (no se puede cambiar después).
+- [ ] Después: `firebase deploy --only storage && node scripts/rules-check.mjs`.
 
-**Still to do before the tracks split (one person)**
-- [ ] **AI spike first** (30 min, biggest unknown): load Transformers.js in a Web Worker under Next 16, embed one sentence. If the chat model won't run, keep embeddings only.
-- [ ] `src/lib/auth.tsx` (real `AuthProvider` / `useUser`) and `/login/`.
-- [ ] The read functions in `src/lib/db.ts` that every track needs: `listUpcomingEvents`, `getEvent`, `getProfile`, `saveProfile`.
-- [ ] `EventCard` (all three tracks use it).
-- [ ] `scripts/seed.mjs`, once the data model has settled.
-- [ ] Optional, in the Firebase console: Google sign-in; add preview domains to Authentication → Settings → Authorized domains if sign-in fails on a preview URL.
+**Pendiente antes de repartir los bloques (una persona)**
+- [ ] **Prueba de IA primero** (30 min, la mayor incógnita): cargar Transformers.js en un Web Worker con Next 16 y calcular el embedding de una frase. Si el modelo de chat no funciona, quedarse solo con los embeddings.
+- [ ] `src/lib/auth.tsx` (`AuthProvider` / `useUser` de verdad) y `/login/`.
+- [ ] Las funciones de lectura de `src/lib/db.ts` que necesitan todos los bloques: `listUpcomingEvents`, `getEvent`, `getProfile`, `saveProfile`.
+- [ ] `EventCard` (lo usan los tres bloques).
+- [ ] `scripts/seed.mjs`, cuando el modelo de datos esté estable.
+- [ ] Opcional, en la consola de Firebase: acceso con Google; añadir los dominios de vista previa en Authentication → Settings → Authorized domains si el acceso falla en una URL de vista previa.
 
-**Contracts between tracks** (agree once, then don't change without telling the others)
+**Contratos entre bloques** (se acuerdan una vez; no se cambian sin avisar)
 
 ```ts
-// src/lib/ai — owned by Track C, used by Track B (create event) and Track A (search)
+// src/lib/ai — del Bloque C, lo usan el Bloque B (crear evento) y el Bloque A (búsqueda)
 findSimilarEvents(text: string, events: Meetup[], limit?: number): Promise<ScoredEvent[]>
 searchEvents(query: string, events: Meetup[], limit?: number): Promise<ScoredEvent[]>
 recommendEvents(profile: UserProfile, events: Meetup[], limit?: number): Promise<ScoredEvent[]>
 
-// src/components/shared — used by everyone
+// src/components/shared — los usan todos
 <EventCard event={event} distanceKm={number | undefined} />
 <LanguageFlags languages={event.attendeeLanguages} />
 
 // src/lib/db.ts
 listUpcomingEvents(): Promise<Meetup[]>
-joinEvent(eventId, me) / leaveEvent(eventId, uid)   // built
+joinEvent(eventId, me) / leaveEvent(eventId, uid)   // hechas
 ```
 
-## Phase 1 — Three tracks in parallel
+## Fase 1 — Tres bloques en paralelo
 
-Each track owns its folders (see ARCHITECTURE → Routes and folders) and never edits another track's.
+Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rutas y carpetas), para que se puedan hacer a la vez sin conflictos.
 
-### Track A — Discover (`team/member-1.md`)
-| # | Task | Feature |
+### Bloque A — Descubrir
+| # | Tarea | Funcionalidad |
 |---|---|---|
-| A1 | Canary Islands map with event pins, tap → mini card | F4 |
-| A2 | Category chip bar filtering map and list | F5 |
-| A3 | Event list under the map using `EventCard` | F7 |
-| A4 | Ask for location; sort by nearby / soonest / most joined | F6 |
-| A5 | Filters: official, online, "speaks my languages" | F6, F13 |
+| A1 | Mapa de las Islas Canarias con pines de eventos; al pulsar, mini tarjeta | F4 |
+| A2 | Fila de botones de categoría que filtra mapa y lista | F5 |
+| A3 | Lista de eventos bajo el mapa con `EventCard` | F7 |
+| A4 | Pedir ubicación; ordenar por cercanía / fecha / más gente | F6 |
+| A5 | Filtros: oficiales, en línea, "hablan mis idiomas" | F6, F13 |
 
-### Track B — Events and chat (`team/member-2.md`)
-| # | Task | Feature |
+### Bloque B — Eventos y chat
+| # | Tarea | Funcionalidad |
 |---|---|---|
-| B1 | Create-event form, place picked by tapping the map | F8 |
-| B2 | Event detail page: info, join / leave | F10 |
-| B3 | Language flags on detail and cards (`LanguageFlags` is built) | F11 |
-| B4 | Group chat per event + "my chats" list | F14 |
-| B5 | Show similar events in the form (calls `findSimilarEvents`) | F9 |
-| B6 | Reviews: stars + comment, average on the event | F12 |
-| B7 | Official badge; institutions publish official events | F13 |
+| B1 | Formulario de crear evento, con el lugar elegido pulsando en el mapa y subida de portada | F8 |
+| B2 | Página de detalle: información, unirse / salir | F10 |
+| B3 | Banderas de idiomas en el detalle y en las tarjetas (`LanguageFlags` ya existe) | F11 |
+| B4 | Chat de grupo por evento + lista "mis chats" | F14 |
+| B5 | Mostrar eventos parecidos en el formulario (llama a `findSimilarEvents`) | F9 |
+| B6 | Reseñas: estrellas + comentario, media en el evento | F12 |
+| B7 | Insignia oficial; las instituciones publican eventos oficiales | F13 |
 
-### Track C — People and AI (`team/member-3.md`)
-| # | Task | Feature |
+### Bloque C — Personas e IA
+| # | Tarea | Funcionalidad |
 |---|---|---|
-| C1 | Onboarding: interests, languages, island, questions, institution toggle | F2, F3 |
-| C2 | Profile page (view and edit) | F2 |
-| C3 | AI worker: embedding model, `embed`, `findSimilarEvents` | F9 |
-| C4 | Assistant: free search → event cards | F16 |
-| C5 | Assistant: "Suggest for me" from the profile | F16 |
-| C6 | Chat model wording on capable devices, fixed sentence otherwise | F16 |
-| C7 | People like you | F15 |
+| C1 | Alta: intereses, idiomas, isla, preguntas, opción de institución | F2, F3 |
+| C2 | Página de perfil (ver y editar) | F2 |
+| C3 | Worker de IA: modelo de embeddings, `embed`, `findSimilarEvents` | F9 |
+| C4 | Asistente: búsqueda libre → tarjetas de eventos | F16 |
+| C5 | Asistente: "Sugiéreme algo" a partir del perfil | F16 |
+| C6 | Redacción con el modelo de chat en dispositivos capaces; frase fija en el resto | F16 |
+| C7 | Gente como tú | F15 |
 
-**Order inside each track is priority order.** A1–A3, B1–B4 and C1–C4 are the demo; the rest is depth.
+**El orden dentro de cada bloque es el de prioridad.** A1–A3, B1–B4 y C1–C4 son la demo; el resto es profundidad.
 
-## Phase 2 — Integrate and rehearse
+## Fase 2 — Integrar y ensayar
 
-- [ ] Merge everything to `develop`, test on staging on a real phone and a laptop.
-- [ ] Run the seed script; create two test accounts with different languages.
-- [ ] Open the assistant once on the demo laptop beforehand so the models are already cached.
-- [ ] PR `develop` → `main`.
-- [ ] Rehearse the demo below twice.
+- [ ] Fusionar todo en `develop` y probar en el entorno de pruebas con un móvil real y un portátil.
+- [ ] Ejecutar el script de datos de ejemplo; crear dos cuentas de prueba con idiomas distintos.
+- [ ] Abrir el asistente una vez en el portátil de la demo antes de empezar, para que los modelos ya estén en caché.
+- [ ] PR de `develop` → `main`.
+- [ ] Ensayar dos veces la demo de abajo.
 
-## Demo script (≈3 minutes)
+## Guion de la demo (≈3 minutos)
 
-1. Sign in → onboarding: pick interests and languages.
-2. Map of the islands → tap the **Language exchange** chip → pins filter.
-3. Sort by **nearby**.
-4. Create an event → the app says "there's a similar one 2 km away" → open it instead.
-5. Join → the flags row gains your languages.
-6. Second device joins the same event → messages appear live in the group chat.
-7. Assistant: "something outdoors this weekend, in English" → cards + a short answer, with the laptop offline to prove it is local.
-8. An institution's official event with its badge.
-9. People like you.
+1. Acceder → alta: elegir intereses e idiomas.
+2. Mapa de las islas → pulsar el botón **Intercambio de idiomas** → los pines se filtran.
+3. Ordenar por **cercanía**.
+4. Crear un evento → la app avisa "hay uno parecido a 2 km" → abrir ese en su lugar.
+5. Unirse → la fila de banderas gana tus idiomas.
+6. Un segundo dispositivo se une al mismo evento → los mensajes aparecen en directo en el chat de grupo.
+7. Asistente: "algo al aire libre este fin de semana, en inglés" → tarjetas + una respuesta corta, con el portátil sin conexión para demostrar que es local.
+8. Un evento oficial de una institución, con su insignia.
+9. Gente como tú.
 
-## If time runs out, cut in this order
+## Si falta tiempo, recortar en este orden
 
-1. C7 embeddings for profiles (the simple score is enough)
-2. B6 reviews
-3. C6 chat-model wording (keep search-by-meaning; it is the impressive part)
-4. A5 extra filters
-5. B7 institution publishing (seed two official events instead)
+1. C7 con embeddings de perfiles (basta la puntuación simple)
+2. B6 reseñas
+3. C6 redacción con el modelo de chat (mantener la búsqueda por significado: es lo que impresiona)
+4. A5 filtros extra
+5. B7 publicación de instituciones (en su lugar, crear dos eventos oficiales con el script de datos)
 
-## How we work
+## Cómo trabajamos
 
-Branches, pull requests and who may edit what: [README.md](README.md).
+Ramas, pull requests y archivos compartidos: [README.md](README.md).

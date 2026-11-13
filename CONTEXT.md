@@ -1,79 +1,79 @@
-# The Pueblo — product context
+# The Pueblo — contexto del producto
 
-Group 3, Hackathon TechLab II. This file says **what** we are building and **why**.
-How it is built: [ARCHITECTURE.md](ARCHITECTURE.md). Who builds what, in what order: [PLAN.md](PLAN.md).
+Grupo 3, Hackathon TechLab II. Este documento explica **qué** construimos y **por qué**.
+Cómo se construye: [ARCHITECTURE.md](ARCHITECTURE.md). Qué se hace y en qué orden: [PLAN.md](PLAN.md).
 
-## One sentence
+## En una frase
 
-A map of the Canary Islands full of small social meetups that anyone can create and join, so people of different origins and languages actually meet — in person or online.
+Un mapa de las Islas Canarias lleno de pequeños encuentros sociales que cualquiera puede crear y a los que cualquiera puede unirse, para que personas de distintos orígenes e idiomas se conozcan de verdad, en persona o en línea.
 
-Think GuruWalk or Google Maps, but the pins are meetups created by neighbours and institutions.
+Piensa en GuruWalk o Google Maps, pero los pines son encuentros creados por vecinos e instituciones.
 
-## The problem
+## El problema
 
-People who arrive in the islands (and plenty who were born here) find it hard to meet others: they don't know what is happening nearby, they are unsure whether anyone there will speak their language, and official activities and informal meetups live in different places.
+A quien llega a las islas (y a muchos que nacieron aquí) le cuesta conocer gente: no sabe qué pasa cerca, no sabe si alguien allí hablará su idioma, y las actividades oficiales y los encuentros informales están en sitios distintos.
 
-## Two sides
+## Dos lados
 
-| Side | Who | What they do |
+| Lado | Quién | Qué hace |
 |---|---|---|
-| **People** (the core) | Anyone who wants to cooperate and meet people around them | Create a profile, find and join meetups, create their own, chat with the group, find people like them |
-| **Instituciones** | Town halls, cabildos, NGOs, cultural centres | Publish **official** events and meetups, shown with an "Official" badge |
+| **Personas** (el núcleo) | Cualquiera que quiera colaborar y conocer gente a su alrededor | Crea un perfil, encuentra encuentros y se une, crea los suyos, chatea con el grupo, encuentra gente parecida |
+| **Instituciones** | Ayuntamientos, cabildos, ONG, centros culturales | Publican eventos y encuentros **oficiales**, que llevan la insignia "Oficial" |
 
-## Features
+## Funcionalidades
 
-Each feature has an ID so branches, PRs and team files can refer to it.
+Cada funcionalidad tiene un identificador para poder citarla en ramas y PR.
 
-### Profile and onboarding
-- **F1 Account.** Sign in with email and password (Google sign-in can be added later).
-- **F2 Onboarding.** Pick interests from the meetup categories, the **languages you speak** (required), your island, and a few short questions that help matching: in person / online / both, when you are usually free, one line about what you'd like to do with others.
-- **F3 Institution account.** At onboarding you can say "I represent an institution". It becomes able to publish official events once verified (done by hand for the hackathon).
+### Perfil y alta
+- **F1 Cuenta.** Acceso con correo y contraseña (el acceso con Google se puede añadir más adelante).
+- **F2 Alta.** Elegir intereses entre las categorías de encuentros, los **idiomas que hablas** (obligatorio), tu isla y unas preguntas cortas que ayudan a emparejar: en persona / en línea / ambos, cuándo sueles tener tiempo, una línea sobre lo que te gustaría hacer con otras personas.
+- **F3 Cuenta de institución.** En el alta puedes indicar "Represento a una institución". Podrá publicar eventos oficiales una vez verificada (a mano durante el hackathon).
 
-### Discover
-- **F4 Map.** Canary Islands map with a pin per event.
-- **F5 Category chips.** A row of buttons above the map (like Google Maps' "Restaurants / Groceries"), one per meetup category: sport, languages, politics & debate, improv, music, food… Tapping filters the map and the list.
-- **F6 Nearby.** Uses the device location to sort events by distance. Other sorts: soonest, most joined. Filters: official only, online only, "speaks my languages".
-- **F7 Event list.** The same events as cards under the map.
+### Descubrir
+- **F4 Mapa.** Mapa de las Islas Canarias con un pin por evento.
+- **F5 Botones de categoría.** Una fila de botones sobre el mapa (como "Restaurantes / Supermercados" en Google Maps), uno por categoría: deporte, idiomas, política y debate, impro, música, comida… Al pulsar uno se filtran el mapa y la lista.
+- **F6 Cerca de mí.** Usa la ubicación del dispositivo para ordenar los eventos por distancia. Otros órdenes: los más próximos en fecha, los que tienen más gente. Filtros: solo oficiales, solo en línea, "hablan mis idiomas".
+- **F7 Lista de eventos.** Los mismos eventos, como tarjetas bajo el mapa.
 
-### Events
-- **F8 Create event.** Title, description, category, date/time, in person (place on map) or online (link), optional capacity, optional cover image (uploaded).
-- **F9 Similar-event check.** Before posting, a small model running **on the device** looks for similar existing events and suggests joining one instead of creating a duplicate.
-- **F10 Join / leave.**
-- **F11 Language flags.** Every event shows the flags of the languages spoken by the people who joined, with counts, so you can see whether someone there speaks your language.
-- **F12 Reviews.** People who attended leave a star rating and a comment.
-- **F13 Official events.** Events from verified institutions carry an "Official" badge and can be filtered.
+### Eventos
+- **F8 Crear evento.** Título, descripción, categoría, fecha y hora, en persona (lugar en el mapa) o en línea (enlace), aforo opcional, imagen de portada opcional (subida).
+- **F9 Aviso de eventos parecidos.** Antes de publicar, un modelo pequeño que se ejecuta **en el dispositivo** busca eventos parecidos y sugiere unirse a uno en lugar de crear un duplicado.
+- **F10 Unirse / salir.**
+- **F11 Banderas de idiomas.** Cada evento muestra las banderas de los idiomas que hablan quienes se han unido, con su número, para que veas si alguien allí habla tu idioma.
+- **F12 Reseñas.** Quienes asistieron dejan una valoración con estrellas y un comentario.
+- **F13 Eventos oficiales.** Los eventos de instituciones verificadas llevan la insignia "Oficial" y se pueden filtrar.
 
-### Together
-- **F14 Group chat.** Once you join an event you enter its group chat (like a WhatsApp group) with everyone else who joined.
-- **F15 People like you.** A list of profiles similar to yours (shared interests and languages).
+### Juntos
+- **F14 Chat de grupo.** Al unirte a un evento entras en su chat de grupo (como un grupo de WhatsApp) con el resto de personas apuntadas.
+- **F15 Gente como tú.** Una lista de perfiles parecidos al tuyo (intereses e idiomas en común).
 
-### Assistant
-- **F16 Chatbot.** Two modes: "Suggest for me" (uses your profile) and free-form search ("something outdoors this weekend in Tenerife, in English"). Runs on the device.
+### Asistente
+- **F16 Chatbot.** Dos modos: "Sugiéreme algo" (usa tu perfil) y búsqueda libre ("algo al aire libre este fin de semana en Tenerife, en inglés"). Se ejecuta en el dispositivo.
 
-## Meetup categories (first version)
+## Categorías de encuentros (primera versión)
 
-Sport · Outdoors & hiking · Language exchange · Politics & debate · Improv & theatre · Music · Food & cooking · Tech · Arts & crafts · Games · Volunteering · Families · Wellbeing · Culture & heritage
+Deporte · Aire libre y senderismo · Intercambio de idiomas · Política y debate · Impro y teatro · Música · Comida y cocina · Tecnología · Arte y manualidades · Juegos · Voluntariado · Familias · Bienestar · Cultura y patrimonio
 
-One list, defined once in code, used by onboarding interests, the chips and the event form.
+Una sola lista, definida una vez en el código, que usan los intereses del alta, los botones de categoría y el formulario de eventos.
 
-## Principles
+## Principios
 
-- **Minimal and clean.** Few screens, one obvious action per screen, mobile first.
-- **Works on any device.** Phone, tablet, laptop. The AI parts degrade gracefully instead of blocking.
-- **Language is visible.** Languages spoken are shown everywhere a person or an event appears.
-- **Private by default.** We never store a person's exact location; only their island. Group chats are readable by members only. The AI runs on the device, so what you type into it stays there.
+- **Mínimo y limpio.** Pocas pantallas, una acción evidente por pantalla, pensado primero para el móvil.
+- **Funciona en cualquier dispositivo.** Móvil, tableta, portátil. Las partes de IA se degradan con elegancia en vez de bloquear.
+- **El idioma se ve.** Los idiomas que habla cada persona aparecen allí donde aparezca una persona o un evento.
+- **Privado por defecto.** Nunca guardamos la ubicación exacta de una persona, solo su isla. Los chats de grupo solo los leen sus miembros. La IA se ejecuta en el dispositivo, así que lo que le escribes no sale de él.
 
-## Out of scope for the hackathon
+## Fuera del alcance del hackathon
 
-Payments, push notifications, direct one-to-one messages, profile photo uploads, moderation tools, native apps, translating the interface into several languages (interface is in one language; content is whatever people write).
+Pagos, notificaciones push, mensajes privados uno a uno, subida de foto de perfil, herramientas de moderación, apps nativas, traducir la interfaz a varios idiomas (la interfaz está en un idioma; el contenido es lo que escriba cada persona).
 
-## Glossary
+## Glosario
 
-| Term | Meaning |
+| Término | Significado |
 |---|---|
-| **Event / meetup** | Same thing. One gathering with a time, a category and a place or a link. |
-| **Official event** | Event created by a verified institution. |
-| **Attendee** | A user who joined an event. |
-| **Category** | One of the fixed meetup types above. A user's *interests* are categories. |
-| **Island** | One of the eight Canary Islands; the coarsest location we store for a person. |
-| **Local model** | A model that runs in the browser on the user's device, not on a server. |
+| **Evento / encuentro** | Lo mismo. Una quedada con hora, categoría y un lugar o un enlace. En el código se llama `Meetup`. |
+| **Evento oficial** | Evento creado por una institución verificada. |
+| **Asistente (persona)** | Usuario que se ha unido a un evento. |
+| **Categoría** | Uno de los tipos fijos de encuentro de arriba. Los *intereses* de un usuario son categorías. |
+| **Isla** | Una de las ocho Islas Canarias; la ubicación más gruesa que guardamos de una persona. |
+| **Modelo local** | Un modelo que se ejecuta en el navegador, en el dispositivo del usuario, no en un servidor. |
