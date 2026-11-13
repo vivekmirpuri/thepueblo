@@ -1,4 +1,4 @@
-# The Pueblo — plan de implementación
+# thePueblo — plan de implementación
 
 Producto: [CONTEXT.md](CONTEXT.md) (funcionalidades F1–F16). Diseño: [ARCHITECTURE.md](ARCHITECTURE.md).
 

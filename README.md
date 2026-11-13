@@ -1,4 +1,4 @@
-# The Pueblo — hackathon
+# thePueblo — hackathon
 
 Next.js (React + TypeScript + Tailwind) → exportación estática → Firebase Hosting.
 

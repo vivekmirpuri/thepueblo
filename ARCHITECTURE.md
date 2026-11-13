@@ -1,4 +1,4 @@
-# The Pueblo — arquitectura
+# thePueblo — arquitectura
 
 Qué construimos: [CONTEXT.md](CONTEXT.md). Tareas y orden: [PLAN.md](PLAN.md).
 

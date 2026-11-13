@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Pueblo",
+  title: "thePueblo",
   description: "Meetups across the Canary Islands, in your languages",
 };
 

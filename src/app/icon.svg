@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="thePueblo">
+  <!-- A map pin (meetups on the map) holding a house with an arched door (the pueblo). -->
+  <rect width="64" height="64" rx="16" fill="#E0572F"/>
+  <path fill="#fff" d="M32 55S17 40.5 17 27a15 15 0 0 1 30 0c0 13.500-15 28-15 28Z"/>
+  <path fill="#E0572F" stroke="#E0572F" stroke-width="2" stroke-linejoin="round" d="M32 19.500 40 26.500V34H24v-7.500Z"/>
+  <path fill="#fff" d="M29.500 36v-6a2.500 2.500 0 0 1 5 0v6Z"/>
+</svg>
