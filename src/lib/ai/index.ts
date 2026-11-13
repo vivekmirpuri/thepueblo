@@ -26,7 +26,7 @@ export interface ScoredEvent {
 
 /** Lower-case, without accents, so "caminata" matches "Caminata" and "ñ" behaves. */
 const plain = (text: string) =>
-  text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 /**
  * Filler words that say nothing about the activity. Without this list "algo al aire libre este
