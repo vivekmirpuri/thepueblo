@@ -67,7 +67,7 @@ Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rut
 | ~~B3~~ | ~~Banderas de idiomas en detalle y tarjetas~~ **hecho** | F11 |
 | ~~B4~~ | ~~Chat de grupo por actividad + lista "mis grupos"~~ **hecho** | F14 |
 | B5 | Mostrar eventos parecidos en el formulario (llama a `findSimilarEvents`) | F9 |
-| B6 | Reseñas: estrellas + comentario, media en el evento | F12 |
+| ~~B6~~ | ~~Reseñas: estrellas + comentario, media calculada de las reseñas~~ **hecho** | F12 |
 | B7 | Insignia oficial; las instituciones publican eventos oficiales | F13 |
 | ~~B8~~ | ~~Iconos de inclusión en formulario, tarjeta y detalle~~ **hecho** | F17 |
 

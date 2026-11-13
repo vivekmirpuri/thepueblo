@@ -93,7 +93,9 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 - [x] Pronombres opcionales en el alta y en el perfil.
 
 ### Reviews de actividades pasadas
-- [ ] B6 Reseñas con estrellas y comentario, solo para quien asistió y cuando el evento ha terminado.
+- [x] B6 Reseñas con estrellas y comentario, solo para quien se apuntó y cuando la actividad ya ha empezado.
+- [ ] Mostrar la nota media también en las tarjetas del mapa (ahora solo en la página de la actividad).
+- [ ] Volver a ejecutar `seed.mjs` (trae 2 actividades pasadas con reseñas) cuando se borren las 3 cuentas demo de contraseña perdida.
 
 ### Auto-moderadores y strikes — **nuevo**
 - [ ] El modelo local revisa el texto antes de publicar un evento o un mensaje y avisa si parece ofensivo (no bloquea solo: avisa y sugiere otra redacción).

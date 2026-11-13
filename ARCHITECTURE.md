@@ -156,7 +156,6 @@ events/{eventId}                 // tipo `Meetup` en el código (`Event` ya exis
   capacity: number | null
   attendeeIds: string[]
   attendeeLanguages: { uid: ["es", "en"] } // alimenta las banderas; se cuenta en el navegador
-  ratingSum, ratingCount         // media = suma / número
   embedding: number[] | null     // 384 números del modelo de embeddings
   createdAt
 
@@ -167,7 +166,7 @@ events/{eventId}/reviews/{uid}            // una reseña por asistente
   rating: 1..5, text, name, createdAt
 ```
 
-Unirse y salir son **una sola actualización atómica** cada una (`arrayUnion` / `arrayRemove` más una clave del mapa), así que no hace falta transacción ni hay contadores que se desajusten. Una reseña actualiza a la vez el documento de la reseña y los totales de valoración, así que esa sí usa una transacción.
+Unirse y salir son **una sola actualización atómica** cada una (`arrayUnion` / `arrayRemove` más una clave del mapa), así que no hace falta transacción ni hay contadores que se desajusten. Las reseñas no guardan totales en el evento: la media se calcula al mostrarlas a partir de los documentos de `reviews`, así nadie puede inflar la nota escribiendo un número.
 
 **Consultas.** La pantalla de inicio carga una vez todos los eventos que no han terminado (`endsAt >= ahora`, ordenados por `endsAt`) y filtra, ordena y calcula distancias en el navegador. "Mis chats" es `where("attendeeIds", "array-contains", uid)`.
 *Atajo: vale para unos cientos de eventos (cada uno lleva ~4 KB de embedding). Más allá, añade consultas por geohash con `geofire-common` y saca los embeddings del documento del evento.*
@@ -179,7 +178,7 @@ Están en `firestore.rules`, desplegadas y cubiertas por `node scripts/rules-che
 - **users**: cualquier usuario con sesión puede leer; solo puedes escribir tu propio documento; no puedes marcarte `verified`.
 - **events**: lectura pública. Con sesión puedes crear con `organizerId == tu uid`; `official: true` solo se permite si tu documento de usuario tiene `verified == true`. Solo quien organiza edita o borra. Cualquier usuario con sesión puede actualizar **solo** `attendeeIds` y `attendeeLanguages` (para unirse o salir), solo añadiéndose o quitándose a sí mismo y nunca por encima de `capacity`.
 - **messages**: leer y crear solo si tu uid está en `attendeeIds` del evento, con un texto de 1 a 1000 caracteres; puedes borrar los tuyos.
-- **reviews**: lectura pública; crear solo en tu nombre y solo si eres asistente.
+- **reviews**: lectura pública; escribir solo la tuya, solo si te apuntaste, solo cuando la actividad ya ha empezado, con 1 a 5 estrellas y un comentario de hasta 500 caracteres.
 - **Storage** (`storage.rules`): las imágenes de eventos van en `events/{uid}/{archivo}`. Lectura pública; solo puedes escribir en tu propia carpeta, solo imágenes y de menos de 5 MB.
 
 ## IA local

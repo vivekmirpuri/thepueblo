@@ -155,7 +155,20 @@ export async function sendMessage(
   });
 }
 
-// ── Reviews (Track B) ─────────────────────────────────────────────────────────
-export const listReviews = (eventId: string): Promise<Review[]> => todo("B6 listReviews", eventId);
-export const saveReview = (eventId: string, review: Omit<Review, "createdAt">): Promise<void> =>
-  todo("B6 saveReview", eventId, review);
+// ── Reviews (F12) ─────────────────────────────────────────────────────────────
+
+/** Max length of a review comment; firestore.rules refuse longer ones. */
+export const REVIEW_MAX = 500;
+
+/** Every review of one activity, newest first. */
+export async function listReviews(eventId: string): Promise<Review[]> {
+  const snap = await getDocs(collection(db, "events", eventId, "reviews"));
+  return snap.docs
+    .map((found) => found.data({ serverTimestamps: "estimate" }) as Review)
+    .sort((a, b) => (b.createdAt?.toMillis() ?? 0) - (a.createdAt?.toMillis() ?? 0));
+}
+
+/** Creates or replaces my review (one per person). The rules only allow it once the activity has started. */
+export async function saveReview(eventId: string, review: Omit<Review, "createdAt">): Promise<void> {
+  await setDoc(doc(db, "events", eventId, "reviews", review.uid), { ...review, createdAt: serverTimestamp() });
+}

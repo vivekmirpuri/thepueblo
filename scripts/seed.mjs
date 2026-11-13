@@ -1,6 +1,6 @@
 /**
- * Fills the database with three fake people and a dozen activities, so the map is not empty
- * during the demo. Safe to run again: each fake person deletes their own activities first.
+ * Fills the database with three fake people, a dozen upcoming activities and two past ones with
+ * reviews, so the map is not empty and reviews can be shown during the demo. Safe to run again: each fake person deletes their own activities first.
  *
  *   node --env-file=.env.local scripts/seed.mjs
  *
@@ -104,6 +104,9 @@ const ACTIVITIES = [
   [2, { title: "Jam de música abierta", category: "music", placeName: "Charco de San Ginés, Arrecife", location: { lat: 28.963, lng: -13.55 }, days: 2, hour: 20, hours: 3, capacity: null, inclusion: ["inclusive_language", "gender_perspective"], description: "Trae tu instrumento o solo tus ganas de escuchar." }],
   [2, { title: "Taller de acuarela para principiantes", category: "arts", placeName: "Casa de la Cultura, Arrecife", location: { lat: 28.9619, lng: -13.5479 }, days: 7, hour: 17, hours: 2, capacity: 6, inclusion: ["wheelchair", "sign_language"], description: "Ponemos el material. No hace falta saber dibujar." }],
   [2, { title: "Debate: ¿cómo es vivir en las islas?", category: "debate", placeName: "En línea", location: null, days: 3, hour: 19, hours: 2, capacity: 25, inclusion: ["captions", "inclusive_language", "gender_perspective"], description: "Hablamos con respeto y con turnos.", mode: "online" }],
+  // Past ones: they only appear in "Mis grupos" and on their own page, with reviews.
+  [0, { title: "Paseo por el casco histórico de La Laguna", category: "culture", placeName: "Catedral de La Laguna", location: { lat: 28.4888, lng: -16.3159 }, days: -4, hour: 11, hours: 2, capacity: null, inclusion: ["wheelchair", "inclusive_language"], description: "Recorrido tranquilo por las calles patrimonio de la humanidad.", past: true }],
+  [1, { title: "Torneo de dominó en el barrio", category: "games", placeName: "Plaza de Santa Ana, Las Palmas", location: { lat: 28.1004, lng: -15.4157 }, days: -2, hour: 18, hours: 3, capacity: 16, inclusion: ["inclusive_language"], description: "Partidas por parejas. Ganó quien menos se lo esperaba.", past: true }],
   [2, { title: "Yoga suave en el parque", category: "wellbeing", placeName: "Parque Islas Canarias, Arrecife", location: { lat: 28.9579, lng: -13.5586 }, days: 4, hour: 8, hours: 1, capacity: 15, inclusion: ["low_vision", "gender_perspective"], description: "Para todos los cuerpos y todas las edades." }],
 ];
 
@@ -177,19 +180,17 @@ for (const [index, person] of PEOPLE.entries()) {
       inclusion: activity.inclusion,
       attendeeIds: [user.uid],
       attendeeLanguages: { [user.uid]: person.languages },
-      ratingSum: 0,
-      ratingCount: 0,
       embedding: null,
       createdAt: serverTimestamp(),
     });
-    created.push({ id: reference.id, owner: index });
+    created.push({ id: reference.id, owner: index, past: !!activity.past });
   }
 }
 
 // Everyone joins two activities of the others, so the flags show more than one language.
 for (const [index, person] of PEOPLE.entries()) {
   const user = await enter(person);
-  for (const activity of created.filter((item) => item.owner !== index).slice(0, 2)) {
+  for (const activity of created.filter((item) => item.owner !== index && !item.past).slice(0, 2)) {
     await updateDoc(doc(db, "events", activity.id), {
       attendeeIds: arrayUnion(user.uid),
       [`attendeeLanguages.${user.uid}`]: person.languages,
@@ -197,5 +198,30 @@ for (const [index, person] of PEOPLE.entries()) {
   }
 }
 
-console.log(`Listo: ${PEOPLE.length} personas y ${created.length} actividades.`);
+// Past activities: the others joined them and left a review afterwards.
+const REVIEWS = [
+  [5, "Me encantó, y la guía hablaba muy despacio, se entendía todo."],
+  [4, "Muy buen ambiente. Repetiría."],
+];
+let reviews = 0;
+for (const [index, person] of PEOPLE.entries()) {
+  const user = await enter(person);
+  for (const activity of created.filter((item) => item.past && item.owner !== index)) {
+    await updateDoc(doc(db, "events", activity.id), {
+      attendeeIds: arrayUnion(user.uid),
+      [`attendeeLanguages.${user.uid}`]: person.languages,
+    });
+    const [rating, text] = REVIEWS[(index + reviews) % REVIEWS.length];
+    await setDoc(doc(db, "events", activity.id, "reviews", user.uid), {
+      uid: user.uid,
+      name: person.displayName,
+      rating,
+      text,
+      createdAt: serverTimestamp(),
+    });
+    reviews += 1;
+  }
+}
+
+console.log(`Listo: ${PEOPLE.length} personas, ${created.length} actividades y ${reviews} reseñas.`);
 process.exit(0);

@@ -61,8 +61,6 @@ export interface Meetup {
   attendeeIds: string[];
   /** uid → languages that person speaks. The flag row (F11) is counted from this in the browser. */
   attendeeLanguages: Record<string, LanguageCode[]>;
-  ratingSum: number;
-  ratingCount: number;
   /** 384 numbers from the local embedding model; null until Track C's model has run on it. */
   embedding: number[] | null;
   createdAt: Timestamp;
@@ -79,7 +77,10 @@ export interface ChatMessage {
   createdAt: Timestamp;
 }
 
-/** events/{id}/reviews/{uid} — one per attendee (F12) */
+/**
+ * events/{id}/reviews/{uid} — one per attendee (F12). The average is worked out from these
+ * documents when shown, so there are no totals on the event that someone could tamper with.
+ */
 export interface Review {
   uid: string;
   name: string;

@@ -50,8 +50,6 @@ export default function NewEventPage() {
                   inclusion: values.inclusion,
                   attendeeIds: [user.uid],
                   attendeeLanguages: { [user.uid]: profile.languages },
-                  ratingSum: 0,
-                  ratingCount: 0,
                   embedding: null,
                 });
                 toast.success("¡Publicada! Ya se ve en el mapa.");

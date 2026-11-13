@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser } from "firebase/auth";
-import { getFirestore, doc, collection, setDoc, updateDoc, deleteDoc, getDoc, getDocs, addDoc, arrayUnion, arrayRemove, deleteField } from "firebase/firestore";
+import { getFirestore, doc, collection, setDoc, updateDoc, deleteDoc, getDoc, getDocs, addDoc, arrayUnion, arrayRemove, deleteField, Timestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import config from "../src/lib/firebase.config.json" with { type: "json" };
 
@@ -30,11 +30,14 @@ const denied = (promise, what, code = "permission-denied") => assert.rejects(pro
 const a = await signUp(), b = await signUp(), c = await signUp();
 const eventRef = doc(db, "events", `rules-check-${randomUUID()}`);
 const messages = collection(eventRef, "messages");
-const event = { title: "rules check", organizerId: a.uid, official: false, capacity: 2, attendeeIds: [a.uid], attendeeLanguages: { [a.uid]: ["es"] } };
+const hour = 60 * 60 * 1000;
+const futureRef = doc(db, "events", `rules-check-future-${randomUUID()}`);
+const event = { title: "rules check", startsAt: Timestamp.fromMillis(Date.now() - hour), organizerId: a.uid, official: false, capacity: 2, attendeeIds: [a.uid], attendeeLanguages: { [a.uid]: ["es"] } };
 const join = (uid) => updateDoc(eventRef, { attendeeIds: arrayUnion(uid), [`attendeeLanguages.${uid}`]: ["en"] });
 const png = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 const image = ref(storage, `events/${a.uid}/rules-check.png`);
-let message, uploaded;
+let message, uploaded, reviewed;
+const review = (uid, rating, on = eventRef) => setDoc(doc(on, "reviews", uid), { uid, name: "x", rating, text: "ok" });
 
 try {
   await as(a);
@@ -56,11 +59,18 @@ try {
   await denied(addDoc(messages, { uid: b.uid, text: "" }), "post an empty message");
   await denied(addDoc(messages, { uid: b.uid, text: "x".repeat(1001) }), "post a message over 1000 characters");
 
+  await allowed(review(b.uid, 5), "review an activity you joined once it has started");
+  reviewed = true;
+  await denied(review(b.uid, 6), "give 6 stars");
+
   await as(c);
   await denied(join(c.uid), "join a full event (capacity 2)");
+  await denied(review(c.uid, 4), "review an activity you did not join");
 
   await as(a);
   assert.equal((await allowed(getDocs(messages), "read the chat as an attendee")).size, 1);
+  await allowed(setDoc(futureRef, { ...event, startsAt: Timestamp.fromMillis(Date.now() + 24 * hour) }), "create a future event");
+  await denied(review(a.uid, 5, futureRef), "review an activity before it starts");
 
   await as(b);
   await allowed(updateDoc(eventRef, { attendeeIds: arrayRemove(b.uid), [`attendeeLanguages.${b.uid}`]: deleteField() }), "leave an event");
@@ -75,10 +85,12 @@ try {
   await as(null);
   await allowed(getDownloadURL(image), "see an event image without an account");
 
-  console.log("rules OK: 20 checks passed");
+  console.log("rules OK: 25 checks passed");
 } finally {
   if (uploaded) await as(a).then(() => deleteObject(image)).catch(() => {});
+  if (reviewed) await as(b).then(() => deleteDoc(doc(eventRef, "reviews", b.uid))).catch(() => {});
   if (message) await as(b).then(() => deleteDoc(message)).catch(() => {});
+  await as(a).then(() => deleteDoc(futureRef)).catch(() => {});
   await as(a).then(() => Promise.all([deleteDoc(eventRef), deleteDoc(doc(db, "users", a.uid))])).catch(() => {});
   for (const who of [a, b, c]) await as(who).then(({ user }) => deleteUser(user)).catch(() => {});
 }

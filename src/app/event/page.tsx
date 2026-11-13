@@ -1,7 +1,7 @@
 "use client";
 /**
  * One activity: what it is, who is going, and the button to join (F10, F11, F13) — Track B.
- * Built (not a placeholder). Reviews (F12) and the group chat (F14) are still to come.
+ * Built (not a placeholder), including reviews (F12) and the link to the group chat (F14).
  *
  * Pattern: this page is the CONTAINER (loads the activity, joins and leaves).
  * The id comes from `?id=` and is read inside a <Suspense>, because a static export has no
@@ -13,15 +13,16 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { CalendarDaysIcon, GlobeIcon, MapPinIcon, MessageCircleIcon, UsersIcon } from "lucide-react";
 import { toast } from "sonner";
+import { Reviews } from "@/components/event/Reviews";
 import { LanguageFlags } from "@/components/shared/LanguageFlags";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@/lib/auth";
 import { findCategory } from "@/lib/categories";
-import { getEvent, joinEvent, leaveEvent } from "@/lib/db";
+import { getEvent, joinEvent, leaveEvent, listReviews, saveReview } from "@/lib/db";
 import { INCLUSION } from "@/lib/inclusion";
-import type { Meetup } from "@/lib/types";
+import type { Meetup, Review } from "@/lib/types";
 
 const WHEN = new Intl.DateTimeFormat("es-ES", {
   weekday: "long",
@@ -37,6 +38,9 @@ function EventDetail() {
   const [event, setEvent] = useState<Meetup | null>(null);
   const [looked, setLooked] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [reviews, setReviews] = useState<Review[] | null>(null);
+  // Read once: whether the activity has started decides if reviews are open.
+  const [now] = useState(() => Date.now());
 
   useEffect(() => {
     if (!id) return;
@@ -44,6 +48,9 @@ function EventDetail() {
       .then(setEvent)
       .catch(() => setEvent(null))
       .finally(() => setLooked(true));
+    listReviews(id)
+      .then(setReviews)
+      .catch(() => setReviews([]));
   }, [id]);
 
   if (!id || (looked && !event)) {
@@ -63,6 +70,7 @@ function EventDetail() {
   const Icon = category?.icon;
   const joined = !!user && event.attendeeIds.includes(user.uid);
   const full = !!event.capacity && event.attendeeIds.length >= event.capacity && !joined;
+  const started = event.startsAt.toMillis() <= now;
 
   async function toggleJoin() {
     if (!user || !profile || !id) return;
@@ -168,6 +176,18 @@ function EventDetail() {
           </Button>
         )}
       </div>
+
+      <Reviews
+        reviews={reviews}
+        myUid={user?.uid}
+        canReview={joined && started}
+        waitingToStart={joined && !started}
+        onSave={async (rating, text) => {
+          if (!user || !profile || !id) return;
+          await saveReview(id, { uid: user.uid, name: profile.displayName, rating: rating as Review["rating"], text });
+          setReviews(await listReviews(id));
+        }}
+      />
     </article>
   );
 }
