@@ -11,6 +11,7 @@ Next.js (React + TypeScript + Tailwind) → exportación estática → Firebase 
 | [CONTEXT.md](CONTEXT.md) | Qué construimos y por qué |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Stack, paquetes, modelo de datos, IA local, hosting |
 | [TODO.md](TODO.md) | La lista de tareas pendientes, por apartado |
+| [marketing/carrusel/](marketing/carrusel/) | 9 imágenes 1080×1350 para redes, con capturas reales |
 | [PLAN.md](PLAN.md) | Fases, los tres bloques de tareas, guion de la demo |
 
 ## Puesta en marcha (una vez)
@@ -38,7 +39,8 @@ Para cargar datos de ejemplo necesitas un archivo `.env.local` (no se sube al re
 npm run dev                      # web en local
 npm run lint && npm run build    # lo que ejecuta el CI
 node scripts/rules-check.mjs     # prueba las reglas de seguridad desplegadas
-node --env-file=.env.local scripts/seed.mjs   # carga personas y actividades de ejemplo
+node --env-file=.env.local scripts/seed.mjs             # 3 personas y 12 actividades (cuentas antiguas)
+node --env-file=.env.local scripts/seed-community.mjs   # 16 personas, 42 actividades con imagen, chats y reseñas
 ```
 
 Las reglas de seguridad las despliega a mano la persona responsable del proyecto, nunca el CI: `firebase deploy --only firestore,storage`.

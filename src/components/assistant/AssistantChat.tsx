@@ -6,15 +6,14 @@
  * so when there is nothing to show xatsí says what it can do and offers examples you can tap. The
  * examples are real sentences, not categories, so you learn you can just write what you feel like.
  *
- * Every answer is a list of real activities. xatsí never writes an activity of its own, so it
+ * Every answer is a compact list of real activities, the same rows as "Mis grupos". xatsí never writes an activity of its own, so it
  * cannot invent one.
  *
  * Presentational: it holds the text you are typing and reports it; the page does the searching.
  */
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { SearchIcon, SparklesIcon, WandSparklesIcon } from "lucide-react";
 import { useState } from "react";
-import { EventCard } from "@/components/shared/EventCard";
+import { EventRow } from "@/components/shared/EventRow";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -45,7 +44,6 @@ export function AssistantChat({
   onSuggest: () => void;
 }) {
   const [query, setQuery] = useState("");
-  const still = useReducedMotion();
 
   return (
     <div className="flex min-h-[70vh] flex-col gap-4 p-4">
@@ -107,20 +105,11 @@ export function AssistantChat({
             <h2 className="text-sm text-muted-foreground">
               Esto es lo que he encontrado para «{asked}»
             </h2>
-            <AnimatePresence initial={false}>
-              <ul className="space-y-3">
-                {results.map(({ event }, index) => (
-                  <motion.li
-                    key={event.id}
-                    initial={{ opacity: 0, y: still ? 0 : 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: still ? 0 : 0.2, delay: still ? 0 : index * 0.04 }}
-                  >
-                    <EventCard event={event} />
-                  </motion.li>
-                ))}
-              </ul>
-            </AnimatePresence>
+            <ul className="divide-y rounded-xl border">
+              {results.map(({ event }) => (
+                <EventRow key={event.id} event={event} href={`/event/?id=${event.id}`} showFlags />
+              ))}
+            </ul>
           </section>
         )}
       </div>

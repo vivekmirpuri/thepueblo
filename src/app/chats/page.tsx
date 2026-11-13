@@ -11,18 +11,17 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { ArrowLeftIcon, ChevronRightIcon, MessageCircleIcon } from "lucide-react";
+import { ArrowLeftIcon, MessageCircleIcon } from "lucide-react";
 import { toast } from "sonner";
 import { ChatThread } from "@/components/chat/ChatThread";
+import { EventRow } from "@/components/shared/EventRow";
 import { LanguageFlags } from "@/components/shared/LanguageFlags";
 import { RequireUser } from "@/components/shared/RequireUser";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { findCategory } from "@/lib/categories";
 import { getEvent, listMyEvents, sendMessage, watchMessages } from "@/lib/db";
 import type { ChatMessage, Meetup, UserProfile } from "@/lib/types";
 
-const WHEN = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short" });
 
 function Loading() {
   return (
@@ -68,29 +67,9 @@ function ChatList({ uid }: { uid: string }) {
     <div className="space-y-3 p-4">
       <h1 className="text-xl font-semibold">Mis grupos</h1>
       <ul className="divide-y rounded-xl border">
-        {events.map((event) => {
-          const Icon = findCategory(event.category)?.icon ?? MessageCircleIcon;
-          return (
-            <li key={event.id}>
-              <Link
-                href={`/chats/?event=${event.id}`}
-                className="flex min-h-16 items-center gap-3 px-3 py-2 outline-none hover:bg-muted/50 focus-visible:bg-muted"
-              >
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted">
-                  <Icon className="size-5" aria-hidden />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-medium">{event.title}</span>
-                  <span className="block text-xs text-muted-foreground">
-                    {WHEN.format(event.startsAt.toDate())} · {event.attendeeIds.length}{" "}
-                    {event.attendeeIds.length === 1 ? "persona" : "personas"}
-                  </span>
-                </span>
-                <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-              </Link>
-            </li>
-          );
-        })}
+        {events.map((event) => (
+          <EventRow key={event.id} event={event} href={`/chats/?event=${event.id}`} />
+        ))}
       </ul>
     </div>
   );
