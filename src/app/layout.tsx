@@ -21,13 +21,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "thePueblo",
-  description: "Meetups across the Canary Islands, in your languages",
+  description: "Encuentros por las Islas Canarias, en tus idiomas",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

@@ -13,7 +13,7 @@ import { Placeholder } from "@/components/shared/Placeholder";
 export default function AssistantPage() {
   return (
     <>
-      <Placeholder title="Assistant" track="C" features="F16" />
+      <Placeholder title="Asistente" track="C" features="F16" />
       <AssistantChat />
     </>
   );

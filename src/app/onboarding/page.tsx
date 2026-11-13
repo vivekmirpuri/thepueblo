@@ -15,6 +15,6 @@ import { Placeholder } from "@/components/shared/Placeholder";
 
 export default function OnboardingPage() {
   return (
-    <Placeholder title="Welcome" track="C" features="F2 · F3" />
+    <Placeholder title="Te damos la bienvenida" track="C" features="F2 · F3" />
   );
 }

@@ -11,11 +11,11 @@ import { MapIcon, MessageCircleIcon, SparklesIcon, UserIcon, UsersIcon } from "l
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { href: "/", label: "Map", icon: MapIcon },
+  { href: "/", label: "Mapa", icon: MapIcon },
   { href: "/chats/", label: "Chats", icon: MessageCircleIcon },
-  { href: "/assistant/", label: "Assistant", icon: SparklesIcon },
-  { href: "/people/", label: "People", icon: UsersIcon },
-  { href: "/profile/", label: "Profile", icon: UserIcon },
+  { href: "/assistant/", label: "Asistente", icon: SparklesIcon },
+  { href: "/people/", label: "Gente", icon: UsersIcon },
+  { href: "/profile/", label: "Perfil", icon: UserIcon },
 ] as const;
 
 export function BottomNav() {

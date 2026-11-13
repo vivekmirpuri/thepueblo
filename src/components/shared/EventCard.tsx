@@ -4,7 +4,7 @@
  *
  * To build (Foundation or whoever needs it first — tell the others, all three tracks use it):
  *  - shadcn <Card>: image on top (`event.imageUrl`, plain <img> with a category-emoji fallback),
- *    title, date (`Intl.DateTimeFormat`), place or an "Online" <Badge>, "Official" <Badge>,
+ *    title, date (`Intl.DateTimeFormat("es-ES", …)`), place or an "Online" <Badge>, "Official" <Badge>,
  *    <LanguageFlags languages={event.attendeeLanguages} />, <InclusionBadges features={event.inclusion} />,
  *    people joined / capacity.
  *  - `distanceKm` is optional: show "2.3 km" only when it is given.

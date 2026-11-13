@@ -57,6 +57,12 @@ Versiones comprobadas en npm el 12-11-2026. Todas son compatibles con React 19.
 
 Se evita **a propósito**: una librería de estado (bastan el estado de React y los listeners de Firestore), un kit de interfaz de chat, una librería de consultas geográficas.
 
+## Idioma
+
+La interfaz está **en español**: todo lo que lee una persona (etiquetas, botones, errores, `aria-label`, textos alternativos) se escribe en español y con lectura fácil. El código, los comentarios y los identificadores (ids de categoría, nombres de variables) están en inglés. `<html lang="es">` está puesto en `layout.tsx`, y las fechas se formatean con `Intl.DateTimeFormat("es-ES", …)`.
+
+No usamos librería de traducción: la app está en un solo idioma. El contenido que escriben las personas (títulos de eventos, mensajes) va en el idioma que cada cual quiera.
+
 ## Patrón de código: contenedores y componentes de presentación
 
 - **Las páginas son contenedores.** Un archivo `src/app/**/page.tsx` carga los datos (a través de `src/lib/db.ts`), guarda el estado y pasa props simples hacia abajo.
@@ -215,7 +221,7 @@ Nota para los modelos e5: antepón `query: ` (búsquedas) o `passage: ` (eventos
 
 Un único workflow, [.github/workflows/deploy.yml](.github/workflows/deploy.yml), ejecuta lint + build y luego despliega. No hay protección de ramas: se hace push directo a `develop`, y `develop` pasa a `main` con `git push origin develop:main`. Un push con la compilación rota no se despliega, pero tampoco se bloquea. La clave de la cuenta de servicio es el secreto de GitHub `FIREBASE_SERVICE_ACCOUNT`; nunca está en el repositorio. Bórrala en la consola de Firebase después del hackathon.
 
-**Imágenes.** El formulario de crear evento sube el archivo con `uploadEventImage(uid, file)` (`src/lib/db.ts`), que lo guarda en `events/{uid}/…` y devuelve un enlace de descarga; ese enlace se guarda en el evento como `imageUrl`. Storage necesita el plan de pago por uso (Blaze) y crear el bucket una vez en la consola.
+**Imágenes.** El formulario de crear evento sube el archivo con `uploadEventImage(uid, file)` (`src/lib/db.ts`), que lo guarda en `events/{uid}/…` y devuelve un enlace de descarga; ese enlace se guarda en el evento como `imageUrl`. El bucket está en `US-EAST1` (ubicación sin coste del plan Blaze); Firestore sigue en Madrid.
 
 **El CI no despliega las reglas de seguridad.** Producción, pruebas y vistas previas comparten una misma base de datos, así que un cambio de reglas llega a todos a la vez. La persona responsable del proyecto las despliega a mano y comprueba:
 

@@ -20,7 +20,7 @@ import { Placeholder } from "@/components/shared/Placeholder";
 export default function HomePage() {
   return (
     <>
-      <Placeholder title="Map" track="A" features="F4 · F5 · F6 · F7" />
+      <Placeholder title="Mapa" track="A" features="F4 · F5 · F6 · F7" />
       <CategoryChips />
       <EventMap />
     </>

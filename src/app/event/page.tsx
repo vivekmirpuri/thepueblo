@@ -16,6 +16,6 @@ import { Placeholder } from "@/components/shared/Placeholder";
 
 export default function EventPage() {
   return (
-    <Placeholder title="Event" track="B" features="F10 · F11 · F12 · F13" />
+    <Placeholder title="Evento" track="B" features="F10 · F11 · F12 · F13" />
   );
 }

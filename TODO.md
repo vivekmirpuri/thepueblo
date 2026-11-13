@@ -5,9 +5,10 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 
 ## 0. Configuración (responsable del proyecto, en consolas)
 
-- [ ] Pasar el proyecto Firebase al plan **Blaze** (cuenta de facturación) y poner una alerta de presupuesto.
-- [ ] Storage → **Comenzar** → elegir región del bucket.
-- [ ] `firebase deploy --only storage && node scripts/rules-check.mjs` (deben pasar todas las comprobaciones).
+- [x] Proyecto Firebase en el plan **Blaze**.
+- [ ] Poner una alerta de presupuesto en la cuenta de facturación.
+- [x] Bucket de Storage creado (`US-EAST1`, ubicación sin coste).
+- [x] Reglas de Storage desplegadas y probadas (18 comprobaciones).
 - [ ] Opcional: activar acceso con Google en Authentication.
 - [ ] Cuando `develop` esté bien: `git push origin develop:main` para actualizar producción.
 
@@ -69,7 +70,7 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 
 ### Lectura fácil / lenguaje inclusivo — **nuevo**
 - [ ] Textos de la interfaz cortos, frases simples, sin tecnicismos (criterios de lectura fácil).
-- [ ] Decidir el idioma de la interfaz (ahora está en inglés; ¿español?).
+- [x] Idioma de la interfaz: **español** (`<html lang="es">`, etiquetas y navegación ya traducidas).
 - [ ] Revisar todos los textos con lenguaje inclusivo.
 
 ### Pictogramas — **nuevo**

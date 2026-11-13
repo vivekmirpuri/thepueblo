@@ -15,6 +15,6 @@ import { Placeholder } from "@/components/shared/Placeholder";
 
 export default function LoginPage() {
   return (
-    <Placeholder title="Sign in" track="Foundation" features="F1" />
+    <Placeholder title="Entrar" track="Foundation" features="F1" />
   );
 }

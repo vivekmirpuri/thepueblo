@@ -19,11 +19,11 @@ export function Placeholder({ title, track, features, children }: {
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription className="flex flex-wrap gap-2">
-          <Badge variant="secondary">Track {track}</Badge>
+          <Badge variant="secondary">Bloque {track}</Badge>
           <Badge variant="outline">{features}</Badge>
         </CardDescription>
       </CardHeader>
-      <CardContent className="text-sm text-muted-foreground">{children ?? "Not built yet."}</CardContent>
+      <CardContent className="text-sm text-muted-foreground">{children ?? "Todavía no está hecho."}</CardContent>
     </Card>
   );
 }

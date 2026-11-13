@@ -14,7 +14,7 @@ import { Placeholder } from "@/components/shared/Placeholder";
 export default function PeoplePage() {
   return (
     <>
-      <Placeholder title="People" track="C" features="F15" />
+      <Placeholder title="Gente como tú" track="C" features="F15" />
       <ProfileCard />
     </>
   );

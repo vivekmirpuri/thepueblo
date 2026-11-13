@@ -13,6 +13,6 @@ import { Placeholder } from "@/components/shared/Placeholder";
 
 export default function ProfilePage() {
   return (
-    <Placeholder title="Profile" track="C" features="F2" />
+    <Placeholder title="Perfil" track="C" features="F2" />
   );
 }

@@ -10,7 +10,7 @@ export function InclusionBadges({ features }: { features: InclusionId[] }) {
   const shown = INCLUSION.filter((item) => features.includes(item.id));
   if (shown.length === 0) return null;
   return (
-    <ul className="flex flex-wrap gap-2 text-muted-foreground" aria-label="Inclusion and accessibility">
+    <ul className="flex flex-wrap gap-2 text-muted-foreground" aria-label="Inclusión y accesibilidad">
       {shown.map(({ id, label, icon: Icon }) => (
         <li key={id} title={label}>
           <Icon className="size-4" aria-hidden />

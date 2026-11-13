@@ -12,12 +12,12 @@ Todo lo que de otro modo pisaríamos entre varias personas se prepara una sola v
 - [x] shadcn/ui, `motion`, `maplibre-gl`, `react-map-gl` y `@huggingface/transformers` instalados.
 - [x] `src/lib/`: `types.ts`, `categories.ts`, `languages.ts`, `islands.ts`, `geo.ts`, `firebase.ts`; `joinEvent` / `leaveEvent` / `uploadEventImage` en `db.ts`.
 - [x] `AppShell`, `BottomNav`, `LanguageFlags`, `InclusionBadges`, `PersonName`.
+- [x] Interfaz en español (`<html lang="es">`, categorías, navegación, iconos de inclusión).
 - [x] Una página provisional por ruta y un componente provisional por bloque, cada uno con un comentario inicial que dice qué construir.
 
-**Responsable del proyecto, en la consola de Firebase (necesario para subir imágenes)**
-- [ ] Pasar el proyecto al plan **Blaze** (pago por uso) y poner una alerta de presupuesto pequeña.
-- [ ] Storage → **Comenzar** → elegir la región del bucket (no se puede cambiar después).
-- [ ] Después: `firebase deploy --only storage && node scripts/rules-check.mjs`.
+**Responsable del proyecto, en la consola de Firebase**
+- [x] Plan Blaze, bucket de Storage creado y reglas desplegadas (18 comprobaciones en verde).
+- [ ] Poner una alerta de presupuesto en la cuenta de facturación.
 
 **Pendiente antes de repartir los bloques (una persona)**
 - [ ] **Prueba de IA primero** (30 min, la mayor incógnita): cargar Transformers.js en un Web Worker con Next 16 y calcular el embedding de una frase. Si el modelo de chat no funciona, quedarse solo con los embeddings.

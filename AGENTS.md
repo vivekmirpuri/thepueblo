@@ -13,6 +13,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 Lee antes de editar: `CONTEXT.md` (qué y por qué), `ARCHITECTURE.md` (cómo) y `PLAN.md` (tareas y bloques).
 
 - La documentación (`*.md`) se escribe en español. El código y sus comentarios, en inglés.
+- **Todo el texto que ve el usuario va en español**: etiquetas, botones, mensajes de error, `aria-label`, textos alternativos. Los identificadores del código (ids de categoría, nombres de variables) siguen en inglés. Fechas con `Intl.DateTimeFormat("es-ES", …)`. El `<html lang="es">` ya está puesto.
+- Escribe en lectura fácil: frases cortas, palabras corrientes, sin tecnicismos, y lenguaje inclusivo ("personas" mejor que "usuarios").
 - Los archivos compartidos (`package.json`, `src/app/layout.tsx`, `globals.css`, `src/lib/*` salvo `src/lib/ai`, `src/components/ui`, `src/components/shared`, configuraciones, workflows) solo se cambian con el visto bueno explícito del usuario.
 - Se trabaja directamente en `develop` y se hace push sin pull request. Antes de cada push: `git pull --rebase origin develop` y `npm run lint && npm run build`. `main` solo recibe `develop` (`git push origin develop:main`) cuando el usuario lo pida.
 - Solo exportación estática: sin rutas de API, server actions, APIs de servidor en tiempo de petición ni segmentos dinámicos (`[id]`); usa parámetros `?id=`.
