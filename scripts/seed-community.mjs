@@ -135,10 +135,22 @@ const ACTIVITIES = [
   [4, "languages", "Intercambio de idiomas en un espacio seguro", "Practica idiomas con gente que respeta quién eres.", { inclusion: ["lgtbiq", "inclusive_language"], past: true }],
 ];
 
+// Regular activities happened before too: a past edition of each, so there is history and reviews.
+for (const [owner, category, title, description, extra] of ACTIVITIES.slice(0, 40)) {
+  if (extra.past || extra.online) continue;
+  ACTIVITIES.push([owner, category, title, description, { ...extra, past: true }]);
+}
+
+const PLATFORM_IDS = ["meet", "zoom", "jitsi", "teams", "whatsapp", "discord"];
+
 const CHAT = [
   "¡Hola! Qué ganas de conoceros.", "¿Alguien viene desde lejos? Puedo llevar a dos personas en coche.",
   "Yo llevo agua para el grupo.", "Es mi primera vez, un poco de nervios 😅", "¿Hay que llevar algo?",
   "Nos vemos allí. Iré con una camiseta naranja.", "Perfecto, gracias por organizar.", "¿Se puede ir con niños?",
+  "Llego 10 minutos tarde, ¡no empecéis sin mí!", "¿Dónde aparcamos?", "Yo puedo traer algo de comer.",
+  "La última vez fue genial, repito.", "¿Alguien habla francés? Así practico.", "Hace buen tiempo, perfecto para salir.",
+  "Gracias por pensar en que sea accesible 🙌", "¿A qué hora terminamos más o menos?", "¡Qué buena idea esta actividad!",
+  "Traigo a una amiga que acaba de llegar a la isla.", "Mándame la ubicación exacta, por favor.", "Yo voy en guagua, llego a las 6.",
 ];
 const REVIEWS = [
   [5, "Me encantó. Se notaba que estaba pensado para que cupiera todo el mundo."],
@@ -146,6 +158,15 @@ const REVIEWS = [
   [4, "Muy buen ambiente. Empezó un poco tarde, pero mereció la pena."],
   [4, "Bien organizado y muy accesible."],
   [5, "La persona que lo organizaba explicaba todo muy despacio. Gracias."],
+  [5, "Me sentí en casa desde el primer minuto."],
+  [4, "Muy bonito. Faltaron algunas sillas, pero todo bien."],
+  [5, "Perfecto para practicar idiomas sin vergüenza."],
+  [3, "Estuvo bien, aunque éramos muchas personas para el sitio."],
+  [5, "Volveré la próxima semana. ¡Gracias por organizarlo!"],
+  [4, "Gente muy maja y un ambiente muy respetuoso."],
+  [5, "Lo mejor de mi semana."],
+  [4, ""],
+  [5, ""],
 ];
 
 // ── Category look for the drawn images ────────────────────────────────────────
@@ -217,6 +238,7 @@ for (const person of PEOPLE) {
       location: online ? null : { lat: lat + (random() - 0.5) * 0.01, lng: lng + (random() - 0.5) * 0.01 },
       placeName: online ? "" : placeName, island: online ? null : person.island,
       onlineUrl: online ? "https://meet.example.com/fleje-" + created.length : null,
+      onlinePlatform: online ? PLATFORM_IDS[created.length % PLATFORM_IDS.length] : null,
       startsAt: Timestamp.fromDate(startsAt), endsAt: Timestamp.fromDate(new Date(startsAt.getTime() + hours * 60 * 60 * 1000)),
       capacity: extra.capacity ?? null, inclusion: extra.inclusion ?? [],
       attendeeIds: [user.uid], attendeeLanguages: { [user.uid]: person.languages },
@@ -232,7 +254,7 @@ let joins = 0;
 for (const person of PEOPLE) {
   await enter(person);
   const fitting = created.filter((item, i) => item.owner !== person.index && person.interests.includes(ACTIVITIES[i][1]));
-  const chosen = [...new Set([...some(fitting, 4), ...some(created.filter((item) => item.owner !== person.index), 2)])];
+  const chosen = [...new Set([...some(fitting, 7), ...some(created.filter((item) => item.owner !== person.index), 5)])];
   for (const activity of chosen) {
     if (activity.capacity && activity.attendees.size >= activity.capacity) continue;
     await updateDoc(doc(db, "events", activity.id), {
@@ -247,18 +269,19 @@ for (const person of PEOPLE) {
 // Chats in the busiest activities, and reviews of the ones that already happened.
 let messages = 0;
 let reviews = 0;
-const busiest = [...created].sort((a, b) => b.attendees.size - a.attendees.size).slice(0, 10);
+const busiest = [...created].filter((item) => !item.past).sort((a, b) => b.attendees.size - a.attendees.size).slice(0, 25);
 for (const person of PEOPLE) {
   const user = await enter(person);
   for (const activity of created) {
     if (!activity.attendees.has(person.index)) continue;
-    if (busiest.includes(activity) && random() < 0.7) {
+    const lines = busiest.includes(activity) ? Math.floor(random() * 3) + (random() < 0.8 ? 1 : 0) : 0;
+    for (let line = 0; line < lines; line += 1) {
       await addDoc(collection(db, "events", activity.id, "messages"), {
         uid: user.uid, name: person.displayName, pronouns: person.pronouns, text: pick(CHAT), createdAt: serverTimestamp(),
       });
       messages += 1;
     }
-    if (activity.past && activity.owner !== person.index) {
+    if (activity.past && activity.owner !== person.index && random() < 0.9) {
       const [rating, text] = pick(REVIEWS);
       await setDoc(doc(db, "events", activity.id, "reviews", user.uid), {
         uid: user.uid, name: person.displayName, rating, text, createdAt: serverTimestamp(),

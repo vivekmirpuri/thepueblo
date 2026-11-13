@@ -24,13 +24,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CATEGORIES, type CategoryId } from "@/lib/categories";
 import { PRONOUN_SUGGESTIONS } from "@/lib/inclusion";
-import { ISLANDS, type IslandId } from "@/lib/islands";
+import { HOMES, type HomeId } from "@/lib/islands";
 import { LANGUAGES, type LanguageCode } from "@/lib/languages";
 import { AVAILABILITY, PREFERS, type AvailabilityId } from "@/lib/profile";
 import type { ProfileDraft } from "@/lib/types";
 
 /** The island is empty until the person picks one; `onSubmit` only ever receives a real one. */
-type Draft = Omit<ProfileDraft, "island"> & { island: IslandId | "" };
+type Draft = Omit<ProfileDraft, "island"> & { island: HomeId | "" };
 
 const flip = <T,>(list: readonly T[], value: T): T[] =>
   list.includes(value) ? list.filter((item) => item !== value) : [...list, value];
@@ -153,12 +153,12 @@ export function ProfileForm({
     },
     {
       id: "island",
-      title: "¿En qué isla vives?",
-      hint: "Solo guardamos la isla, nunca dónde estás exactamente.",
-      missing: draft.island ? null : "Elige tu isla.",
+      title: "¿Dónde vives?",
+      hint: "Solo guardamos la isla, nunca dónde estás exactamente. Si vives fuera de las islas, elige «Otro sitio».",
+      missing: draft.island ? null : "Elige tu isla u «Otro sitio».",
       content: (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {ISLANDS.map((island) => (
+          {HOMES.map((island) => (
             <Bubble
               key={island.id}
               label={island.name}
@@ -251,7 +251,7 @@ export function ProfileForm({
     try {
       await onSubmit({
         ...draft,
-        island: draft.island as IslandId,
+        island: draft.island as HomeId,
         displayName: draft.displayName.trim(),
         pronouns: draft.pronouns?.trim() || null,
         bio: draft.bio.trim(),

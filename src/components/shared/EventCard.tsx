@@ -12,6 +12,7 @@ import { InclusionBadges } from "@/components/shared/InclusionBadges";
 import { LanguageFlags } from "@/components/shared/LanguageFlags";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { onlineLabel } from "@/lib/platforms";
 import { findCategory } from "@/lib/categories";
 import type { Meetup } from "@/lib/types";
 
@@ -59,7 +60,7 @@ export function EventCard({ event, distanceKm }: { event: Meetup; distanceKm?: n
           <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
             {event.mode === "online" ? (
               <>
-                <GlobeIcon className="size-4 shrink-0" aria-hidden /> En línea
+                <GlobeIcon className="size-4 shrink-0" aria-hidden /> {onlineLabel(event.onlinePlatform)}
               </>
             ) : (
               <>

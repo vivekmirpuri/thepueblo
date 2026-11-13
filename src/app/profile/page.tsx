@@ -19,7 +19,7 @@ import { useUser } from "@/lib/auth";
 import { findCategory } from "@/lib/categories";
 import { saveProfile } from "@/lib/db";
 import { auth } from "@/lib/firebase";
-import { ISLANDS } from "@/lib/islands";
+import { homeName } from "@/lib/islands";
 import { LANGUAGES } from "@/lib/languages";
 import { AVAILABILITY, PREFERS } from "@/lib/profile";
 import type { UserProfile } from "@/lib/types";
@@ -29,7 +29,7 @@ const initials = (name: string) =>
 
 function ProfileView({ profile, onEdit }: { profile: UserProfile; onEdit: () => void }) {
   const router = useRouter();
-  const island = ISLANDS.find((item) => item.id === profile.island);
+  const island = homeName(profile.island);
   const prefers = PREFERS.find((item) => item.id === profile.prefers);
 
   return (
@@ -45,7 +45,7 @@ function ProfileView({ profile, onEdit }: { profile: UserProfile; onEdit: () => 
           {island && (
             <p className="flex items-center gap-1 text-sm text-muted-foreground">
               <MapPinIcon className="size-4" aria-hidden />
-              {island.name}
+              {island}
             </p>
           )}
           {profile.role === "institution" && (

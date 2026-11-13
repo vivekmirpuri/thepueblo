@@ -15,7 +15,7 @@
  * Nothing here ever invents an activity: every result is a real document from Firestore.
  */
 import { findCategory } from "../categories";
-import { ISLANDS } from "../islands";
+import { homeName } from "../islands";
 import type { Meetup, UserProfile } from "../types";
 
 export interface ScoredEvent {
@@ -34,7 +34,7 @@ const plain = (text: string) =>
  * shortcut: time words ("semana", "hoy") are ignored, not used as a date filter; add one if asked.
  */
 const FILLER = new Set(
-  "algo este esta estos estas ese esa para con una uno unos unas que por los las del mas muy fin semana hoy manana plan planes quiero busco gustaria hacer cerca sitio".split(" "),
+  "algo este esta estos estas ese esa para con una uno unos unas que por los las del mas muy fin semana hoy manana plan planes quiero busco gustaria hacer cerca sitio otro".split(" "),
 );
 
 /** Words worth matching on: three letters or more and not filler. */
@@ -49,6 +49,14 @@ const haystack = (event: Meetup) =>
       .filter(Boolean)
       .join(" "),
   );
+
+/** True when every meaningful word typed appears in the activity. Used by the search bar on the map. */
+export function matchesText(query: string, event: Meetup): boolean {
+  const asked = words(query);
+  if (asked.length === 0) return true;
+  const text = haystack(event);
+  return asked.every((word) => text.includes(word));
+}
 
 function rank(text: string, events: Meetup[], limit: number): ScoredEvent[] {
   const asked = words(text);
@@ -81,7 +89,7 @@ export async function searchEvents(query: string, events: Meetup[], limit = 6): 
  */
 export async function recommendEvents(profile: UserProfile, events: Meetup[], limit = 6): Promise<ScoredEvent[]> {
   const interests = profile.interests.map((id) => findCategory(id)?.label ?? "").filter(Boolean);
-  const island = ISLANDS.find((item) => item.id === profile.island)?.name ?? "";
+  const island = homeName(profile.island) ?? "";
   const asked = [...interests, island, profile.bio].join(" ");
 
   const scored = rank(asked, events, events.length).map((result) => {

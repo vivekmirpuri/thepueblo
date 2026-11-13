@@ -2,8 +2,8 @@
 /**
  * "Descubrir": one activity at a time, full screen, swipe to decide — Track A. Built.
  *
- * Swipe right (or tap the heart) to join, left (or tap the cross) to skip, tap the card to open
- * it. Gestures are never the only way: every action also has a labelled button, so it works with a
+ * Swipe right (or tap the heart) to join, left (or tap the cross) to skip, tap ⓘ to open it, and
+ * the arrow undoes the last decision (if it was a join, you are taken off the activity again). Gestures are never the only way: every action also has a labelled button, so it works with a
  * keyboard, a screen reader or a shaky hand. The category bubbles at the top choose which topics
  * come into the deck; none chosen means all of them.
  *
@@ -13,11 +13,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { animate, motion, useMotionValue, useReducedMotion, useTransform, type PanInfo } from "motion/react";
 import Link from "next/link";
-import { CalendarDaysIcon, GlobeIcon, HeartIcon, InfoIcon, MapPinIcon, UndoIcon, UsersIcon, XIcon } from "lucide-react";
+import { ArrowLeftIcon, CalendarDaysIcon, GlobeIcon, HeartIcon, InfoIcon, MapPinIcon, Undo2Icon, UndoIcon, UsersIcon, XIcon } from "lucide-react";
 import { InclusionBadges } from "@/components/shared/InclusionBadges";
 import { LanguageFlags } from "@/components/shared/LanguageFlags";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
+import { onlineLabel } from "@/lib/platforms";
 import { CATEGORIES, findCategory, type CategoryId } from "@/lib/categories";
 import type { Meetup } from "@/lib/types";
 
@@ -78,7 +79,7 @@ function Card({ event, onDecide }: { event: Meetup; onDecide: (join: boolean) =>
         </p>
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           {event.mode === "online" ? <GlobeIcon className="size-4 shrink-0" aria-hidden /> : <MapPinIcon className="size-4 shrink-0" aria-hidden />}
-          {event.mode === "online" ? "En línea" : event.placeName}
+          {event.mode === "online" ? onlineLabel(event.onlinePlatform) : event.placeName}
         </p>
         {event.description && <p className="line-clamp-3 text-sm">{event.description}</p>}
         <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-2">
@@ -98,16 +99,21 @@ export function SwipeDeck({
   events,
   myUid,
   onJoin,
+  onLeave,
   onClose,
 }: {
   events: Meetup[];
   myUid?: string;
   /** Resolves when joined; the deck moves on either way. */
   onJoin: (event: Meetup) => Promise<void>;
+  /** Undo of a join. */
+  onLeave: (event: Meetup) => Promise<void>;
   onClose: () => void;
 }) {
   const [topics, setTopics] = useState<CategoryId[]>([]);
-  const [seen, setSeen] = useState<string[]>([]);
+  // Every decision, newest last, so the last one can be undone.
+  const [history, setHistory] = useState<{ event: Meetup; joined: boolean }[]>([]);
+  const seen = useMemo(() => history.map((item) => item.event.id), [history]);
   const still = useReducedMotion();
 
   // Full screen: the map page behind must not scroll (or show its scrollbar) while the deck is open.
@@ -133,17 +139,24 @@ export function SwipeDeck({
 
   function decide(join: boolean) {
     if (!current) return;
-    setSeen((list) => [...list, current.id]);
+    setHistory((list) => [...list, { event: current, joined: join }]);
     if (join) void onJoin(current);
+  }
+
+  function undo() {
+    const last = history.at(-1);
+    if (!last) return;
+    setHistory((list) => list.slice(0, -1));
+    if (last.joined) void onLeave(last.event);
   }
 
   return (
     <div className="fixed inset-0 z-30 flex flex-col bg-background" role="dialog" aria-modal="true" aria-label="Descubrir actividades">
       <header className="flex items-center gap-2 px-4 pt-4">
-        <h1 className="flex-1 text-xl font-semibold">Descubrir</h1>
-        <Button variant="ghost" size="icon" onClick={onClose} aria-label="Volver al mapa">
-          <XIcon aria-hidden />
+        <Button variant="ghost" onClick={onClose} className="-ml-2 h-11 gap-1.5 px-2 text-base">
+          <ArrowLeftIcon aria-hidden /> Volver al mapa
         </Button>
+        <h1 className="flex-1 text-right text-xl font-semibold">Descubrir</h1>
       </header>
 
       <div className="-mx-0 overflow-x-auto px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="Temas que quieres ver">
@@ -174,8 +187,8 @@ export function SwipeDeck({
             <p className="max-w-xs text-sm text-muted-foreground">
               {topics.length ? "Prueba a elegir más temas arriba." : "Vuelve más tarde: cada día se crean actividades nuevas."}
             </p>
-            {seen.length > 0 && (
-              <Button variant="outline" onClick={() => setSeen([])}>
+            {history.length > 0 && (
+              <Button variant="outline" onClick={() => setHistory([])}>
                 <UndoIcon aria-hidden /> Empezar otra vez
               </Button>
             )}
@@ -183,7 +196,10 @@ export function SwipeDeck({
         )}
       </div>
 
-      <div className="flex items-center justify-center gap-6 px-4 py-5">
+      <div className="flex items-center justify-center gap-5 px-4 py-5">
+        <Button variant="outline" className="size-12 rounded-full" onClick={undo} disabled={history.length === 0} aria-label="Deshacer la última decisión">
+          <Undo2Icon className="size-5" aria-hidden />
+        </Button>
         <Button variant="outline" className="size-16 rounded-full" onClick={() => decide(false)} disabled={!current} aria-label="Paso de esta actividad">
           <XIcon className="size-7" aria-hidden />
         </Button>

@@ -19,6 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { CATEGORIES, type CategoryId } from "@/lib/categories";
 import { INCLUSION, type InclusionId } from "@/lib/inclusion";
+import { PLATFORMS, type PlatformId } from "@/lib/platforms";
 import type { Point } from "@/components/map/EventMap";
 
 const PickMap = dynamic(() => import("@/components/map/EventMap").then((module) => module.EventMap), {
@@ -41,6 +42,7 @@ export interface EventFormValues {
   location: Point | null;
   placeName: string;
   onlineUrl: string | null;
+  onlinePlatform: PlatformId | null;
   startsAt: Date;
   endsAt: Date;
   capacity: number | null;
@@ -74,6 +76,7 @@ export function EventForm({
   const [location, setLocation] = useState<Point | null>(null);
   const [placeName, setPlaceName] = useState("");
   const [onlineUrl, setOnlineUrl] = useState("");
+  const [platform, setPlatform] = useState<PlatformId>("meet");
   const [starts, setStarts] = useState("");
   const [hours, setHours] = useState(2);
   const [capacity, setCapacity] = useState("");
@@ -111,6 +114,7 @@ export function EventForm({
         location: mode === "in_person" ? location : null,
         placeName: mode === "in_person" ? placeName.trim() : "",
         onlineUrl: mode === "online" ? onlineUrl.trim() : null,
+        onlinePlatform: mode === "online" ? platform : null,
         startsAt,
         endsAt: new Date(startsAt.getTime() + hours * 60 * 60 * 1000),
         capacity: capacity ? Number(capacity) : null,
@@ -171,7 +175,12 @@ export function EventForm({
           />
         </Question>
       ) : (
-        <Question title="¿Dónde os conectáis?" hint="Solo verán el enlace las personas apuntadas.">
+        <Question title="¿Dónde os conectáis?" hint="Elige la plataforma y pega el enlace. Solo lo verán las personas apuntadas.">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {PLATFORMS.map((item) => (
+              <Bubble key={item.id} label={item.label} pressed={platform === item.id} onPressedChange={() => setPlatform(item.id)} />
+            ))}
+          </div>
           <Input
             type="url"
             value={onlineUrl}

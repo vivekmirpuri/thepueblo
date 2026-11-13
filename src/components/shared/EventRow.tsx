@@ -9,6 +9,7 @@
 import Link from "next/link";
 import { ChevronRightIcon, MessageCircleIcon } from "lucide-react";
 import { LanguageFlags } from "@/components/shared/LanguageFlags";
+import { onlineLabel } from "@/lib/platforms";
 import { findCategory } from "@/lib/categories";
 import type { Meetup } from "@/lib/types";
 
@@ -29,7 +30,7 @@ export function EventRow({ event, href, showFlags = false }: { event: Meetup; hr
         <span className="min-w-0 flex-1 space-y-0.5">
           <span className="block truncate font-medium">{event.title}</span>
           <span className="block truncate text-xs text-muted-foreground">
-            {WHEN.format(event.startsAt.toDate())} · {event.mode === "online" ? "En línea" : event.placeName} · {people}{" "}
+            {WHEN.format(event.startsAt.toDate())} · {event.mode === "online" ? onlineLabel(event.onlinePlatform) : event.placeName} · {people}{" "}
             {people === 1 ? "persona" : "personas"}
           </span>
           {showFlags && <LanguageFlags languages={event.attendeeLanguages ?? {}} />}

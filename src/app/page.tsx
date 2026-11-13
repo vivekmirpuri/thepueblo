@@ -11,7 +11,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { FilterIcon, LayersIcon, LocateFixedIcon, PlusIcon } from "lucide-react";
+import { ArrowRightIcon, FilterIcon, LayersIcon, LocateFixedIcon, PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { CategoryChips } from "@/components/discover/CategoryChips";
 import { SwipeDeck } from "@/components/discover/SwipeDeck";
@@ -22,7 +22,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Toggle } from "@/components/ui/toggle";
 import { useUser } from "@/lib/auth";
 import type { CategoryId } from "@/lib/categories";
-import { joinEvent, listUpcomingEvents } from "@/lib/db";
+import { matchesText } from "@/lib/ai";
+import { Input } from "@/components/ui/input";
+import { joinEvent, leaveEvent, listUpcomingEvents } from "@/lib/db";
 import { distanceKm } from "@/lib/geo";
 import { INCLUSION, type InclusionId } from "@/lib/inclusion";
 import { ISLANDS } from "@/lib/islands";
@@ -47,6 +49,7 @@ export default function HomePage() {
   const [discovering, setDiscovering] = useState(false);
   const [events, setEvents] = useState<Meetup[] | null>(null);
   const [category, setCategory] = useState<CategoryId | null>(null);
+  const [text, setText] = useState("");
   const [sort, setSort] = useState<SortId>("soon");
   const [showFilters, setShowFilters] = useState(false);
   const [onlyOfficial, setOnlyOfficial] = useState(false);
@@ -89,6 +92,7 @@ export default function HomePage() {
     const mine = profile?.languages ?? [];
     const list = events.filter((event) => {
       if (category && event.category !== category) return false;
+      if (text && !matchesText(text, event)) return false;
       if (onlyOfficial && !event.official) return false;
       if (onlyOnline && event.mode !== "online") return false;
       if (needs.some((need) => !event.inclusion?.includes(need))) return false;
@@ -107,15 +111,51 @@ export default function HomePage() {
       if (sort === "people") return b.attendeeIds.length - a.attendeeIds.length;
       return a.startsAt.toMillis() - b.startsAt.toMillis();
     });
-  }, [events, category, onlyOfficial, onlyOnline, onlyMyLanguages, needs, sort, here, profile]);
+  }, [events, category, text, onlyOfficial, onlyOnline, onlyMyLanguages, needs, sort, here, profile]);
 
   const selected = shown.find((event) => event.id === selectedId);
 
   return (
     <div className="space-y-4 p-4">
-      <Button size="lg" className="h-12 w-full rounded-full text-base" onClick={() => setDiscovering(true)} disabled={!events?.length}>
-        <LayersIcon aria-hidden /> Descubrir actividades
-      </Button>
+      <button
+        type="button"
+        onClick={() => setDiscovering(true)}
+        disabled={!events?.length}
+        className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl bg-primary p-4 text-left text-primary-foreground shadow-lg outline-none transition-transform active:scale-[0.98] focus-visible:ring-4 focus-visible:ring-ring/50 disabled:opacity-60"
+      >
+        <span className="pointer-events-none absolute -top-8 -right-6 size-32 rounded-full bg-white/10" aria-hidden />
+        <span className="pointer-events-none absolute -bottom-10 right-16 size-24 rounded-full bg-white/10" aria-hidden />
+        {/* Three tilted cards: a hint of the swipe deck behind the button. */}
+        <span className="relative h-14 w-12 shrink-0" aria-hidden>
+          <span className="absolute inset-0 -rotate-12 rounded-lg bg-white/30" />
+          <span className="absolute inset-0 rotate-6 rounded-lg bg-white/50" />
+          <span className="absolute inset-0 flex items-center justify-center rounded-lg bg-white text-primary shadow">
+            <LayersIcon className="size-6" />
+          </span>
+        </span>
+        <span className="relative flex-1">
+          <span className="block text-lg font-semibold">Descubrir actividades</span>
+          <span className="block text-sm opacity-90">Desliza: a la derecha te apuntas, a la izquierda pasas.</span>
+        </span>
+        <ArrowRightIcon className="relative size-6 shrink-0 transition-transform group-hover:translate-x-1" aria-hidden />
+      </button>
+
+      <div className="relative">
+        <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
+        <Input
+          type="search"
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          placeholder="Busca: caminata, música, Tenerife…"
+          aria-label="Buscar actividades"
+          className="h-12 rounded-full pr-12 pl-10 text-base"
+        />
+        {text && (
+          <Button variant="ghost" size="icon" className="absolute top-1/2 right-1 size-10 -translate-y-1/2 rounded-full" onClick={() => setText("")} aria-label="Borrar la búsqueda">
+            <XIcon aria-hidden />
+          </Button>
+        )}
+      </div>
 
       <CategoryChips selected={category} onChange={setCategory} />
 
@@ -226,6 +266,23 @@ export default function HomePage() {
               toast.success(`Te has apuntado a «${event.title}».`);
             } catch {
               toast.error("No se ha podido apuntar. Puede que esté completa.");
+            }
+          }}
+          onLeave={async (event) => {
+            if (!user) return;
+            try {
+              await leaveEvent(event.id, user.uid);
+              setEvents((list) =>
+                list?.map((item) => {
+                  if (item.id !== event.id) return item;
+                  const languages = { ...item.attendeeLanguages };
+                  delete languages[user.uid];
+                  return { ...item, attendeeIds: item.attendeeIds.filter((id) => id !== user.uid), attendeeLanguages: languages };
+                }) ?? null,
+              );
+              toast.info(`Ya no estás en «${event.title}».`);
+            } catch {
+              toast.error("No se ha podido deshacer.");
             }
           }}
         />

@@ -18,6 +18,14 @@ export const ISLANDS = [
 
 export type IslandId = (typeof ISLANDS)[number]["id"];
 
+/**
+ * Where a person can say they live: the eight islands, or "Otro sitio" for anyone outside the
+ * archipelago (the peninsula, abroad, just visiting). "otro" has no map centre.
+ */
+export const HOMES = [...ISLANDS, { id: "otro", name: "Otro sitio", center: null }] as const;
+export type HomeId = IslandId | "otro";
+export const homeName = (id: string | null | undefined) => HOMES.find((home) => home.id === id)?.name;
+
 /** [[west, south], [east, north]] — the whole archipelago; use as the map's initial `bounds`. */
 export const ARCHIPELAGO_BOUNDS: [[number, number], [number, number]] = [[-18.3, 27.5], [-13.2, 29.5]];
 

@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@/lib/auth";
 import { findCategory } from "@/lib/categories";
+import { onlineLabel, platformLabel } from "@/lib/platforms";
 import { getEvent, joinEvent, leaveEvent, listReviews, saveReview } from "@/lib/db";
 import { INCLUSION } from "@/lib/inclusion";
 import type { Meetup, Review } from "@/lib/types";
@@ -117,10 +118,10 @@ function EventDetail() {
             <GlobeIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
             {joined && event.onlineUrl ? (
               <a href={event.onlineUrl} target="_blank" rel="noreferrer" className="underline">
-                Entrar a la videollamada
+                Entrar a la videollamada{platformLabel(event.onlinePlatform) && event.onlinePlatform !== "otra" ? ` (${platformLabel(event.onlinePlatform)})` : ""}
               </a>
             ) : (
-              "En línea. Apúntate para ver el enlace."
+              `${onlineLabel(event.onlinePlatform)}. Apúntate para ver el enlace.`
             )}
           </>
         ) : (

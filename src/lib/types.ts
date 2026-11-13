@@ -8,7 +8,8 @@
 import type { Timestamp } from "firebase/firestore";
 import type { CategoryId } from "./categories";
 import type { InclusionId } from "./inclusion";
-import type { IslandId } from "./islands";
+import type { HomeId, IslandId } from "./islands";
+import type { PlatformId } from "./platforms";
 import type { LanguageCode } from "./languages";
 
 /** users/{uid} */
@@ -24,8 +25,8 @@ export interface UserProfile {
   bio: string;
   interests: CategoryId[];
   languages: LanguageCode[];
-  /** The only location stored for a person. Never an exact position. */
-  island: IslandId;
+  /** The only location stored for a person: an island or "otro". Never an exact position. */
+  island: HomeId;
   prefers: "in_person" | "online" | "both";
   availability: string[];
   createdAt: Timestamp;
@@ -54,6 +55,8 @@ export interface Meetup {
   placeName: string;
   island: IslandId | null;
   onlineUrl: string | null;
+  /** Which video-call platform, for online activities. */
+  onlinePlatform: PlatformId | null;
   startsAt: Timestamp;
   /** Required: the home screen lists events until they END, so a running event stays visible. */
   endsAt: Timestamp;
