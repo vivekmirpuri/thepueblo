@@ -1,4 +1,4 @@
-# flejethepueblo — contexto del producto
+# FlejeThePueblo — contexto del producto
 
 Grupo 3, Hackathon TechLab II. Este documento explica **qué** construimos y **por qué**.
 Cómo se construye: [ARCHITECTURE.md](ARCHITECTURE.md). Qué se hace y en qué orden: [PLAN.md](PLAN.md).

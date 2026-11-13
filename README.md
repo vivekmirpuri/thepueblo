@@ -1,4 +1,4 @@
-# flejethepueblo — hackathon
+# FlejeThePueblo — hackathon
 
 Next.js (React + TypeScript + Tailwind) → exportación estática → Firebase Hosting.
 

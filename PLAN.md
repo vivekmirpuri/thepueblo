@@ -1,4 +1,4 @@
-# flejethepueblo — plan de implementación
+# FlejeThePueblo — plan de implementación
 
 Producto: [CONTEXT.md](CONTEXT.md) (funcionalidades F1–F16). Diseño: [ARCHITECTURE.md](ARCHITECTURE.md).
 
@@ -65,7 +65,7 @@ Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rut
 | ~~B1~~ | ~~Formulario de crear actividad: lugar en el mapa y foto~~ **hecho** | F8 |
 | ~~B2~~ | ~~Detalle: información, unirse / salir~~ **hecho** | F10 |
 | ~~B3~~ | ~~Banderas de idiomas en detalle y tarjetas~~ **hecho** | F11 |
-| B4 | Chat de grupo por evento + lista "mis chats" | F14 |
+| ~~B4~~ | ~~Chat de grupo por actividad + lista "mis grupos"~~ **hecho** | F14 |
 | B5 | Mostrar eventos parecidos en el formulario (llama a `findSimilarEvents`) | F9 |
 | B6 | Reseñas: estrellas + comentario, media en el evento | F12 |
 | B7 | Insignia oficial; las instituciones publican eventos oficiales | F13 |

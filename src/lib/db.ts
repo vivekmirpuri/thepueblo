@@ -2,7 +2,7 @@
  * Firestore reads and writes — SHARED file. Every screen goes through these functions instead
  * of calling Firestore directly, so the document shapes live in one place.
  *
- * Built:      getProfile, saveProfile, joinEvent, leaveEvent, uploadEventImage
+ * Built:      profiles, events, join/leave, image upload, group chat
  * Not built:  everything that calls todo() — the task id says who picks it up (see PLAN.md)
  *
  * Notes for whoever fills these in:
@@ -20,6 +20,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   orderBy,
   query,
   serverTimestamp,
@@ -106,12 +107,55 @@ export const leaveEvent = (eventId: string, uid: string) =>
     [`attendeeLanguages.${uid}`]: deleteField(),
   });
 
-// ── Chat and reviews (Track B) ────────────────────────────────────────────────
-/** Returns the unsubscribe function. */
-export const watchMessages = (eventId: string, onChange: (messages: ChatMessage[]) => void): (() => void) =>
-  todo("B4 watchMessages", eventId, onChange);
-export const sendMessage = (eventId: string, me: Pick<UserProfile, "uid" | "displayName" | "pronouns">, text: string): Promise<void> =>
-  todo("B4 sendMessage", eventId, me, text);
+// ── Group chat (F14) ──────────────────────────────────────────────────────────
+
+/** Activities I have joined, soonest first — the list on /chats/. */
+export async function listMyEvents(uid: string): Promise<Meetup[]> {
+  const mine = query(collection(db, "events"), where("attendeeIds", "array-contains", uid));
+  return (await getDocs(mine)).docs
+    .map(toMeetup)
+    .sort((a, b) => a.startsAt.toMillis() - b.startsAt.toMillis());
+}
+
+/** Max length of one message; firestore.rules refuse longer ones. */
+export const MESSAGE_MAX = 1000;
+
+/**
+ * Live messages of one activity, oldest first. Calls `onChange` every time someone writes.
+ * Returns the unsubscribe function: call it when the screen closes.
+ * Only attendees can read (firestore.rules); anyone else gets `onError`.
+ */
+export function watchMessages(
+  eventId: string,
+  onChange: (messages: ChatMessage[]) => void,
+  onError?: (error: Error) => void,
+): () => void {
+  return onSnapshot(
+    query(collection(db, "events", eventId, "messages"), orderBy("createdAt")),
+    (snap) =>
+      onChange(
+        // "estimate" fills in the time of a message that is still on its way to the server.
+        snap.docs.map((found) => ({ id: found.id, ...found.data({ serverTimestamps: "estimate" }) }) as ChatMessage),
+      ),
+    onError,
+  );
+}
+
+export async function sendMessage(
+  eventId: string,
+  me: Pick<UserProfile, "uid" | "displayName" | "pronouns">,
+  text: string,
+): Promise<void> {
+  await addDoc(collection(db, "events", eventId, "messages"), {
+    uid: me.uid,
+    name: me.displayName,
+    pronouns: me.pronouns ?? null,
+    text,
+    createdAt: serverTimestamp(),
+  });
+}
+
+// ── Reviews (Track B) ─────────────────────────────────────────────────────────
 export const listReviews = (eventId: string): Promise<Review[]> => todo("B6 listReviews", eventId);
 export const saveReview = (eventId: string, review: Omit<Review, "createdAt">): Promise<void> =>
   todo("B6 saveReview", eventId, review);

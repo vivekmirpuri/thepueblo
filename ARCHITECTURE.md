@@ -1,4 +1,4 @@
-# flejethepueblo — arquitectura
+# FlejeThePueblo — arquitectura
 
 Qué construimos: [CONTEXT.md](CONTEXT.md). Tareas y orden: [PLAN.md](PLAN.md).
 
@@ -174,11 +174,11 @@ Unirse y salir son **una sola actualización atómica** cada una (`arrayUnion` /
 
 ## Reglas de seguridad (resumen)
 
-Están en `firestore.rules`, desplegadas y cubiertas por `node scripts/rules-check.mjs`.
+Están en `firestore.rules`, desplegadas y cubiertas por `node scripts/rules-check.mjs` (20 comprobaciones).
 
 - **users**: cualquier usuario con sesión puede leer; solo puedes escribir tu propio documento; no puedes marcarte `verified`.
 - **events**: lectura pública. Con sesión puedes crear con `organizerId == tu uid`; `official: true` solo se permite si tu documento de usuario tiene `verified == true`. Solo quien organiza edita o borra. Cualquier usuario con sesión puede actualizar **solo** `attendeeIds` y `attendeeLanguages` (para unirse o salir), solo añadiéndose o quitándose a sí mismo y nunca por encima de `capacity`.
-- **messages**: leer y crear solo si tu uid está en `attendeeIds` del evento; puedes borrar los tuyos.
+- **messages**: leer y crear solo si tu uid está en `attendeeIds` del evento, con un texto de 1 a 1000 caracteres; puedes borrar los tuyos.
 - **reviews**: lectura pública; crear solo en tu nombre y solo si eres asistente.
 - **Storage** (`storage.rules`): las imágenes de eventos van en `events/{uid}/{archivo}`. Lectura pública; solo puedes escribir en tu propia carpeta, solo imágenes y de menos de 5 MB.
 

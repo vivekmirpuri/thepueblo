@@ -42,7 +42,9 @@ service cloud.firestore {
 
       match /messages/{messageId} {
         allow read: if isAttendee(eventId);
-        allow create: if isAttendee(eventId) && request.resource.data.uid == request.auth.uid;
+        allow create: if isAttendee(eventId) && request.resource.data.uid == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000;
         allow delete: if signedIn() && resource.data.uid == request.auth.uid;
       }
       match /reviews/{uid} {

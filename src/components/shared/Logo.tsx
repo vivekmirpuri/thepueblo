@@ -1,10 +1,10 @@
 /**
- * flejethepueblo logo: the mark (same drawing as src/app/icon.svg, the browser-tab icon) and the
+ * FlejeThePueblo logo: the mark (same drawing as src/app/icon.svg, the browser-tab icon) and the
  * lettering in one SVG — SHARED. Inline so the lettering uses the app font (Geist) and "pueblo"
  * follows the theme text colour (light and dark). Scales by height: smaller on phones.
  *
  * The mark is a pueblo — four little houses of different heights, because a village is more than
- * one house. Lettering: "flejethe" light and orange, "pueblo" extra-bold, cap height centred on
+ * one house. Lettering: "FlejeThe" light and orange, "Pueblo" extra-bold, cap height centred on
  * the mark. The text orange is deeper in light mode and lighter in dark mode so it stays readable.
  */
 import Link from "next/link";
@@ -17,13 +17,13 @@ export function Logo({ className }: { className?: string }) {
   return (
     <Link
       href="/"
-      aria-label="flejethepueblo, inicio"
+      aria-label="FlejeThePueblo, inicio"
       className={cn(
         "inline-flex min-h-11 items-center rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
         className,
       )}
     >
-      <svg viewBox="0 0 344 64" className="h-8 w-auto sm:h-10" aria-hidden>
+      <svg viewBox="0 0 358 64" className="h-8 w-auto sm:h-10" aria-hidden>
         <rect width="64" height="64" rx="16" fill={BRAND} />
         <g fill="#fff">
           <path d="M5 32 11 24 17 32V49H5Z" />
@@ -46,10 +46,10 @@ export function Logo({ className }: { className?: string }) {
           letterSpacing="-1.5"
         >
           <tspan fontWeight="400" className="fill-[#C2410C] dark:fill-[#FB923C]">
-            flejethe
+            FlejeThe
           </tspan>
           <tspan fontWeight="800" fill="currentColor" dx="1">
-            pueblo
+            Pueblo
           </tspan>
         </text>
       </svg>

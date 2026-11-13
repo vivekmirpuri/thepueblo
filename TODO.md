@@ -1,4 +1,4 @@
-# flejethepueblo — lista de tareas
+# FlejeThePueblo — lista de tareas
 
 Todo lo que falta, en un solo sitio. Marca `[x]` al terminar y haz push a `develop`.
 Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md](CONTEXT.md). Las tareas marcadas **nuevo** salen de la tabla de apartados del equipo y aún no estaban en el plan.
@@ -53,7 +53,7 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 - [ ] Opción de crear un encuentro rápido ("estoy en X, ¿alguien se apunta a un café?") con fin automático a las 2 horas.
 
 ### Chat grupal
-- [ ] B4 Chat de grupo por evento + lista "mis chats".
+- [x] B4 Chat de grupo en directo por actividad + lista "mis grupos" (mensajes de 1 a 1000 caracteres, solo para quien se apunta).
 
 ### Algoritmo de afinidad
 - [ ] C7 Gente como tú: intereses + idiomas + isla en común.
@@ -69,6 +69,7 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 
 ### Idioma / bandera
 - [x] `LanguageFlags` hecho.
+- [x] 29 idiomas elegidos por quién vive en Canarias, con lengua de signos, tamazight, wolof, pular, bambara, sindhi…
 - [x] B3 Banderas en tarjetas y detalle.
 
 ### Lectura fácil / lenguaje inclusivo — **nuevo**

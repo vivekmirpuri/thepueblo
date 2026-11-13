@@ -53,6 +53,8 @@ try {
   await denied(join("someone-else"), "add another person to an event");
   await allowed(join(b.uid), "join an event");
   message = await allowed(addDoc(messages, { uid: b.uid, text: "hi" }), "post in the chat after joining");
+  await denied(addDoc(messages, { uid: b.uid, text: "" }), "post an empty message");
+  await denied(addDoc(messages, { uid: b.uid, text: "x".repeat(1001) }), "post a message over 1000 characters");
 
   await as(c);
   await denied(join(c.uid), "join a full event (capacity 2)");
@@ -73,7 +75,7 @@ try {
   await as(null);
   await allowed(getDownloadURL(image), "see an event image without an account");
 
-  console.log("rules OK: 18 checks passed");
+  console.log("rules OK: 20 checks passed");
 } finally {
   if (uploaded) await as(a).then(() => deleteObject(image)).catch(() => {});
   if (message) await as(b).then(() => deleteDoc(message)).catch(() => {});
