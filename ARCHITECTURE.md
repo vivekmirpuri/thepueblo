@@ -130,7 +130,7 @@ Los archivos "compartidos" los usan todos los bloques: cámbialos con commits pe
 ```
 users/{uid}
   displayName, photoURL
-  pronouns: string | null        // opcional, texto libre ("she/her")
+  pronouns: string | null        // opcional, texto libre ("ella", "elle"…)
   role: "user" | "institution"
   verified: boolean              // solo instituciones; se marca a mano en la consola
   bio: string

@@ -19,5 +19,6 @@ export const INCLUSION = [
 
 export type InclusionId = (typeof INCLUSION)[number]["id"];
 
-/** Suggestions shown in onboarding; people can also type their own. */
-export const PRONOUN_SUGGESTIONS = ["she/her", "he/him", "they/them", "she/they", "he/they"] as const;
+/** Suggestions shown in onboarding, in Spanish like the rest of the interface; people can also type their own. */
+// "elle" is the neutral pronoun used in Spanish by many non-binary people.
+export const PRONOUN_SUGGESTIONS = ["ella", "él", "elle", "ella/elle", "él/elle"] as const;

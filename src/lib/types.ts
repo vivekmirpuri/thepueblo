@@ -15,7 +15,7 @@ import type { LanguageCode } from "./languages";
 export interface UserProfile {
   uid: string;
   displayName: string;
-  /** Optional, free text (e.g. "she/her"), asked at sign-up and shown next to the name (F18). */
+  /** Optional, free text (e.g. "ella"), asked at sign-up and shown next to the name (F18). */
   pronouns: string | null;
   photoURL: string | null;
   role: "user" | "institution";

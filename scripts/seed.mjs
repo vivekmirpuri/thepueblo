@@ -53,7 +53,7 @@ const PEOPLE = [
   {
     email: "ana.demo@example.com",
     displayName: "Ana",
-    pronouns: "she/her",
+    pronouns: "ella",
     languages: ["es", "en"],
     island: "tenerife",
     interests: ["outdoors", "languages", "food"],
@@ -73,7 +73,7 @@ const PEOPLE = [
   {
     email: "nadia.demo@example.com",
     displayName: "Nadia",
-    pronouns: "they/them",
+    pronouns: "elle",
     languages: ["fr", "es", "wo"],
     island: "lanzarote",
     interests: ["music", "arts", "debate"],
