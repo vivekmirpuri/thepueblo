@@ -1,19 +1,235 @@
+"use client";
 /**
- * The form to create an event (F8), with the similar-event warning (F9) — Track B. PLACEHOLDER.
+ * The form to create an activity (F8) — Track B. Built (not a placeholder).
+ * Still to come: B5, the warning about similar activities (it will call `findSimilarEvents`).
  *
- * To build (B1, then B5):
- *  - shadcn <Field>, <Input>, <Textarea>, <Select> (category), date and time inputs, capacity.
- *  - In person: pick the place by tapping <EventMap onPick>. Online: a link field instead.
- *  - Cover image: an <input type="file" accept="image/*">; on submit call `uploadEventImage(uid, file)`
- *    from "@/lib/db" and save the link it returns as `imageUrl`. Show a preview; max 5 MB (the rules enforce it).
- *  - Inclusion (F17): a <ToggleGroup> with one item per entry in INCLUSION ("@/lib/inclusion"), icon + label.
- *  - `endsAt` is required; default it to two hours after `startsAt`.
- *  - B5: as the title and description change (debounced), call `findSimilarEvents` from "@/lib/ai"
- *    and show the results as <EventCard>s above the submit button: "Similar events — join one instead?"
- *  - Presentational: props are `onSubmit(event)` and the list of existing events; the page saves.
+ * The place is chosen by tapping the map, because searching an address would need a geocoding
+ * service we do not have. Accessibility (F17) is part of the form, not an afterthought.
+ *
+ * Presentational: it holds the draft while you type and hands it over on submit; the page uploads
+ * the image and writes to Firestore.
  */
-import { Placeholder } from "@/components/shared/Placeholder";
+import dynamic from "next/dynamic";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Bubble } from "@/components/shared/Bubble";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { CATEGORIES, type CategoryId } from "@/lib/categories";
+import { INCLUSION, type InclusionId } from "@/lib/inclusion";
+import type { Point } from "@/components/map/EventMap";
 
-export function EventForm() {
-  return <Placeholder title="EventForm" track="B" features="F8 · F9" />;
+const PickMap = dynamic(() => import("@/components/map/EventMap").then((module) => module.EventMap), {
+  ssr: false,
+  loading: () => <Skeleton className="h-64 w-full rounded-xl" />,
+});
+
+const LENGTHS = [
+  { hours: 1, label: "1 hora" },
+  { hours: 2, label: "2 horas" },
+  { hours: 4, label: "4 horas" },
+  { hours: 8, label: "Todo el día" },
+] as const;
+
+export interface EventFormValues {
+  title: string;
+  description: string;
+  category: CategoryId;
+  mode: "in_person" | "online";
+  location: Point | null;
+  placeName: string;
+  onlineUrl: string | null;
+  startsAt: Date;
+  endsAt: Date;
+  capacity: number | null;
+  inclusion: InclusionId[];
+  official: boolean;
+  image: File | null;
+}
+
+function Question({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <fieldset className="space-y-3">
+      <legend className="text-base font-semibold">{title}</legend>
+      {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
+      {children}
+    </fieldset>
+  );
+}
+
+export function EventForm({
+  canPublishOfficial = false,
+  onSubmit,
+}: {
+  /** True only for a verified institution; the security rules check it again on the server. */
+  canPublishOfficial?: boolean;
+  onSubmit: (values: EventFormValues) => Promise<void>;
+}) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState<CategoryId | null>(null);
+  const [mode, setMode] = useState<"in_person" | "online">("in_person");
+  const [location, setLocation] = useState<Point | null>(null);
+  const [placeName, setPlaceName] = useState("");
+  const [onlineUrl, setOnlineUrl] = useState("");
+  const [starts, setStarts] = useState("");
+  const [hours, setHours] = useState(2);
+  const [capacity, setCapacity] = useState("");
+  const [inclusion, setInclusion] = useState<InclusionId[]>([]);
+  const [official, setOfficial] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  async function submit(formEvent: React.FormEvent) {
+    formEvent.preventDefault();
+    if (!title.trim()) return toast.error("Ponle un título a la actividad.");
+    if (!category) return toast.error("Elige un tema.");
+    if (!starts) return toast.error("Elige el día y la hora.");
+    const startsAt = new Date(starts);
+    if (Number.isNaN(startsAt.getTime())) return toast.error("Esa fecha no es válida.");
+    if (startsAt.getTime() < Date.now()) return toast.error("La fecha ya ha pasado. Elige otra.");
+    if (mode === "in_person" && !location) return toast.error("Toca el mapa para marcar dónde es.");
+    if (mode === "in_person" && !placeName.trim()) return toast.error("Escribe el nombre del sitio.");
+    if (mode === "online" && !onlineUrl.trim()) return toast.error("Pega el enlace de la videollamada.");
+    if (image && image.size > 5 * 1024 * 1024) return toast.error("La imagen pesa más de 5 MB.");
+
+    setSaving(true);
+    try {
+      await onSubmit({
+        title: title.trim(),
+        description: description.trim(),
+        category,
+        mode,
+        location: mode === "in_person" ? location : null,
+        placeName: mode === "in_person" ? placeName.trim() : "",
+        onlineUrl: mode === "online" ? onlineUrl.trim() : null,
+        startsAt,
+        endsAt: new Date(startsAt.getTime() + hours * 60 * 60 * 1000),
+        capacity: capacity ? Number(capacity) : null,
+        inclusion,
+        official,
+        image,
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("No se ha podido publicar. Inténtalo otra vez.");
+      setSaving(false);
+    }
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-8 p-4">
+      <Question title="¿Qué vais a hacer?">
+        <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Por ejemplo: caminata al atardecer" aria-label="Título" required />
+        <Textarea
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+          placeholder="Cuenta en pocas frases qué vais a hacer, para quién es y qué hay que llevar."
+          aria-label="Descripción"
+          rows={4}
+        />
+      </Question>
+
+      <Question title="¿De qué tema es?">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {CATEGORIES.map((item) => (
+            <Bubble
+              key={item.id}
+              icon={item.icon}
+              label={item.label}
+              description={item.description}
+              pressed={category === item.id}
+              onPressedChange={(on) => setCategory(on ? item.id : null)}
+            />
+          ))}
+        </div>
+      </Question>
+
+      <Question title="¿En persona o en línea?">
+        <div className="grid grid-cols-2 gap-2">
+          <Bubble label="En persona" pressed={mode === "in_person"} onPressedChange={() => setMode("in_person")} />
+          <Bubble label="En línea" pressed={mode === "online"} onPressedChange={() => setMode("online")} />
+        </div>
+      </Question>
+
+      {mode === "in_person" ? (
+        <Question title="¿Dónde es?" hint="Toca el mapa para marcar el sitio.">
+          <PickMap pick={location} onPick={setLocation} className="h-64" />
+          <Input
+            value={placeName}
+            onChange={(event) => setPlaceName(event.target.value)}
+            placeholder="Nombre del sitio, por ejemplo: Parque García Sanabria"
+            aria-label="Nombre del sitio"
+          />
+        </Question>
+      ) : (
+        <Question title="¿Dónde os conectáis?" hint="Solo verán el enlace las personas apuntadas.">
+          <Input
+            type="url"
+            value={onlineUrl}
+            onChange={(event) => setOnlineUrl(event.target.value)}
+            placeholder="https://…"
+            aria-label="Enlace de la videollamada"
+          />
+        </Question>
+      )}
+
+      <Question title="¿Cuándo?">
+        <Input type="datetime-local" value={starts} onChange={(event) => setStarts(event.target.value)} aria-label="Día y hora" required />
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {LENGTHS.map((option) => (
+            <Bubble key={option.hours} label={option.label} pressed={hours === option.hours} onPressedChange={() => setHours(option.hours)} />
+          ))}
+        </div>
+      </Question>
+
+      <Question title="¿Cuánta gente cabe?" hint="Déjalo vacío si no hay límite.">
+        <Input
+          type="number"
+          min={1}
+          value={capacity}
+          onChange={(event) => setCapacity(event.target.value)}
+          placeholder="Sin límite"
+          aria-label="Número máximo de personas"
+        />
+      </Question>
+
+      <Question title="¿Qué ofrece tu actividad?" hint="Marca solo lo que puedas cumplir. Ayuda a que más gente se anime.">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {INCLUSION.map((item) => (
+            <Bubble
+              key={item.id}
+              icon={item.icon}
+              label={item.label}
+              pressed={inclusion.includes(item.id)}
+              onPressedChange={(on) =>
+                setInclusion((current) => (on ? [...current, item.id] : current.filter((id) => id !== item.id)))
+              }
+            />
+          ))}
+        </div>
+      </Question>
+
+      <Question title="Una foto" hint="Opcional. Como mucho 5 MB.">
+        <Input
+          type="file"
+          accept="image/*"
+          onChange={(event) => setImage(event.target.files?.[0] ?? null)}
+          aria-label="Foto de la actividad"
+        />
+      </Question>
+
+      {canPublishOfficial && (
+        <Question title="¿Es una actividad oficial?" hint="Llevará la insignia de tu institución.">
+          <Bubble label="Sí, publícala como oficial" pressed={official} onPressedChange={setOfficial} className="sm:w-auto" />
+        </Question>
+      )}
+
+      <Button type="submit" size="lg" className="w-full" disabled={saving}>
+        {saving ? "Publicando…" : "Publicar actividad"}
+      </Button>
+    </form>
+  );
 }

@@ -25,8 +25,8 @@ Todo lo que de otro modo pisaríamos entre varias personas se prepara una sola v
 - [x] Alta (`/onboarding/`) y perfil (`/profile/`): pronombres, idiomas, intereses, isla, disponibilidad.
 - [x] `EventCard` con imagen, icono de categoría, banderas e iconos de inclusión.
 - [x] `getProfile` y `saveProfile` en `src/lib/db.ts`.
-- [ ] Las funciones de lectura de eventos que necesitan los bloques A y B: `listUpcomingEvents`, `getEvent`.
-- [ ] `scripts/seed.mjs`, cuando el modelo de datos esté estable.
+- [x] Funciones de eventos en `db.ts`: `listUpcomingEvents`, `getEvent`, `createEvent`.
+- [x] `scripts/seed.mjs`: 3 personas y 12 actividades de ejemplo.
 - [ ] Opcional, en la consola de Firebase: acceso con Google; añadir los dominios de vista previa en Authentication → Settings → Authorized domains si el acceso falla en una URL de vista previa.
 
 **Contratos entre bloques** (se acuerdan una vez; no se cambian sin avisar)
@@ -53,23 +53,23 @@ Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rut
 ### Bloque A — Descubrir
 | # | Tarea | Funcionalidad |
 |---|---|---|
-| A1 | Mapa de las Islas Canarias con pines de eventos; al pulsar, mini tarjeta | F4 |
-| A2 | Fila de botones de categoría que filtra mapa y lista | F5 |
-| A3 | Lista de eventos bajo el mapa con `EventCard` | F7 |
-| A4 | Pedir ubicación; ordenar por cercanía / fecha / más gente | F6 |
-| A5 | Filtros: oficiales, en línea, "hablan mis idiomas", "accesible para mí" | F6, F13, F17 |
+| ~~A1~~ | ~~Mapa con pines por categoría y tarjeta al pulsar~~ **hecho** | F4 |
+| ~~A2~~ | ~~Botones de categoría que filtran mapa y lista~~ **hecho** | F5 |
+| ~~A3~~ | ~~Lista de actividades bajo el mapa~~ **hecho** | F7 |
+| ~~A4~~ | ~~Ubicación y orden por cercanía / fecha / más gente~~ **hecho** | F6 |
+| ~~A5~~ | ~~Filtros: oficiales, en línea, idiomas, accesibilidad~~ **hecho** | F6, F13, F17 |
 
 ### Bloque B — Eventos y chat
 | # | Tarea | Funcionalidad |
 |---|---|---|
-| B1 | Formulario de crear evento, con el lugar elegido pulsando en el mapa y subida de portada | F8 |
-| B2 | Página de detalle: información, unirse / salir | F10 |
-| B3 | Banderas de idiomas en el detalle y en las tarjetas (`LanguageFlags` ya existe) | F11 |
+| ~~B1~~ | ~~Formulario de crear actividad: lugar en el mapa y foto~~ **hecho** | F8 |
+| ~~B2~~ | ~~Detalle: información, unirse / salir~~ **hecho** | F10 |
+| ~~B3~~ | ~~Banderas de idiomas en detalle y tarjetas~~ **hecho** | F11 |
 | B4 | Chat de grupo por evento + lista "mis chats" | F14 |
 | B5 | Mostrar eventos parecidos en el formulario (llama a `findSimilarEvents`) | F9 |
 | B6 | Reseñas: estrellas + comentario, media en el evento | F12 |
 | B7 | Insignia oficial; las instituciones publican eventos oficiales | F13 |
-| B8 | Iconos de inclusión: elegirlos en el formulario y mostrarlos en tarjeta y detalle (`InclusionBadges` ya existe) | F17 |
+| ~~B8~~ | ~~Iconos de inclusión en formulario, tarjeta y detalle~~ **hecho** | F17 |
 
 ### Bloque C — Personas e IA
 | # | Tarea | Funcionalidad |
@@ -87,7 +87,7 @@ Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rut
 ## Fase 2 — Integrar y ensayar
 
 - [ ] Fusionar todo en `develop` y probar en el entorno de pruebas con un móvil real y un portátil.
-- [ ] Ejecutar el script de datos de ejemplo; crear dos cuentas de prueba con idiomas distintos.
+- [x] Datos de ejemplo cargados (3 personas con idiomas distintos, 12 actividades).
 - [ ] Abrir el asistente una vez en el portátil de la demo antes de empezar, para que los modelos ya estén en caché.
 - [ ] Pasar `develop` a `main`: `git push origin develop:main`.
 - [ ] Ensayar dos veces la demo de abajo.

@@ -41,6 +41,9 @@ Versiones comprobadas en npm el 12-11-2026. Todas son compatibles con React 19.
 | Tipografía | **Geist** con `next/font` | Ya conectada en `layout.tsx` |
 | Mapa | **maplibre-gl** + **react-map-gl** (`react-map-gl/maplibre`) | Código abierto, fluido en móviles |
 | Teselas del mapa | **OpenFreeMap** — estilo `https://tiles.openfreemap.org/styles/liberty` | Gratis, sin clave de API ni registro |
+
+**El worker del mapa.** MapLibre arranca un Web Worker y deduce su dirección de su propio `import.meta.url`; en cuanto el bundler mete la librería en un chunk, esa dirección no existe y el mapa se queda sin teselas. Por eso `scripts/copy-map-worker.mjs` copia `maplibre-gl-worker.mjs` a `public/` antes de `dev` y de `build` (scripts `predev` y `prebuild`), y `EventMap.tsx` llama a `setWorkerUrl("/maplibre-gl-worker.mjs")`. El archivo copiado está en `.gitignore`: se regenera en cada arranque, así nunca se queda desfasado.
+
 | Auth, base de datos, chat, imágenes | **firebase** (instalado) | `onSnapshot` de Firestore da chat en tiempo real sin otra librería; Cloud Storage guarda las imágenes de los eventos |
 | IA local | **@huggingface/transformers** (Transformers.js 4) | Una sola librería para el modelo de embeddings y el de chat; usa WebGPU si existe y WASM si no |
 | Formularios | `field` de shadcn + estado de React | Los formularios son pequeños; añade react-hook-form + zod solo si alguno crece |
@@ -113,7 +116,8 @@ src/
     todo.ts               marca las funciones que aún no existen
     ai/                   Bloque C  (config.ts hecho; index.ts es el contrato y aún no devuelve nada)
 scripts/rules-check.mjs   prueba las reglas de seguridad desplegadas (hecho)
-scripts/seed.mjs          personas y eventos falsos para la demo (provisional)
+scripts/seed.mjs          3 personas y 12 actividades de ejemplo (hecho)
+scripts/copy-map-worker.mjs  copia el worker de MapLibre a public/ (predev y prebuild)
 firestore.rules           reglas de seguridad de la base de datos, se despliegan A MANO (ver Hosting)
 storage.rules             reglas de subida de imágenes, se despliegan A MANO
 ```

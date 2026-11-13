@@ -23,6 +23,8 @@ npm run dev   # http://localhost:3000
 
 Firebase está listo para usar desde `src/lib/firebase.ts` (`auth`, `db`, `storage`).
 
+Para cargar datos de ejemplo necesitas un archivo `.env.local` (no se sube al repositorio) con una línea `SEED_PASSWORD=...`. Usa siempre la misma: con ella se crean la primera vez las cuentas de demostración y luego se reutilizan.
+
 ## Cómo trabajamos sin pisarnos
 
 1. **Trabaja en `develop` y haz push directo.** Cada push a `develop` se despliega solo en el entorno de pruebas. Cuando las pruebas vayan bien, pasa a producción con `git push origin develop:main`. No hace falta pull request; ábrelo solo si quieres una URL de vista previa o que alguien revise algo.
@@ -36,6 +38,7 @@ Firebase está listo para usar desde `src/lib/firebase.ts` (`auth`, `db`, `stora
 npm run dev                      # web en local
 npm run lint && npm run build    # lo que ejecuta el CI
 node scripts/rules-check.mjs     # prueba las reglas de seguridad desplegadas
+node --env-file=.env.local scripts/seed.mjs   # carga personas y actividades de ejemplo
 ```
 
 Las reglas de seguridad las despliega a mano la persona responsable del proyecto, nunca el CI: `firebase deploy --only firestore,storage`.

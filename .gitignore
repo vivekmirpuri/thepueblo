@@ -44,3 +44,6 @@ next-env.d.ts
 *firebase-adminsdk*.json
 service-account*.json
 .firebase/
+
+# copied from node_modules before dev/build (scripts/copy-map-worker.mjs)
+/public/maplibre-gl-worker.mjs

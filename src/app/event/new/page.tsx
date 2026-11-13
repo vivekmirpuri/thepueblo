@@ -1,22 +1,66 @@
+"use client";
 /**
- * Create an event — Track B. PLACEHOLDER.
- * Pattern: this page is the CONTAINER (loads data, holds state); components under
- * src/components/ only receive props and draw.
+ * Create an activity (F8) — Track B. Built (not a placeholder).
+ * Pattern: this page is the CONTAINER (uploads the photo, writes to Firestore and goes to the new
+ * activity); <EventForm> draws the form.
  *
- * To build (B1, B5):
- *  - Client container around <EventForm>: load existing events (for the similar-event check),
- *    save with `createEvent` from "@/lib/db", then go to the new event's page.
- *  - Signed out → send to "/login/".
- *  - `official` may be true only when my profile is a verified institution (the rules enforce it).
+ * Whoever creates an activity is counted as going to it, so the flags already show their languages.
  */
+import { useRouter } from "next/navigation";
+import { Timestamp } from "firebase/firestore";
+import { toast } from "sonner";
 import { EventForm } from "@/components/event/EventForm";
-import { Placeholder } from "@/components/shared/Placeholder";
+import { RequireUser } from "@/components/shared/RequireUser";
+import { createEvent, uploadEventImage } from "@/lib/db";
 
 export default function NewEventPage() {
+  const router = useRouter();
+
   return (
-    <>
-      <Placeholder title="Nuevo evento" track="B" features="F8 · F9" />
-      <EventForm />
-    </>
+    <RequireUser>
+      {({ user, profile }) =>
+        !profile ? null : (
+          <>
+            <header className="space-y-1 p-4 pb-0">
+              <h1 className="text-2xl font-semibold">Crear una actividad</h1>
+              <p className="text-sm text-muted-foreground">
+                Cualquier plan vale: un café, una caminata, una charla. Lo verá la gente que esté cerca.
+              </p>
+            </header>
+            <EventForm
+              canPublishOfficial={profile.role === "institution" && profile.verified}
+              onSubmit={async (values) => {
+                const imageUrl = values.image ? await uploadEventImage(user.uid, values.image) : null;
+                const id = await createEvent({
+                  title: values.title,
+                  description: values.description,
+                  category: values.category,
+                  imageUrl,
+                  official: values.official,
+                  organizerId: user.uid,
+                  organizerName: profile.displayName,
+                  mode: values.mode,
+                  location: values.location,
+                  placeName: values.placeName,
+                  island: values.mode === "in_person" ? profile.island : null,
+                  onlineUrl: values.onlineUrl,
+                  startsAt: Timestamp.fromDate(values.startsAt),
+                  endsAt: Timestamp.fromDate(values.endsAt),
+                  capacity: values.capacity,
+                  inclusion: values.inclusion,
+                  attendeeIds: [user.uid],
+                  attendeeLanguages: { [user.uid]: profile.languages },
+                  ratingSum: 0,
+                  ratingCount: 0,
+                  embedding: null,
+                });
+                toast.success("¡Publicada! Ya se ve en el mapa.");
+                router.replace(`/event/?id=${id}`);
+              }}
+            />
+          </>
+        )
+      }
+    </RequireUser>
   );
 }

@@ -12,14 +12,22 @@
  *  - Add the document id yourself: `{ id: snap.id, ...snap.data() } as Meetup`.
  */
 import {
+  addDoc,
   arrayRemove,
   arrayUnion,
+  collection,
   deleteField,
   doc,
   getDoc,
+  getDocs,
+  orderBy,
+  query,
   serverTimestamp,
   setDoc,
+  Timestamp,
   updateDoc,
+  where,
+  type QueryDocumentSnapshot,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "./firebase";
@@ -46,10 +54,33 @@ export async function saveProfile(uid: string, draft: ProfileDraft): Promise<voi
 
 export const listProfiles = (): Promise<UserProfile[]> => todo("C7 listProfiles");
 
-// ── Events (Track A reads, Track B writes) ────────────────────────────────────
-export const listUpcomingEvents = (): Promise<Meetup[]> => todo("A1 listUpcomingEvents");
-export const getEvent = (id: string): Promise<Meetup | null> => todo("B2 getEvent", id);
-export const createEvent = (event: Omit<Meetup, "id" | "createdAt">): Promise<string> => todo("B1 createEvent", event);
+// ── Events ───────────────────────────────────────────────────────────────────
+
+const toMeetup = (snap: QueryDocumentSnapshot) => ({ id: snap.id, ...snap.data() }) as Meetup;
+
+/**
+ * Every event that has not ended yet, soonest first. The home screen loads this once and then
+ * filters, sorts and measures distances in the browser — see ARCHITECTURE → Consultas.
+ */
+export async function listUpcomingEvents(): Promise<Meetup[]> {
+  const upcoming = query(
+    collection(db, "events"),
+    where("endsAt", ">=", Timestamp.now()),
+    orderBy("endsAt"),
+  );
+  return (await getDocs(upcoming)).docs.map(toMeetup);
+}
+
+export async function getEvent(id: string): Promise<Meetup | null> {
+  const snap = await getDoc(doc(db, "events", id));
+  return snap.exists() ? ({ id: snap.id, ...snap.data() } as Meetup) : null;
+}
+
+/** Returns the new event's id. The rules check that `organizerId` is you. */
+export async function createEvent(event: Omit<Meetup, "id" | "createdAt">): Promise<string> {
+  const created = await addDoc(collection(db, "events"), { ...event, createdAt: serverTimestamp() });
+  return created.id;
+}
 
 /**
  * Uploads a cover image and returns its download link; save that link as `imageUrl` on the event.

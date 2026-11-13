@@ -18,15 +18,15 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 - [x] `src/lib/auth.tsx` real (`AuthProvider`, `useUser`) y pantalla `/login/`.
 - [x] Alta (`/onboarding/`) y perfil (`/profile/`), con burbujas de intereses, idiomas y pronombres.
 - [x] `getProfile` y `saveProfile` en `src/lib/db.ts`.
-- [ ] Funciones de lectura de eventos: `listUpcomingEvents`, `getEvent`.
+- [x] Funciones de eventos: `listUpcomingEvents`, `getEvent`, `createEvent`.
 - [x] `EventCard` completa, con el icono de la categoría.
-- [ ] `scripts/seed.mjs`: ~20 personas falsas y ~30 eventos.
+- [x] `scripts/seed.mjs`: 3 personas y 12 actividades (`node --env-file=.env.local scripts/seed.mjs`).
 
 ## 2. Por apartado
 
 ### Actividades del pueblo — eventos creados por personas
-- [ ] B1 Formulario de crear evento (lugar en el mapa, portada subida).
-- [ ] B2 Detalle del evento: unirse / salir.
+- [x] B1 Formulario de crear actividad (lugar en el mapa, foto subida a Storage).
+- [x] B2 Detalle de la actividad: unirse / salir.
 - [ ] B5 Aviso de eventos parecidos antes de publicar (modelo local).
 
 ### Actividades institucionales
@@ -34,14 +34,15 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 - [ ] C1 Opción "Represento a una institución" en el alta.
 
 ### Apartado de distintas actividades (categorías)
-- [ ] A1 Mapa de las Islas Canarias con pines.
-- [ ] A2 Botones de categoría sobre el mapa (tipo Google Maps).
-- [ ] A3 Lista de eventos bajo el mapa.
+- [x] A1 Mapa de las Islas Canarias con pines por categoría.
+- [x] A2 Botones de categoría sobre el mapa.
+- [x] A3 Lista de actividades bajo el mapa.
 
 ### Filtro de fechas y actividades
-- [ ] A4 Ordenar por cercanía / fecha / más gente.
-- [ ] A5 Filtros: oficiales, en línea, "hablan mis idiomas", "accesible para mí".
+- [x] A4 Ordenar por cercanía / fecha / más gente.
+- [x] A5 Filtros: oficiales, en línea, "hablan mis idiomas", "accesible para mí".
 - [ ] **Nuevo** — Filtro por rango de fechas: hoy, este fin de semana, esta semana, elegir fechas.
+- [ ] Agrupar los pines que se solapan cuando hay varios en el mismo sitio.
 
 ### Intercambios de saberes — **nuevo**
 - [ ] Decidir el formato: categoría nueva "Intercambio de saberes" (enseño X / quiero aprender Y) o campo del perfil. Lo más simple: una categoría más en `src/lib/categories.ts`.
@@ -68,7 +69,7 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 
 ### Idioma / bandera
 - [x] `LanguageFlags` hecho.
-- [ ] B3 Mostrar banderas en tarjetas y detalle.
+- [x] B3 Banderas en tarjetas y detalle.
 
 ### Lectura fácil / lenguaje inclusivo — **nuevo**
 - [ ] Textos de la interfaz cortos, frases simples, sin tecnicismos (criterios de lectura fácil).
@@ -82,7 +83,7 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 
 ### Accesibilidad
 - [x] Iconos de inclusión (`InclusionBadges`) y lista en `src/lib/inclusion.ts`.
-- [ ] B8 Elegir iconos en el formulario y mostrarlos en tarjeta y detalle.
+- [x] B8 Iconos de inclusión en el formulario, la tarjeta y el detalle.
 - [ ] Revisión: contraste, tamaño de toque, navegación con teclado, lector de pantalla (textos alternativos).
 
 ### Pronombres

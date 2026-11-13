@@ -75,7 +75,9 @@ export function EventCard({ event, distanceKm }: { event: Meetup; distanceKm?: n
               <UsersIcon className="size-4" aria-hidden />
               {event.attendeeIds.length}
               {event.capacity ? ` / ${event.capacity}` : ""}
-              <span className="sr-only">personas apuntadas</span>
+              <span className="sr-only">
+                {event.attendeeIds.length === 1 && !event.capacity ? "persona apuntada" : "personas apuntadas"}
+              </span>
             </span>
             <LanguageFlags languages={event.attendeeLanguages} />
             <InclusionBadges features={event.inclusion} />
