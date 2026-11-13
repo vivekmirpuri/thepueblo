@@ -1,4 +1,4 @@
-# thePueblo — lista de tareas
+# flejethepueblo — lista de tareas
 
 Todo lo que falta, en un solo sitio. Marca `[x]` al terminar y haz push a `develop`.
 Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md](CONTEXT.md). Las tareas marcadas **nuevo** salen de la tabla de apartados del equipo y aún no estaban en el plan.
@@ -15,9 +15,11 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 ## 1. Base (antes de repartir el trabajo)
 
 - [ ] **Prueba de IA**: Transformers.js en un Web Worker con Next 16, calcular el embedding de una frase.
-- [ ] `src/lib/auth.tsx` real (`AuthProvider`, `useUser`) y pantalla `/login/`.
-- [ ] Funciones de lectura en `src/lib/db.ts`: `listUpcomingEvents`, `getEvent`, `getProfile`, `saveProfile`.
-- [ ] `EventCard` completa (la usan todas las pantallas).
+- [x] `src/lib/auth.tsx` real (`AuthProvider`, `useUser`) y pantalla `/login/`.
+- [x] Alta (`/onboarding/`) y perfil (`/profile/`), con burbujas de intereses, idiomas y pronombres.
+- [x] `getProfile` y `saveProfile` en `src/lib/db.ts`.
+- [ ] Funciones de lectura de eventos: `listUpcomingEvents`, `getEvent`.
+- [x] `EventCard` completa, con el icono de la categoría.
 - [ ] `scripts/seed.mjs`: ~20 personas falsas y ~30 eventos.
 
 ## 2. Por apartado
@@ -74,7 +76,8 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 - [ ] Revisar todos los textos con lenguaje inclusivo.
 
 ### Pictogramas — **nuevo**
-- [ ] Un pictograma por categoría además del emoji (iconos de `lucide-react`, o pictogramas de ARASAAC con su licencia CC BY-NC-SA).
+- [x] Un icono SVG por categoría (`lucide-react`), en las burbujas de intereses y en cada actividad.
+- [ ] Valorar pictogramas de ARASAAC si hace falta algo más sencillo (licencia CC BY-NC-SA, pide atribución).
 - [ ] Pictogramas en los botones principales de navegación (ya tienen icono + texto).
 
 ### Accesibilidad
@@ -84,7 +87,7 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 
 ### Pronombres
 - [x] `PersonName` hecho.
-- [ ] C1 Paso opcional de pronombres en el alta.
+- [x] Pronombres opcionales en el alta y en el perfil.
 
 ### Reviews de actividades pasadas
 - [ ] B6 Reseñas con estrellas y comentario, solo para quien asistió y cuando el evento ha terminado.

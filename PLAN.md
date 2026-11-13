@@ -1,4 +1,4 @@
-# thePueblo — plan de implementación
+# flejethepueblo — plan de implementación
 
 Producto: [CONTEXT.md](CONTEXT.md) (funcionalidades F1–F16). Diseño: [ARCHITECTURE.md](ARCHITECTURE.md).
 
@@ -21,9 +21,11 @@ Todo lo que de otro modo pisaríamos entre varias personas se prepara una sola v
 
 **Pendiente antes de repartir los bloques (una persona)**
 - [ ] **Prueba de IA primero** (30 min, la mayor incógnita): cargar Transformers.js en un Web Worker con Next 16 y calcular el embedding de una frase. Si el modelo de chat no funciona, quedarse solo con los embeddings.
-- [ ] `src/lib/auth.tsx` (`AuthProvider` / `useUser` de verdad) y `/login/`.
-- [ ] Las funciones de lectura de `src/lib/db.ts` que necesitan todos los bloques: `listUpcomingEvents`, `getEvent`, `getProfile`, `saveProfile`.
-- [ ] `EventCard` (lo usan los tres bloques).
+- [x] `src/lib/auth.tsx` (`AuthProvider` / `useUser`) y `/login/` (entrar y crear cuenta con correo).
+- [x] Alta (`/onboarding/`) y perfil (`/profile/`): pronombres, idiomas, intereses, isla, disponibilidad.
+- [x] `EventCard` con imagen, icono de categoría, banderas e iconos de inclusión.
+- [x] `getProfile` y `saveProfile` en `src/lib/db.ts`.
+- [ ] Las funciones de lectura de eventos que necesitan los bloques A y B: `listUpcomingEvents`, `getEvent`.
 - [ ] `scripts/seed.mjs`, cuando el modelo de datos esté estable.
 - [ ] Opcional, en la consola de Firebase: acceso con Google; añadir los dominios de vista previa en Authentication → Settings → Authorized domains si el acceso falla en una URL de vista previa.
 
@@ -72,8 +74,8 @@ Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rut
 ### Bloque C — Personas e IA
 | # | Tarea | Funcionalidad |
 |---|---|---|
-| C1 | Alta: pronombres (opcional), intereses, idiomas, isla, preguntas, opción de institución | F2, F3, F18 |
-| C2 | Página de perfil (ver y editar) | F2 |
+| ~~C1~~ | ~~Alta: pronombres, intereses, idiomas, isla, preguntas, institución~~ **hecho** | F2, F3, F18 |
+| ~~C2~~ | ~~Página de perfil (ver y editar)~~ **hecho** | F2 |
 | C3 | Worker de IA: modelo de embeddings, `embed`, `findSimilarEvents` | F9 |
 | C4 | Asistente: búsqueda libre → tarjetas de eventos | F16 |
 | C5 | Asistente: "Sugiéreme algo" a partir del perfil | F16 |

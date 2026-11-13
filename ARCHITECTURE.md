@@ -1,4 +1,4 @@
-# thePueblo — arquitectura
+# flejethepueblo — arquitectura
 
 Qué construimos: [CONTEXT.md](CONTEXT.md). Tareas y orden: [PLAN.md](PLAN.md).
 
@@ -45,6 +45,7 @@ Versiones comprobadas en npm el 12-11-2026. Todas son compatibles con React 19.
 | IA local | **@huggingface/transformers** (Transformers.js 4) | Una sola librería para el modelo de embeddings y el de chat; usa WebGPU si existe y WASM si no |
 | Formularios | `field` de shadcn + estado de React | Los formularios son pequeños; añade react-hook-form + zod solo si alguno crece |
 | Fechas | `Intl.DateTimeFormat` | Viene con el navegador |
+| Iconos de categoría | **lucide-react**, uno por categoría en `src/lib/categories.ts` | Se ven en las burbujas de intereses y en cada actividad |
 | Iconos de inclusión | **lucide-react** (Accessibility, Hand, EyeOff, Captions, Speech, VenusAndMars) | SVG pequeños que ya vienen instalados; lista en `src/lib/inclusion.ts` |
 | Banderas | Emojis de bandera desde una tabla idioma → bandera | Sin paquete. *Límite: Windows muestra letras en vez de banderas; cambia a `flag-icons` si eso importa en la demo* |
 
@@ -97,7 +98,8 @@ src/
   app/                    una carpeta por ruta de la tabla
   components/
     ui/                   componentes de shadcn            (compartido)
-    shared/               AppShell, BottomNav, LanguageFlags, InclusionBadges, PersonName (hechos) · EventCard, Placeholder  (compartido)
+    shared/               AppShell, BottomNav, Logo, Bubble, RequireUser, EventCard,
+                          LanguageFlags, InclusionBadges, PersonName (hechos) · EventCard, Placeholder  (compartido)
     map/  discover/       Bloque A
     event/  chat/         Bloque B
     people/  assistant/   Bloque C
@@ -105,9 +107,9 @@ src/
     firebase.ts           app de Firebase, auth, db, storage    (compartido, hecho)
     firebase.config.json  configuración web pública, la leen también los scripts
     types.ts              UserProfile, Meetup, ChatMessage, Review  (compartido, hecho)
-    db.ts                 funciones de Firestore y Storage      (compartido; unirse/salir/subir hechas, resto pendiente)
-    auth.tsx              AuthProvider + useUser()              (compartido, provisional)
-    categories.ts  languages.ts  islands.ts  geo.ts  inclusion.ts  (compartido, hechos)
+    db.ts                 funciones de Firestore y Storage      (compartido; perfil, unirse/salir y subir imagen hechas)
+    auth.tsx              AuthProvider + useUser()              (compartido, hecho)
+    categories.ts  languages.ts  islands.ts  geo.ts  inclusion.ts  profile.ts  (compartido, hechos)
     todo.ts               marca las funciones que aún no existen
     ai/                   Bloque C  (config.ts hecho; index.ts es el contrato y aún no devuelve nada)
 scripts/rules-check.mjs   prueba las reglas de seguridad desplegadas (hecho)

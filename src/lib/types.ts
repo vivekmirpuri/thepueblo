@@ -31,6 +31,9 @@ export interface UserProfile {
   createdAt: Timestamp;
 }
 
+/** What a person can edit about themselves. `verified` and `createdAt` are not theirs to set. */
+export type ProfileDraft = Omit<UserProfile, "uid" | "verified" | "createdAt">;
+
 /** events/{id} */
 export interface Meetup {
   id: string;

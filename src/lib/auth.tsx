@@ -1,19 +1,17 @@
 "use client";
 /**
- * Who is signed in — SHARED file. PLACEHOLDER: it always answers "nobody".
+ * Who is signed in — SHARED file. Built (not a placeholder).
  *
- * To build (Foundation, before the tracks need a real user):
- *  1. In AuthProvider, subscribe with `onAuthStateChanged(auth, …)` from "firebase/auth".
- *  2. When a user arrives, load their profile with `getProfile(uid)` from ./db.
- *  3. Put `{ user, profile, loading }` in a React context; `useUser()` reads it.
- *  4. `/login/` calls `signInWithEmailAndPassword` / `createUserWithEmailAndPassword`
- *     (email + password is already enabled in the Firebase project).
- *  5. A signed-in user without a profile is sent to `/onboarding/`.
+ * Screens never import "firebase/auth" directly: they call `useUser()` and get the Firebase
+ * account, their users/{uid} profile and whether we are still checking.
  *
- * Screens only ever import `useUser()` — they never touch firebase/auth directly.
+ * `profile` is null for someone who signed up but has not finished onboarding yet.
+ * Call `refresh()` after saving the profile so the rest of the app sees the new values.
  */
-import type { User } from "firebase/auth";
-import type { ReactNode } from "react";
+import { onAuthStateChanged, type User } from "firebase/auth";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { getProfile } from "./db";
+import { auth } from "./firebase";
 import type { UserProfile } from "./types";
 
 export interface AuthState {
@@ -22,12 +20,40 @@ export interface AuthState {
   /** The users/{uid} document, or null before onboarding is finished. */
   profile: UserProfile | null;
   loading: boolean;
+  /** Re-reads the profile from Firestore. */
+  refresh: () => Promise<void>;
 }
 
+const AuthContext = createContext<AuthState>({
+  user: null,
+  profile: null,
+  loading: true,
+  refresh: async () => {},
+});
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+  const [state, setState] = useState<Omit<AuthState, "refresh">>({
+    user: null,
+    profile: null,
+    loading: true,
+  });
+
+  useEffect(
+    () =>
+      onAuthStateChanged(auth, async (user) => {
+        setState({ user, profile: user ? await getProfile(user.uid) : null, loading: false });
+      }),
+    [],
+  );
+
+  const refresh = useCallback(async () => {
+    const user = auth.currentUser;
+    setState({ user, profile: user ? await getProfile(user.uid) : null, loading: false });
+  }, []);
+
+  return <AuthContext value={{ ...state, refresh }}>{children}</AuthContext>;
 }
 
 export function useUser(): AuthState {
-  return { user: null, profile: null, loading: false };
+  return useContext(AuthContext);
 }

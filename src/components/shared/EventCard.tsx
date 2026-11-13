@@ -1,27 +1,86 @@
 /**
- * One event as a card — SHARED, used by the home list (Track A), "my chats" (Track B) and the
- * assistant's answers (Track C). PLACEHOLDER: shows the title only.
+ * One event as a card — SHARED, used by the home list (Track A), "mis chats" (Track B) and the
+ * assistant's answers (Track C). Built (not a placeholder).
  *
- * To build (Foundation or whoever needs it first — tell the others, all three tracks use it):
- *  - shadcn <Card>: image on top (`event.imageUrl`, plain <img> with a category-emoji fallback),
- *    title, date (`Intl.DateTimeFormat("es-ES", …)`), place or an "Online" <Badge>, "Official" <Badge>,
- *    <LanguageFlags languages={event.attendeeLanguages} />, <InclusionBadges features={event.inclusion} />,
- *    people joined / capacity.
- *  - `distanceKm` is optional: show "2.3 km" only when it is given.
- *  - The whole card is a <Link href={`/event/?id=${event.id}`}>.
- *  - Presentational: props in, markup out. No data loading here.
+ * Shows, in this order: the cover image (or the category's icon when there is none), the title,
+ * when and where, the "Oficial" badge, the flags of the languages its people speak and the
+ * inclusion icons. Presentational: props in, markup out. It never loads anything.
  */
 import Link from "next/link";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { CalendarDaysIcon, GlobeIcon, MapPinIcon, UsersIcon } from "lucide-react";
+import { InclusionBadges } from "@/components/shared/InclusionBadges";
+import { LanguageFlags } from "@/components/shared/LanguageFlags";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { findCategory } from "@/lib/categories";
 import type { Meetup } from "@/lib/types";
 
-export function EventCard({ event }: { event: Meetup; distanceKm?: number }) {
+const WHEN = new Intl.DateTimeFormat("es-ES", {
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+export function EventCard({ event, distanceKm }: { event: Meetup; distanceKm?: number }) {
+  const category = findCategory(event.category);
+  const Icon = category?.icon;
+
   return (
-    <Link href={`/event/?id=${event.id}`}>
-      <Card>
-        <CardHeader>
-          <CardTitle>{event.title}</CardTitle>
-        </CardHeader>
+    <Link href={`/event/?id=${event.id}`} className="block rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+      <Card className="overflow-hidden py-0 transition-colors hover:bg-muted/40">
+        <div className="flex items-center justify-center bg-muted" aria-hidden>
+          {event.imageUrl ? (
+            // Plain <img>: the site is a static export, so next/image optimisation is off anyway.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={event.imageUrl} alt="" className="h-32 w-full object-cover" loading="lazy" />
+          ) : (
+            Icon && <Icon className="my-8 size-10 text-muted-foreground" />
+          )}
+        </div>
+
+        <CardContent className="space-y-2 px-4 py-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {category && Icon && (
+              <Badge variant="secondary">
+                <Icon className="size-3.5" aria-hidden /> {category.label}
+              </Badge>
+            )}
+            {event.official && <Badge>Oficial</Badge>}
+          </div>
+
+          <h3 className="font-semibold">{event.title}</h3>
+
+          <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <CalendarDaysIcon className="size-4 shrink-0" aria-hidden />
+            {WHEN.format(event.startsAt.toDate())}
+          </p>
+          <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            {event.mode === "online" ? (
+              <>
+                <GlobeIcon className="size-4 shrink-0" aria-hidden /> En línea
+              </>
+            ) : (
+              <>
+                <MapPinIcon className="size-4 shrink-0" aria-hidden />
+                {event.placeName}
+                {distanceKm !== undefined && ` · a ${distanceKm.toFixed(1)} km`}
+              </>
+            )}
+          </p>
+
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <UsersIcon className="size-4" aria-hidden />
+              {event.attendeeIds.length}
+              {event.capacity ? ` / ${event.capacity}` : ""}
+              <span className="sr-only">personas apuntadas</span>
+            </span>
+            <LanguageFlags languages={event.attendeeLanguages} />
+            <InclusionBadges features={event.inclusion} />
+          </div>
+        </CardContent>
       </Card>
     </Link>
   );

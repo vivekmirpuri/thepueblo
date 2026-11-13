@@ -1,7 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="thePueblo">
-  <!-- A map pin (meetups on the map) holding a house with an arched door (the pueblo). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="flejethepueblo">
+  <!-- A pueblo: four little houses of different heights, side by side. Also the browser-tab icon. -->
   <rect width="64" height="64" rx="16" fill="#E0572F"/>
-  <path fill="#fff" d="M32 55S17 40.5 17 27a15 15 0 0 1 30 0c0 13.500-15 28-15 28Z"/>
-  <path fill="#E0572F" stroke="#E0572F" stroke-width="2" stroke-linejoin="round" d="M32 19.500 40 26.500V34H24v-7.500Z"/>
-  <path fill="#fff" d="M29.500 36v-6a2.500 2.500 0 0 1 5 0v6Z"/>
+  <g fill="#fff">
+    <path d="M5 32 11 24 17 32V49H5Z"/>
+    <path d="M19 28 25.5 18 32 28V49H19Z"/>
+    <path d="M34 33 39.5 25 45 33V49H34Z"/>
+    <path d="M47 30 52.5 22 58 30V49H47Z"/>
+  </g>
+  <g fill="#E0572F">
+    <path d="M23 49v-7a2.5 2.5 0 0 1 5 0v7Z"/>
+    <rect x="9" y="36" width="4" height="4" rx="1"/>
+    <rect x="37.5" y="37" width="4" height="4" rx="1"/>
+    <rect x="50.5" y="34" width="4" height="4" rx="1"/>
+  </g>
 </svg>

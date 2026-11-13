@@ -2,7 +2,7 @@
  * Firestore reads and writes — SHARED file. Every screen goes through these functions instead
  * of calling Firestore directly, so the document shapes live in one place.
  *
- * Built:      joinEvent, leaveEvent, uploadEventImage (all verified by scripts/rules-check.mjs)
+ * Built:      getProfile, saveProfile, joinEvent, leaveEvent, uploadEventImage
  * Not built:  everything that calls todo() — the task id says who picks it up (see PLAN.md)
  *
  * Notes for whoever fills these in:
@@ -11,15 +11,39 @@
  *    and return its unsubscribe function from the component's effect.
  *  - Add the document id yourself: `{ id: snap.id, ...snap.data() } as Meetup`.
  */
-import { arrayRemove, arrayUnion, deleteField, doc, updateDoc } from "firebase/firestore";
+import {
+  arrayRemove,
+  arrayUnion,
+  deleteField,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "./firebase";
 import { todo } from "./todo";
-import type { ChatMessage, Meetup, Review, UserProfile } from "./types";
+import type { ChatMessage, Meetup, ProfileDraft, Review, UserProfile } from "./types";
 
-// ── Profiles (Track C) ────────────────────────────────────────────────────────
-export const getProfile = (uid: string): Promise<UserProfile | null> => todo("C1 getProfile", uid);
-export const saveProfile = (profile: UserProfile): Promise<void> => todo("C1 saveProfile", profile);
+// ── Profiles ──────────────────────────────────────────────────────────────────
+
+/** The users/{uid} document, or null when the person has not finished onboarding. */
+export async function getProfile(uid: string): Promise<UserProfile | null> {
+  const snap = await getDoc(doc(db, "users", uid));
+  return snap.exists() ? ({ verified: false, ...snap.data(), uid } as UserProfile) : null;
+}
+
+/**
+ * Saves the fields a person can edit. `verified` is never written here: only an admin sets it
+ * by hand in the Firebase console, and firestore.rules refuse any client that tries.
+ */
+export async function saveProfile(uid: string, draft: ProfileDraft): Promise<void> {
+  const target = doc(db, "users", uid);
+  if ((await getDoc(target)).exists()) await updateDoc(target, { ...draft });
+  else await setDoc(target, { ...draft, verified: false, createdAt: serverTimestamp() });
+}
+
 export const listProfiles = (): Promise<UserProfile[]> => todo("C7 listProfiles");
 
 // ── Events (Track A reads, Track B writes) ────────────────────────────────────
