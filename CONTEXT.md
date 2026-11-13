@@ -47,6 +47,10 @@ Cada funcionalidad tiene un identificador para poder citarla en ramas y PR.
 - **F14 Chat de grupo.** Al unirte a un evento entras en su chat de grupo (como un grupo de WhatsApp) con el resto de personas apuntadas.
 - **F15 Gente como tú.** Una lista de perfiles parecidos al tuyo (intereses e idiomas en común).
 
+### Diversidad e inclusión
+- **F17 Iconos de inclusión y accesibilidad.** Al crear un evento, quien organiza marca lo que ofrece: accesible en silla de ruedas, lengua de signos, adaptado a personas ciegas o con baja visión, subtítulos o bucle magnético, lenguaje inclusivo, perspectiva de género. Se muestran como iconos SVG pequeños junto a las banderas de idiomas, y en el mapa se puede filtrar por ellos.
+- **F18 Pronombres.** Al registrarse, cada persona puede añadir sus pronombres (opcional). Aparecen junto a su nombre en todas partes: chat, asistentes, "Gente como tú" y perfil.
+
 ### Asistente
 - **F16 Chatbot.** Dos modos: "Sugiéreme algo" (usa tu perfil) y búsqueda libre ("algo al aire libre este fin de semana en Tenerife, en inglés"). Se ejecuta en el dispositivo.
 
@@ -61,6 +65,7 @@ Una sola lista, definida una vez en el código, que usan los intereses del alta,
 - **Mínimo y limpio.** Pocas pantallas, una acción evidente por pantalla, pensado primero para el móvil.
 - **Funciona en cualquier dispositivo.** Móvil, tableta, portátil. Las partes de IA se degradan con elegancia en vez de bloquear.
 - **El idioma se ve.** Los idiomas que habla cada persona aparecen allí donde aparezca una persona o un evento.
+- **La inclusión se ve.** Las banderas de idiomas, los iconos de accesibilidad y los pronombres hacen visible quién puede participar y cómo. Nunca guardamos la discapacidad de una persona: el filtro "accesible para mí" se elige en el momento y no se guarda.
 - **Privado por defecto.** Nunca guardamos la ubicación exacta de una persona, solo su isla. Los chats de grupo solo los leen sus miembros. La IA se ejecuta en el dispositivo, así que lo que le escribes no sale de él.
 
 ## Fuera del alcance del hackathon

@@ -55,7 +55,7 @@ export const leaveEvent = (eventId: string, uid: string) =>
 /** Returns the unsubscribe function. */
 export const watchMessages = (eventId: string, onChange: (messages: ChatMessage[]) => void): (() => void) =>
   todo("B4 watchMessages", eventId, onChange);
-export const sendMessage = (eventId: string, me: Pick<UserProfile, "uid" | "displayName">, text: string): Promise<void> =>
+export const sendMessage = (eventId: string, me: Pick<UserProfile, "uid" | "displayName" | "pronouns">, text: string): Promise<void> =>
   todo("B4 sendMessage", eventId, me, text);
 export const listReviews = (eventId: string): Promise<Review[]> => todo("B6 listReviews", eventId);
 export const saveReview = (eventId: string, review: Omit<Review, "createdAt">): Promise<void> =>

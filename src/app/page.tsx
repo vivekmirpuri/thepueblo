@@ -9,6 +9,8 @@
  *  - Layout top to bottom: <CategoryChips>, <EventMap>, sort/filter row, list of <EventCard>.
  *  - Nearby (A4): ask `navigator.geolocation.getCurrentPosition`; sort with `distanceKm` from
  *    "@/lib/geo". If the user refuses, use the centre of their island from "@/lib/islands".
+ *  - A5 filter: "accessible for me" — pick inclusion features from INCLUSION ("@/lib/inclusion") and show
+ *    only events offering all of them. Kept in page state only, never saved to the profile.
  *  - Animate list changes lightly with `motion/react` (items fading in), nothing more.
  */
 import { CategoryChips } from "@/components/discover/CategoryChips";

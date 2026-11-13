@@ -4,7 +4,8 @@
  * src/components/ only receive props and draw.
  *
  * To build (C1):
- *  - Short steps, one question per screen: name → languages (required, from "@/lib/languages")
+ *  - Short steps, one question per screen: name → pronouns (optional, skippable: chips from
+ *    PRONOUN_SUGGESTIONS in "@/lib/inclusion" plus a free-text field) → languages (required, from "@/lib/languages")
  *    → interests (CATEGORIES) → island → in person / online / both → when you are usually free.
  *  - "I represent an institution" switch sets `role: "institution"`; `verified` stays false
  *    until someone ticks it in the Firebase console.

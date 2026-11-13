@@ -7,6 +7,7 @@
  */
 import type { Timestamp } from "firebase/firestore";
 import type { CategoryId } from "./categories";
+import type { InclusionId } from "./inclusion";
 import type { IslandId } from "./islands";
 import type { LanguageCode } from "./languages";
 
@@ -14,6 +15,8 @@ import type { LanguageCode } from "./languages";
 export interface UserProfile {
   uid: string;
   displayName: string;
+  /** Optional, free text (e.g. "she/her"), asked at sign-up and shown next to the name (F18). */
+  pronouns: string | null;
   photoURL: string | null;
   role: "user" | "institution";
   /** Institutions only. Set by hand in the Firebase console; the rules stop users changing it. */
@@ -34,6 +37,8 @@ export interface Meetup {
   title: string;
   description: string;
   category: CategoryId;
+  /** Inclusion and accessibility features the organiser offers (F17), shown as small icons. */
+  inclusion: InclusionId[];
   /** Download link of the cover image in Cloud Storage, from `uploadEventImage` in ./db. */
   imageUrl: string | null;
   /** True only when the organiser is a verified institution (F13). */
@@ -65,6 +70,8 @@ export interface ChatMessage {
   id: string;
   uid: string;
   name: string;
+  /** Copied from the sender's profile when the message is sent. */
+  pronouns: string | null;
   text: string;
   createdAt: Timestamp;
 }

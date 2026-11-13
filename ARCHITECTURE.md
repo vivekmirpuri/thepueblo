@@ -45,6 +45,7 @@ Versiones comprobadas en npm el 12-11-2026. Todas son compatibles con React 19.
 | IA local | **@huggingface/transformers** (Transformers.js 4) | Una sola librería para el modelo de embeddings y el de chat; usa WebGPU si existe y WASM si no |
 | Formularios | `field` de shadcn + estado de React | Los formularios son pequeños; añade react-hook-form + zod solo si alguno crece |
 | Fechas | `Intl.DateTimeFormat` | Viene con el navegador |
+| Iconos de inclusión | **lucide-react** (Accessibility, Hand, EyeOff, Captions, Speech, VenusAndMars) | SVG pequeños que ya vienen instalados; lista en `src/lib/inclusion.ts` |
 | Banderas | Emojis de bandera desde una tabla idioma → bandera | Sin paquete. *Límite: Windows muestra letras en vez de banderas; cambia a `flag-icons` si eso importa en la demo* |
 
 **Reglas de aspecto**
@@ -90,7 +91,7 @@ src/
   app/                    una carpeta por ruta de la tabla
   components/
     ui/                   componentes de shadcn            (compartido)
-    shared/               AppShell, BottomNav, LanguageFlags (hechos) · EventCard, Placeholder  (compartido)
+    shared/               AppShell, BottomNav, LanguageFlags, InclusionBadges, PersonName (hechos) · EventCard, Placeholder  (compartido)
     map/  discover/       Bloque A
     event/  chat/         Bloque B
     people/  assistant/   Bloque C
@@ -100,7 +101,7 @@ src/
     types.ts              UserProfile, Meetup, ChatMessage, Review  (compartido, hecho)
     db.ts                 funciones de Firestore y Storage      (compartido; unirse/salir/subir hechas, resto pendiente)
     auth.tsx              AuthProvider + useUser()              (compartido, provisional)
-    categories.ts  languages.ts  islands.ts  geo.ts             (compartido, hechos)
+    categories.ts  languages.ts  islands.ts  geo.ts  inclusion.ts  (compartido, hechos)
     todo.ts               marca las funciones que aún no existen
     ai/                   Bloque C  (config.ts hecho; index.ts es el contrato y aún no devuelve nada)
 scripts/rules-check.mjs   prueba las reglas de seguridad desplegadas (hecho)
@@ -116,6 +117,7 @@ Los archivos "compartidos" los usan todos los bloques: cámbialos con commits pe
 ```
 users/{uid}
   displayName, photoURL
+  pronouns: string | null        // opcional, texto libre ("she/her")
   role: "user" | "institution"
   verified: boolean              // solo instituciones; se marca a mano en la consola
   bio: string
@@ -129,6 +131,7 @@ users/{uid}
 events/{eventId}                 // tipo `Meetup` en el código (`Event` ya existe en el navegador)
   title, description
   category: string
+  inclusion: string[]            // ids de src/lib/inclusion.ts: "wheelchair", "sign_language"…
   imageUrl: string | null        // enlace de descarga de la portada en Cloud Storage
   official: boolean              // true solo si quien organiza es una institución verificada
   organizerId, organizerName
@@ -145,7 +148,7 @@ events/{eventId}                 // tipo `Meetup` en el código (`Event` ya exis
   createdAt
 
 events/{eventId}/messages/{messageId}     // chat de grupo
-  uid, name, text, createdAt
+  uid, name, pronouns, text, createdAt
 
 events/{eventId}/reviews/{uid}            // una reseña por asistente
   rating: 1..5, text, name, createdAt

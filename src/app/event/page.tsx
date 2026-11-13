@@ -8,7 +8,8 @@
  *    in a static export). Load with `getEvent(id)` from "@/lib/db".
  *  - Image, title, "Official" badge, date, place (small map) or online link, description.
  *  - Join / Leave <Button> → `joinEvent` / `leaveEvent` (already built in "@/lib/db").
- *  - <LanguageFlags languages={event.attendeeLanguages} /> (already built).
+ *  - <LanguageFlags languages={event.attendeeLanguages} /> and <InclusionBadges features={event.inclusion} />
+ *    (both built); here show the labels too, not just the icons.
  *  - "Open chat" → `/chats/?event=<id>` once joined. Reviews list and form after the event has started.
  */
 import { Placeholder } from "@/components/shared/Placeholder";

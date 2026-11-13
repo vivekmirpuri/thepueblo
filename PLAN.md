@@ -11,7 +11,7 @@ Todo lo que de otro modo pisaríamos entre varias personas se prepara una sola v
 - [x] `firestore.rules` desplegado y probado (`node scripts/rules-check.mjs`).
 - [x] shadcn/ui, `motion`, `maplibre-gl`, `react-map-gl` y `@huggingface/transformers` instalados.
 - [x] `src/lib/`: `types.ts`, `categories.ts`, `languages.ts`, `islands.ts`, `geo.ts`, `firebase.ts`; `joinEvent` / `leaveEvent` / `uploadEventImage` en `db.ts`.
-- [x] `AppShell`, `BottomNav`, `LanguageFlags`.
+- [x] `AppShell`, `BottomNav`, `LanguageFlags`, `InclusionBadges`, `PersonName`.
 - [x] Una página provisional por ruta y un componente provisional por bloque, cada uno con un comentario inicial que dice qué construir.
 
 **Responsable del proyecto, en la consola de Firebase (necesario para subir imágenes)**
@@ -55,7 +55,7 @@ Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rut
 | A2 | Fila de botones de categoría que filtra mapa y lista | F5 |
 | A3 | Lista de eventos bajo el mapa con `EventCard` | F7 |
 | A4 | Pedir ubicación; ordenar por cercanía / fecha / más gente | F6 |
-| A5 | Filtros: oficiales, en línea, "hablan mis idiomas" | F6, F13 |
+| A5 | Filtros: oficiales, en línea, "hablan mis idiomas", "accesible para mí" | F6, F13, F17 |
 
 ### Bloque B — Eventos y chat
 | # | Tarea | Funcionalidad |
@@ -67,11 +67,12 @@ Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rut
 | B5 | Mostrar eventos parecidos en el formulario (llama a `findSimilarEvents`) | F9 |
 | B6 | Reseñas: estrellas + comentario, media en el evento | F12 |
 | B7 | Insignia oficial; las instituciones publican eventos oficiales | F13 |
+| B8 | Iconos de inclusión: elegirlos en el formulario y mostrarlos en tarjeta y detalle (`InclusionBadges` ya existe) | F17 |
 
 ### Bloque C — Personas e IA
 | # | Tarea | Funcionalidad |
 |---|---|---|
-| C1 | Alta: intereses, idiomas, isla, preguntas, opción de institución | F2, F3 |
+| C1 | Alta: pronombres (opcional), intereses, idiomas, isla, preguntas, opción de institución | F2, F3, F18 |
 | C2 | Página de perfil (ver y editar) | F2 |
 | C3 | Worker de IA: modelo de embeddings, `embed`, `findSimilarEvents` | F9 |
 | C4 | Asistente: búsqueda libre → tarjetas de eventos | F16 |
@@ -95,7 +96,7 @@ Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rut
 2. Mapa de las islas → pulsar el botón **Intercambio de idiomas** → los pines se filtran.
 3. Ordenar por **cercanía**.
 4. Crear un evento → la app avisa "hay uno parecido a 2 km" → abrir ese en su lugar.
-5. Unirse → la fila de banderas gana tus idiomas.
+5. Unirse → la fila de banderas gana tus idiomas; el evento muestra sus iconos de accesibilidad y en el chat aparecen los pronombres.
 6. Un segundo dispositivo se une al mismo evento → los mensajes aparecen en directo en el chat de grupo.
 7. Asistente: "algo al aire libre este fin de semana, en inglés" → tarjetas + una respuesta corta, con el portátil sin conexión para demostrar que es local.
 8. Un evento oficial de una institución, con su insignia.
