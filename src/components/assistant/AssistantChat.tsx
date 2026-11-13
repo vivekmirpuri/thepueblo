@@ -13,6 +13,7 @@
  */
 import { SearchIcon, SparklesIcon, WandSparklesIcon } from "lucide-react";
 import { useState } from "react";
+import { AiDisclaimer } from "@/components/assistant/AiDisclaimer";
 import { EventRow } from "@/components/shared/EventRow";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -88,9 +89,7 @@ export function AssistantChat({
               </Button>
             )}
 
-            <p className="max-w-xs text-xs text-muted-foreground">
-              xatsí funciona dentro de tu móvil. Lo que escribes no sale de aquí.
-            </p>
+            <AiDisclaimer />
           </section>
         ) : results.length === 0 ? (
           <section className="space-y-3 py-10 text-center">
@@ -105,6 +104,7 @@ export function AssistantChat({
             <h2 className="text-sm text-muted-foreground">
               Esto es lo que he encontrado para «{asked}»
             </h2>
+            <AiDisclaimer />
             <ul className="divide-y rounded-xl border">
               {results.map(({ event }) => (
                 <EventRow key={event.id} event={event} href={`/event/?id=${event.id}`} showFlags />
