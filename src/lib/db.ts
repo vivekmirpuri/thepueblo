@@ -3,7 +3,6 @@
  * of calling Firestore directly, so the document shapes live in one place.
  *
  * Built:      profiles, events, join/leave, image upload, group chat
- * Not built:  everything that calls todo() — the task id says who picks it up (see PLAN.md)
  *
  * Notes for whoever fills these in:
  *  - Reads for lists: `getDocs(query(collection(db, "events"), where("endsAt", ">=", Timestamp.now()), orderBy("endsAt")))`.
@@ -32,7 +31,6 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "./firebase";
-import { todo } from "./todo";
 import type { ChatMessage, Meetup, ProfileDraft, Review, UserProfile } from "./types";
 
 // ── Profiles ──────────────────────────────────────────────────────────────────
@@ -53,7 +51,14 @@ export async function saveProfile(uid: string, draft: ProfileDraft): Promise<voi
   else await setDoc(target, { ...draft, verified: false, createdAt: serverTimestamp() });
 }
 
-export const listProfiles = (): Promise<UserProfile[]> => todo("C7 listProfiles");
+/**
+ * Everyone's profile, for "Gente como tú". Only signed-in people can read profiles (firestore.rules).
+ * shortcut: reads the whole collection; fine for a few thousand people, page it or pre-filter by island beyond that.
+ */
+export async function listProfiles(): Promise<UserProfile[]> {
+  const snap = await getDocs(collection(db, "users"));
+  return snap.docs.map((found) => ({ verified: false, ...found.data(), uid: found.id }) as UserProfile);
+}
 
 // ── Events ───────────────────────────────────────────────────────────────────
 

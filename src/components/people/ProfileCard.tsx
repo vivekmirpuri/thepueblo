@@ -1,14 +1,84 @@
 /**
- * One person in "People like you" (F15) — Track C. PLACEHOLDER.
+ * One person in "Gente como tú" (F15) — Track C. Built (not a placeholder).
  *
- * To build (C7):
- *  - shadcn <Card> with <Avatar>, <PersonName name pronouns>, island, shared interests as <Badge>s, and the flags of
- *    the languages they speak.
- *  - Props: `profile` and `shared` (which interests and languages you have in common).
- *  - The matching score lives in the page, not here: shared interests + shared languages + same island.
+ * Shows who they are (avatar, name, pronouns, island, a line about them) and, first and clearly,
+ * what you have in common: shared interests with their icons and shared languages with their flags.
+ * Presentational: the page works out the match and passes it in.
  */
-import { Placeholder } from "@/components/shared/Placeholder";
+import { MapPinIcon } from "lucide-react";
+import { PersonAvatar } from "@/components/shared/PersonAvatar";
+import { PersonName } from "@/components/shared/PersonName";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { findCategory } from "@/lib/categories";
+import { homeName } from "@/lib/islands";
+import { LANGUAGES } from "@/lib/languages";
+import type { Match } from "@/lib/people";
 
-export function ProfileCard() {
-  return <Placeholder title="ProfileCard" track="C" features="F15" />;
+export function ProfileCard({ match }: { match: Match }) {
+  const { profile, interests, languages, sameIsland } = match;
+  const common = interests.length + languages.length + (sameIsland ? 1 : 0);
+
+  return (
+    <Card className="py-0">
+      <CardContent className="space-y-3 p-4">
+        <div className="flex items-center gap-3">
+          <PersonAvatar name={profile.displayName} avatar={profile.avatar} className="size-14 text-base" />
+          <div className="min-w-0 flex-1">
+            <h2 className="truncate font-semibold">
+              <PersonName name={profile.displayName} pronouns={profile.pronouns} />
+            </h2>
+            <p className="flex items-center gap-1 text-sm text-muted-foreground">
+              <MapPinIcon className="size-3.5 shrink-0" aria-hidden />
+              {homeName(profile.island) ?? "Sin isla"}
+              {sameIsland && <span className="font-medium text-foreground"> · tu isla</span>}
+            </p>
+          </div>
+          <Badge variant="secondary" className="shrink-0">
+            {common} en común
+          </Badge>
+        </div>
+
+        {profile.bio && <p className="line-clamp-2 text-sm">{profile.bio}</p>}
+
+        {languages.length > 0 && (
+          <div className="space-y-1">
+            <h3 className="text-xs font-semibold text-muted-foreground">Os entendéis en</h3>
+            <ul className="flex flex-wrap gap-1.5">
+              {languages.map((code) => {
+                const language = LANGUAGES.find((item) => item.code === code);
+                return (
+                  <li key={code}>
+                    <Badge variant="outline">
+                      <span aria-hidden>{language?.flag}</span> {language?.name ?? code}
+                    </Badge>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+
+        {interests.length > 0 && (
+          <div className="space-y-1">
+            <h3 className="text-xs font-semibold text-muted-foreground">Os gusta</h3>
+            <ul className="flex flex-wrap gap-1.5">
+              {interests.map((id) => {
+                const category = findCategory(id);
+                if (!category) return null;
+                const Icon = category.icon;
+                return (
+                  <li key={id}>
+                    <Badge variant="outline">
+                      <Icon className="size-3.5" aria-hidden /> {category.label}
+                    </Badge>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }

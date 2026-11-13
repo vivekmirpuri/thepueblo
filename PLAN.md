@@ -80,7 +80,7 @@ Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rut
 | ~~C4~~ | ~~xatsí: búsqueda libre → tarjetas (por palabras; el modelo reordenará después)~~ **hecho** | F16 |
 | ~~C5~~ | ~~xatsí: "Sugiéreme algo" a partir del perfil~~ **hecho** | F16 |
 | C6 | Redacción con el modelo de chat en dispositivos capaces; frase fija en el resto | F16 |
-| C7 | Gente como tú | F15 |
+| ~~C7~~ | ~~Gente como tú~~ **hecho** | F15 |
 
 **El orden dentro de cada bloque es el de prioridad.** A1–A3, B1–B4 y C1–C4 son la demo; el resto es profundidad.
 

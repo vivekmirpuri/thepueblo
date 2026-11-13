@@ -56,7 +56,7 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 - [x] B4 Chat de grupo en directo por actividad + lista "mis grupos" (mensajes de 1 a 1000 caracteres, solo para quien se apunta).
 
 ### Algoritmo de afinidad
-- [ ] C7 Gente como tú: intereses + idiomas + isla en común.
+- [x] C7 Gente como tú: intereses + idiomas + isla en común, con filtros «hablan mi idioma» y «de mi isla».
 - [ ] **Nuevo** — Sumar intercambio de saberes (lo que yo quiero aprender y la otra persona enseña).
 
 ### Apartado IA
