@@ -10,7 +10,7 @@
  * the image and writes to Firestore.
  */
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Bubble } from "@/components/shared/Bubble";
 import { Button } from "@/components/ui/button";
@@ -80,6 +80,11 @@ export function EventForm({
   const [inclusion, setInclusion] = useState<InclusionId[]>([]);
   const [official, setOfficial] = useState(false);
   const [image, setImage] = useState<File | null>(null);
+  // A temporary local link to show the chosen photo; freed when it changes or the form closes.
+  const preview = useMemo(() => (image ? URL.createObjectURL(image) : null), [image]);
+  useEffect(() => () => {
+    if (preview) URL.revokeObjectURL(preview);
+  }, [preview]);
   const [saving, setSaving] = useState(false);
 
   async function submit(formEvent: React.FormEvent) {
@@ -93,7 +98,8 @@ export function EventForm({
     if (mode === "in_person" && !location) return toast.error("Toca el mapa para marcar dónde es.");
     if (mode === "in_person" && !placeName.trim()) return toast.error("Escribe el nombre del sitio.");
     if (mode === "online" && !onlineUrl.trim()) return toast.error("Pega el enlace de la videollamada.");
-    if (image && image.size > 5 * 1024 * 1024) return toast.error("La imagen pesa más de 5 MB.");
+    // Photos are shrunk before upload (src/lib/image.ts), so big phone photos are fine.
+    if (image && image.size > 40 * 1024 * 1024) return toast.error("Esa imagen es demasiado grande.");
 
     setSaving(true);
     try {
@@ -212,13 +218,17 @@ export function EventForm({
         </div>
       </Question>
 
-      <Question title="Una foto" hint="Opcional. Como mucho 5 MB.">
+      <Question title="Una foto" hint="Opcional. Puedes usar una foto del móvil.">
         <Input
           type="file"
           accept="image/*"
           onChange={(event) => setImage(event.target.files?.[0] ?? null)}
           aria-label="Foto de la actividad"
         />
+        {preview && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={preview} alt="Vista previa de la foto" className="h-40 w-full rounded-xl object-cover" />
+        )}
       </Question>
 
       {canPublishOfficial && (

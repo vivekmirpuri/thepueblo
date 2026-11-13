@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { EventForm } from "@/components/event/EventForm";
 import { RequireUser } from "@/components/shared/RequireUser";
 import { createEvent, uploadEventImage } from "@/lib/db";
+import { shrinkImage } from "@/lib/image";
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function NewEventPage() {
             <EventForm
               canPublishOfficial={profile.role === "institution" && profile.verified}
               onSubmit={async (values) => {
-                const imageUrl = values.image ? await uploadEventImage(user.uid, values.image) : null;
+                const imageUrl = values.image ? await uploadEventImage(user.uid, await shrinkImage(values.image)) : null;
                 const id = await createEvent({
                   title: values.title,
                   description: values.description,

@@ -6,7 +6,7 @@
  * language flags, and the home screen can filter by them. Icons are lucide-react SVGs.
  * We never store a person's disability: filtering happens in the moment, not on the profile.
  */
-import { AccessibilityIcon, CaptionsIcon, EyeOffIcon, HandIcon, SpeechIcon, VenusAndMarsIcon } from "lucide-react";
+import { AccessibilityIcon, CaptionsIcon, EyeOffIcon, HandIcon, RainbowIcon, SpeechIcon, VenusAndMarsIcon } from "lucide-react";
 
 export const INCLUSION = [
   { id: "wheelchair", label: "Accesible en silla de ruedas", icon: AccessibilityIcon },
@@ -15,6 +15,7 @@ export const INCLUSION = [
   { id: "captions", label: "Subtítulos o bucle magnético", icon: CaptionsIcon },
   { id: "inclusive_language", label: "Lenguaje inclusivo", icon: SpeechIcon },
   { id: "gender_perspective", label: "Perspectiva de género", icon: VenusAndMarsIcon },
+  { id: "lgtbiq", label: "Espacio seguro LGTBIQ+", icon: RainbowIcon },
 ] as const;
 
 export type InclusionId = (typeof INCLUSION)[number]["id"];

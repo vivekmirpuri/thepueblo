@@ -1,6 +1,6 @@
 /**
- * Fills the app with a whole community for the demo: 16 fake people across the islands, ~40
- * activities with a cover image, people joining each other's plans, group chats and reviews.
+ * Fills the app with a whole community for the demo: 16 fake people across the islands, ~54
+ * activities (12 of them LGTBIQ+ safe spaces, written without gendered words) with a cover image, people joining each other's plans, group chats and reviews.
  *
  *   node --env-file=.env.local scripts/seed-community.mjs
  *
@@ -120,10 +120,23 @@ const ACTIVITIES = [
   [15, "tech", "Ayuda con papeles en el móvil", "Te ayudo con la cita previa y el certificado digital.", { inclusion: ["captions", "wheelchair"] }],
   [15, "games", "Torneo de ajedrez del barrio", "Todos los niveles. Tableros para todos.", { capacity: 20 }],
   [15, "volunteering", "Clases de refuerzo para peques", "Ayudamos con los deberes los martes.", { inclusion: ["inclusive_language"] }],
+  // LGTBIQ+ safe spaces, written without gendered words.
+  [6, "debate", "Charla: ser LGTBIQ+ y migrante", "Un espacio para hablar y escuchar sin juicios. Cada persona comparte lo que quiera.", { inclusion: ["lgtbiq", "inclusive_language", "captions"], capacity: 20 }],
+  [6, "improv", "Impro queer", "Juegos de teatro para soltarse. No hace falta experiencia.", { inclusion: ["lgtbiq", "inclusive_language"], capacity: 16 }],
+  [14, "music", "Karaoke del Orgullo", "Canciones, risas y cero presión. Canta quien quiera.", { inclusion: ["lgtbiq", "inclusive_language", "wheelchair"] }],
+  [14, "games", "Noche de juegos de mesa LGTBIQ+", "Juegos fáciles para conocer gente en un ambiente tranquilo.", { inclusion: ["lgtbiq", "inclusive_language"], capacity: 20 }],
+  [0, "outdoors", "Ruta arcoíris por Anaga", "Caminata tranquila en un grupo diverso. Ritmo para cualquier persona.", { inclusion: ["lgtbiq", "inclusive_language"], capacity: 15 }],
+  [15, "tech", "Ayuda con el cambio de nombre en los papeles", "Acompañamiento paso a paso con los trámites del registro.", { inclusion: ["lgtbiq", "captions", "inclusive_language"], online: true }],
+  [11, "arts", "Taller de fanzines queer", "Recortes, dibujos y palabras para contar quién eres.", { inclusion: ["lgtbiq", "inclusive_language"], capacity: 12 }],
+  [3, "sport", "Vóley playa abierto y diverso", "Equipos mezclados al llegar. Cada persona juega a su ritmo.", { inclusion: ["lgtbiq", "inclusive_language"], capacity: 16 }],
+  [7, "wellbeing", "Yoga en un espacio seguro LGTBIQ+", "Sesión suave, sin espejos y sin comentarios sobre cuerpos.", { inclusion: ["lgtbiq", "low_vision", "inclusive_language"] }],
+  [9, "culture", "Signos del Orgullo", "Vocabulario LGTBIQ+ en lengua de signos, para cualquier persona.", { inclusion: ["lgtbiq", "sign_language", "inclusive_language"], capacity: 20 }],
+  [2, "families", "Merienda de familias diversas", "Para familias de cualquier forma, con peques o sin peques.", { inclusion: ["lgtbiq", "wheelchair", "inclusive_language"] }],
+  [4, "languages", "Intercambio de idiomas en un espacio seguro", "Practica idiomas con gente que respeta quién eres.", { inclusion: ["lgtbiq", "inclusive_language"], past: true }],
 ];
 
 const CHAT = [
-  "¡Hola a todas! Qué ganas.", "¿Alguien viene desde lejos? Puedo llevar a dos personas en coche.",
+  "¡Hola! Qué ganas de conoceros.", "¿Alguien viene desde lejos? Puedo llevar a dos personas en coche.",
   "Yo llevo agua para el grupo.", "Es mi primera vez, un poco de nervios 😅", "¿Hay que llevar algo?",
   "Nos vemos allí. Iré con una camiseta naranja.", "Perfecto, gracias por organizar.", "¿Se puede ir con niños?",
 ];

@@ -9,10 +9,12 @@
  */
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { FilterIcon, LocateFixedIcon, PlusIcon } from "lucide-react";
+import { FilterIcon, LayersIcon, LocateFixedIcon, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 import { CategoryChips } from "@/components/discover/CategoryChips";
+import { SwipeDeck } from "@/components/discover/SwipeDeck";
 import { Bubble } from "@/components/shared/Bubble";
 import { EventCard } from "@/components/shared/EventCard";
 import { Button } from "@/components/ui/button";
@@ -20,7 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Toggle } from "@/components/ui/toggle";
 import { useUser } from "@/lib/auth";
 import type { CategoryId } from "@/lib/categories";
-import { listUpcomingEvents } from "@/lib/db";
+import { joinEvent, listUpcomingEvents } from "@/lib/db";
 import { distanceKm } from "@/lib/geo";
 import { INCLUSION, type InclusionId } from "@/lib/inclusion";
 import { ISLANDS } from "@/lib/islands";
@@ -40,7 +42,9 @@ const SORTS = [
 type SortId = (typeof SORTS)[number]["id"];
 
 export default function HomePage() {
-  const { profile } = useUser();
+  const { user, profile } = useUser();
+  const router = useRouter();
+  const [discovering, setDiscovering] = useState(false);
   const [events, setEvents] = useState<Meetup[] | null>(null);
   const [category, setCategory] = useState<CategoryId | null>(null);
   const [sort, setSort] = useState<SortId>("soon");
@@ -109,9 +113,21 @@ export default function HomePage() {
 
   return (
     <div className="space-y-4 p-4">
+      <Button size="lg" className="h-12 w-full rounded-full text-base" onClick={() => setDiscovering(true)} disabled={!events?.length}>
+        <LayersIcon aria-hidden /> Descubrir actividades
+      </Button>
+
       <CategoryChips selected={category} onChange={setCategory} />
 
-      <EventMap events={shown} selectedId={selectedId} onSelect={(event) => setSelectedId(event.id)} />
+      <EventMap
+        events={shown}
+        selectedId={selectedId}
+        onSelect={(event) => setSelectedId(event.id)}
+        onLocate={(point) => {
+          setHere(point);
+          setSort("near");
+        }}
+      />
 
       {selected && <EventCard event={selected} distanceKm={here && selected.location ? distanceKm(here, selected.location) : undefined} />}
 
@@ -186,6 +202,33 @@ export default function HomePage() {
             </li>
           ))}
         </ul>
+      )}
+
+      {discovering && events && (
+        <SwipeDeck
+          events={events}
+          myUid={user?.uid}
+          onClose={() => setDiscovering(false)}
+          onJoin={async (event) => {
+            if (!user || !profile) {
+              toast.info("Entra en tu cuenta para apuntarte.");
+              return router.push("/login/");
+            }
+            try {
+              await joinEvent(event.id, { uid: user.uid, languages: profile.languages });
+              setEvents((list) =>
+                list?.map((item) =>
+                  item.id === event.id
+                    ? { ...item, attendeeIds: [...item.attendeeIds, user.uid], attendeeLanguages: { ...item.attendeeLanguages, [user.uid]: profile.languages } }
+                    : item,
+                ) ?? null,
+              );
+              toast.success(`Te has apuntado a «${event.title}».`);
+            } catch {
+              toast.error("No se ha podido apuntar. Puede que esté completa.");
+            }
+          }}
+        />
       )}
 
       <Button
