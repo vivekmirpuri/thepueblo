@@ -10,8 +10,8 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { ArrowRightIcon, FilterIcon, LayersIcon, LocateFixedIcon, PlusIcon, SearchIcon, XIcon } from "lucide-react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { ArrowRightIcon, EyeOffIcon, FilterIcon, HeartIcon, LayersIcon, LocateFixedIcon, MapIcon, PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { CategoryChips } from "@/components/discover/CategoryChips";
 import { SwipeDeck } from "@/components/discover/SwipeDeck";
@@ -33,7 +33,7 @@ import type { Meetup } from "@/lib/types";
 // The map needs `window` (WebGL), so it is only loaded in the browser.
 const EventMap = dynamic(() => import("@/components/map/EventMap").then((module) => module.EventMap), {
   ssr: false,
-  loading: () => <Skeleton className="h-[45vh] w-full rounded-xl" />,
+  loading: () => <Skeleton className="h-[40vh] min-h-64 w-full rounded-xl" />,
 });
 
 const SORTS = [
@@ -42,6 +42,30 @@ const SORTS = [
   { id: "people", label: "Más gente" },
 ] as const;
 type SortId = (typeof SORTS)[number]["id"];
+
+// Hiding the map is remembered on this device only (a convenience, not part of the profile).
+// Storage can throw (private mode, blocked site data); then it is kept in memory for this visit.
+const MAP_KEY = "map-hidden";
+let mapHiddenMemory: string | null = null;
+const mapListeners = new Set<() => void>();
+function onMapPref(listener: () => void) {
+  mapListeners.add(listener);
+  return () => mapListeners.delete(listener);
+}
+function readMapHidden() {
+  try {
+    return localStorage.getItem(MAP_KEY) ?? mapHiddenMemory;
+  } catch {
+    return mapHiddenMemory;
+  }
+}
+function writeMapHidden(value: string) {
+  mapHiddenMemory = value;
+  try {
+    localStorage.setItem(MAP_KEY, value);
+  } catch {}
+  mapListeners.forEach((listener) => listener());
+}
 
 export default function HomePage() {
   const { user, profile } = useUser();
@@ -59,6 +83,11 @@ export default function HomePage() {
   const [needs, setNeeds] = useState<InclusionId[]>([]);
   const [here, setHere] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const showMap = useSyncExternalStore(onMapPref, () => readMapHidden() !== "1", () => true);
+  function toggleMap(show: boolean) {
+    if (!show) setSelectedId(null);
+    writeMapHidden(show ? "0" : "1");
+  }
 
   useEffect(() => {
     listUpcomingEvents()
@@ -114,30 +143,30 @@ export default function HomePage() {
   }, [events, category, text, onlyOfficial, onlyOnline, onlyMyLanguages, needs, sort, here, profile]);
 
   const selected = shown.find((event) => event.id === selectedId);
+  const onMap = shown.filter((event) => event.location).length;
+  const online = shown.length - onMap;
 
   return (
     <div className="space-y-4 p-4">
+      {/* One slim row: what Descubrir does, in plain words, and how many cards there are. */}
       <button
         type="button"
         onClick={() => setDiscovering(true)}
         disabled={!events?.length}
-        className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl bg-primary p-4 text-left text-primary-foreground shadow-lg outline-none transition-transform active:scale-[0.98] focus-visible:ring-4 focus-visible:ring-ring/50 disabled:opacity-60"
+        className="group flex min-h-14 w-full items-center gap-3 rounded-xl bg-primary px-3 py-2 text-left text-primary-foreground shadow-sm outline-none transition-transform active:scale-[0.98] focus-visible:ring-4 focus-visible:ring-ring/50 disabled:opacity-60"
       >
-        <span className="pointer-events-none absolute -top-8 -right-6 size-32 rounded-full bg-white/10" aria-hidden />
-        <span className="pointer-events-none absolute -bottom-10 right-16 size-24 rounded-full bg-white/10" aria-hidden />
-        {/* Three tilted cards: a hint of the swipe deck behind the button. */}
-        <span className="relative h-14 w-12 shrink-0" aria-hidden>
-          <span className="absolute inset-0 -rotate-12 rounded-lg bg-white/30" />
-          <span className="absolute inset-0 rotate-6 rounded-lg bg-white/50" />
-          <span className="absolute inset-0 flex items-center justify-center rounded-lg bg-white text-primary shadow">
-            <LayersIcon className="size-6" />
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary-foreground text-primary" aria-hidden>
+          <LayersIcon className="size-5" />
+        </span>
+        <span className="min-w-0 flex-1 leading-tight">
+          <span className="block font-semibold">
+            Descubrir{events?.length ? ` · ${events.length} actividades` : ""}
+          </span>
+          <span className="flex items-center gap-1 text-xs opacity-90">
+            Una a una: <HeartIcon className="size-3" aria-hidden /> te apuntas, <XIcon className="size-3" aria-hidden /> pasas
           </span>
         </span>
-        <span className="relative flex-1">
-          <span className="block text-lg font-semibold">Descubrir actividades</span>
-          <span className="block text-sm opacity-90">Desliza: a la derecha te apuntas, a la izquierda pasas.</span>
-        </span>
-        <ArrowRightIcon className="relative size-6 shrink-0 transition-transform group-hover:translate-x-1" aria-hidden />
+        <ArrowRightIcon className="size-5 shrink-0 transition-transform group-hover:translate-x-1" aria-hidden />
       </button>
 
       <div className="relative">
@@ -159,17 +188,46 @@ export default function HomePage() {
 
       <CategoryChips selected={category} onChange={setCategory} />
 
-      <EventMap
-        events={shown}
-        selectedId={selectedId}
-        onSelect={(event) => setSelectedId(event.id)}
-        onLocate={(point) => {
-          setHere(point);
-          setSort("near");
-        }}
-      />
+      <section className="space-y-2" aria-label="Mapa">
+        <div className="flex items-center gap-2">
+          <p className="min-w-0 flex-1 text-sm text-muted-foreground">
+            {events === null
+              ? "Cargando el mapa…"
+              : showMap
+                ? `${onMap} en el mapa${online ? ` · ${online} en línea (sin punto)` : ""}. Toca un punto para verla.`
+                : `${shown.length} actividades. El mapa está oculto.`}
+          </p>
+          <Button variant="outline" className="h-10 shrink-0 rounded-full" onClick={() => toggleMap(!showMap)} aria-pressed={!showMap}>
+            {showMap ? <EyeOffIcon aria-hidden /> : <MapIcon aria-hidden />}
+            {showMap ? "Ocultar mapa" : "Ver mapa"}
+          </Button>
+        </div>
 
-      {selected && <EventCard event={selected} distanceKm={here && selected.location ? distanceKm(here, selected.location) : undefined} />}
+        {showMap && (
+          <EventMap
+            events={shown}
+            selectedId={selectedId}
+            onSelect={(event) => setSelectedId(event.id)}
+            onClear={() => setSelectedId(null)}
+            onLocate={(point) => {
+              setHere(point);
+              setSort("near");
+            }}
+          />
+        )}
+
+        {showMap && selected && (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-muted-foreground">Has tocado en el mapa:</p>
+              <Button variant="ghost" size="sm" className="h-9" onClick={() => setSelectedId(null)}>
+                <XIcon aria-hidden /> Cerrar
+              </Button>
+            </div>
+            <EventCard event={selected} distanceKm={here && selected.location ? distanceKm(here, selected.location) : undefined} />
+          </div>
+        )}
+      </section>
 
       <div className="flex flex-wrap items-center gap-2">
         {SORTS.map((option) => (
@@ -232,7 +290,7 @@ export default function HomePage() {
           No hay actividades con estos filtros. Prueba a quitar alguno, o crea tú la primera.
         </p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-3" aria-label="Próximas actividades">
           {shown.map((event) => (
             <li key={event.id}>
               <EventCard

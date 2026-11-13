@@ -8,10 +8,15 @@
  *  - choosing a place for a new activity: pass `onPick`; tapping anywhere reports the point.
  *  - the target button (top right) shows your position as a blue dot and reports it via `onLocate`.
  *
+ * When the pins change (a filter, a search) the map zooms to fit them, and a chosen pin is centred,
+ * so you always see what the list below shows. One finger scrolls the page and two move the map
+ * (cooperative gestures), so the map never traps you while scrolling on a phone.
+ *
  * It needs `window` (WebGL), so load it with next/dynamic and `ssr: false`.
  * Presentational: it never loads data; the page owns the events and the filters.
  */
-import Map, { GeolocateControl, Marker, NavigationControl, type MapLayerMouseEvent } from "react-map-gl/maplibre";
+import Map, { GeolocateControl, Marker, NavigationControl, type MapLayerMouseEvent, type MapRef } from "react-map-gl/maplibre";
+import { useEffect, useRef } from "react";
 import { setWorkerUrl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { MapPinIcon } from "lucide-react";
@@ -25,6 +30,21 @@ setWorkerUrl("/maplibre-gl-worker.mjs");
 
 export type Point = { lat: number; lng: number };
 
+// MapLibre's own buttons and hints, in Spanish.
+const LOCALE = {
+  "GeolocateControl.FindMyLocation": "Ver dónde estoy",
+  "GeolocateControl.LocationNotAvailable": "No podemos saber dónde estás",
+  "NavigationControl.ZoomIn": "Acercar",
+  "NavigationControl.ZoomOut": "Alejar",
+  "NavigationControl.ResetBearing": "Poner el norte arriba",
+  "Map.Title": "Mapa",
+  "Marker.Title": "Punto en el mapa",
+  "AttributionControl.ToggleAttribution": "Ver créditos del mapa",
+  "CooperativeGesturesHandler.WindowsHelpText": "Usa Ctrl + rueda para acercar o alejar el mapa",
+  "CooperativeGesturesHandler.MacHelpText": "Usa ⌘ + rueda para acercar o alejar el mapa",
+  "CooperativeGesturesHandler.MobileHelpText": "Usa dos dedos para mover el mapa",
+};
+
 export function EventMap({
   events = [],
   selectedId,
@@ -32,6 +52,7 @@ export function EventMap({
   pick,
   onPick,
   onLocate,
+  onClear,
   className,
 }: {
   events?: Meetup[];
@@ -42,16 +63,42 @@ export function EventMap({
   onPick?: (point: Point) => void;
   /** Called when the person taps "where am I" and the browser shares the position. Kept in memory only. */
   onLocate?: (point: Point) => void;
+  /** Called when the person taps the map outside any pin, to close the chosen activity. */
+  onClear?: () => void;
   className?: string;
 }) {
+  const map = useRef<MapRef>(null);
   const withPlace = events.filter((event) => event.location);
+  const pins = withPlace.map((event) => `${event.id}:${event.location!.lng},${event.location!.lat}`).join("|");
+
+  // Zoom to fit the pins whenever the set changes (a filter or a search), so map and list agree.
+  useEffect(() => {
+    const current = map.current;
+    if (!current || !pins) return;
+    const points = pins.split("|").map((pin) => pin.split(":")[1].split(",").map(Number) as [number, number]);
+    const lngs = points.map(([lng]) => lng), lats = points.map(([, lat]) => lat);
+    current.fitBounds([[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]], {
+      padding: 48, maxZoom: 12, duration: 600,
+    });
+  }, [pins]);
+
+  // Centre the chosen pin, without zooming out.
+  const chosen = withPlace.find((event) => event.id === selectedId);
+  useEffect(() => {
+    if (!chosen?.location || !map.current) return;
+    map.current.easeTo({ center: [chosen.location.lng, chosen.location.lat], zoom: Math.max(map.current.getZoom(), 10), duration: 500 });
+  }, [chosen?.id]); // eslint-disable-line react-hooks/exhaustive-deps -- only when the choice changes
 
   return (
-    <div className={cn("h-[45vh] w-full overflow-hidden rounded-xl border", className)}>
+    <div className={cn("h-[40vh] min-h-64 w-full overflow-hidden rounded-xl border", className)}>
       <Map
+        ref={map}
         mapStyle={MAP_STYLE}
+        locale={LOCALE}
+        cooperativeGestures
+        attributionControl={{ compact: true }}
         initialViewState={{ bounds: ARCHIPELAGO_BOUNDS, fitBoundsOptions: { padding: 24 } }}
-        onClick={onPick ? (event: MapLayerMouseEvent) => onPick({ lat: event.lngLat.lat, lng: event.lngLat.lng }) : undefined}
+        onClick={(event: MapLayerMouseEvent) => (onPick ? onPick({ lat: event.lngLat.lat, lng: event.lngLat.lng }) : onClear?.())}
         cursor={onPick ? "crosshair" : "grab"}
         style={{ width: "100%", height: "100%" }}
       >
@@ -63,21 +110,25 @@ export function EventMap({
         />
         {withPlace.map((event) => {
           const Icon = findCategory(event.category)?.icon ?? MapPinIcon;
-          const chosen = event.id === selectedId;
+          const isChosen = event.id === selectedId;
           return (
             <Marker
               key={event.id}
               longitude={event.location!.lng}
               latitude={event.location!.lat}
               anchor="bottom"
-              onClick={() => onSelect?.(event)}
+              onClick={(click) => {
+                click.originalEvent.stopPropagation(); // a pin tap is not a tap on the empty map
+                onSelect?.(event);
+              }}
             >
               <button
                 type="button"
                 aria-label={event.title}
+                aria-pressed={isChosen}
                 className={cn(
                   "flex size-9 items-center justify-center rounded-full border-2 border-background shadow-md transition-transform",
-                  chosen ? "scale-125 bg-primary text-primary-foreground" : "bg-background text-foreground",
+                  isChosen ? "z-10 scale-125 bg-primary text-primary-foreground" : "bg-background text-foreground",
                 )}
               >
                 <Icon className="size-4" aria-hidden />
