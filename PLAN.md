@@ -22,7 +22,7 @@ Todo lo que de otro modo pisaríamos entre varias personas se prepara una sola v
 **Pendiente antes de repartir los bloques (una persona)**
 - [ ] **Prueba de IA primero** (30 min, la mayor incógnita): cargar Transformers.js en un Web Worker con Next 16 y calcular el embedding de una frase. Si el modelo de chat no funciona, quedarse solo con los embeddings.
 - [x] `src/lib/auth.tsx` (`AuthProvider` / `useUser`) y `/login/` (entrar y crear cuenta con correo).
-- [x] Alta (`/onboarding/`) y perfil (`/profile/`): pronombres, idiomas, intereses, isla, disponibilidad.
+- [x] Alta (`/onboarding/`) en 7 pasos cortos, y perfil (`/profile/`) en una sola página para editar.
 - [x] `EventCard` con imagen, icono de categoría, banderas e iconos de inclusión.
 - [x] `getProfile` y `saveProfile` en `src/lib/db.ts`.
 - [x] Funciones de eventos en `db.ts`: `listUpcomingEvents`, `getEvent`, `createEvent`.
@@ -77,8 +77,8 @@ Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rut
 | ~~C1~~ | ~~Alta: pronombres, intereses, idiomas, isla, preguntas, institución~~ **hecho** | F2, F3, F18 |
 | ~~C2~~ | ~~Página de perfil (ver y editar)~~ **hecho** | F2 |
 | C3 | Worker de IA: modelo de embeddings, `embed`, `findSimilarEvents` | F9 |
-| C4 | Asistente: búsqueda libre → tarjetas de eventos | F16 |
-| C5 | Asistente: "Sugiéreme algo" a partir del perfil | F16 |
+| ~~C4~~ | ~~xatsí: búsqueda libre → tarjetas (por palabras; el modelo reordenará después)~~ **hecho** | F16 |
+| ~~C5~~ | ~~xatsí: "Sugiéreme algo" a partir del perfil~~ **hecho** | F16 |
 | C6 | Redacción con el modelo de chat en dispositivos capaces; frase fija en el resto | F16 |
 | C7 | Gente como tú | F15 |
 

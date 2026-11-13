@@ -2,6 +2,9 @@
 /**
  * First-time setup: pronouns, languages, interests, island and a couple of short questions
  * (F2, F3, F18) — Built (not a placeholder).
+ *
+ * One question per screen (`mode="wizard"`): short screens are easier to read and to answer on a
+ * phone than one long form, and nothing optional ever blocks you.
  * Pattern: this page is the CONTAINER (saves the profile and redirects); <ProfileForm> draws it.
  */
 import { useRouter } from "next/navigation";
@@ -19,15 +22,15 @@ export default function OnboardingPage() {
     <RequireUser needsProfile={false}>
       {({ user }) => (
         <>
-          <header className="space-y-1 p-4 pb-0">
+          <header className="space-y-1 px-4 pt-4">
             <h1 className="text-2xl font-semibold">Te damos la bienvenida</h1>
             <p className="text-sm text-muted-foreground">
-              Cuéntanos un poco de ti. Así te enseñamos encuentros que te encajen y verás con quién
-              te vas a entender.
+              Siete preguntas cortas. Puedes volver atrás cuando quieras.
             </p>
           </header>
           <ProfileForm
             initial={{ displayName: user.displayName ?? "" }}
+            mode="wizard"
             submitLabel="Empezar"
             onSubmit={async (draft) => {
               await saveProfile(user.uid, draft);

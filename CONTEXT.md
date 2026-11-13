@@ -26,7 +26,7 @@ Cada funcionalidad tiene un identificador para poder citarla en ramas y PR.
 
 ### Perfil y alta
 - **F1 Cuenta.** Acceso con correo y contraseña (el acceso con Google se puede añadir más adelante).
-- **F2 Alta.** Elegir intereses entre las categorías de encuentros, los **idiomas que hablas** (obligatorio), tu isla y unas preguntas cortas que ayudan a emparejar: en persona / en línea / ambos, cuándo sueles tener tiempo, una línea sobre lo que te gustaría hacer con otras personas.
+- **F2 Alta.** Una pregunta por pantalla, con barra de progreso, botón para volver y opción de saltar lo opcional. Elegir intereses entre las categorías de encuentros, los **idiomas que hablas** (obligatorio), tu isla y unas preguntas cortas que ayudan a emparejar: en persona / en línea / ambos, cuándo sueles tener tiempo, una línea sobre lo que te gustaría hacer con otras personas.
 - **F3 Cuenta de institución.** En el alta puedes indicar "Represento a una institución". Podrá publicar eventos oficiales una vez verificada (a mano durante el hackathon).
 
 ### Descubrir
@@ -60,7 +60,7 @@ Cada funcionalidad tiene un identificador para poder citarla en ramas y PR.
 - **F24 Protección de datos.** Página de privacidad, consentimiento al registrarse y borrar la cuenta.
 
 ### Asistente
-- **F16 Chatbot.** Dos modos: "Sugiéreme algo" (usa tu perfil) y búsqueda libre ("algo al aire libre este fin de semana en Tenerife, en inglés"). Se ejecuta en el dispositivo.
+- **F16 xatsí, el asistente.** Se llama **xatsí**. Dos modos: "Sugiéreme algo" (usa tu perfil) y búsqueda libre ("algo al aire libre este fin de semana en Tenerife, en inglés"). Se ejecuta en el dispositivo.
 
 ## Categorías de encuentros (primera versión)
 

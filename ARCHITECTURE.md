@@ -38,7 +38,8 @@ Versiones comprobadas en npm el 12-11-2026. Todas son compatibles con React 19.
 | Animación | **motion** (`import { motion } from "motion/react"`) | La librería de animación estándar de React (antes Framer Motion). Solo para toques pequeños: elementos de lista que aparecen, transiciones de paneles y tarjetas |
 | Avisos (toasts) | **sonner** | A través del componente `sonner` de shadcn |
 | Panel inferior en móvil | **drawer** de shadcn | Da la sensación de "app" al previsualizar eventos en el móvil |
-| Tipografía | **Geist** con `next/font` | Ya conectada en `layout.tsx` |
+| Tipografía | **Atkinson Hyperlegible Next** con `next/font` para todo el texto; **Geist** solo en el logo | Atkinson está diseñada para que las letras no se confundan (baja visión, dislexia) |
+| Color principal | Naranja de la marca: `oklch(0.553 0.195 38.4)` en claro, `oklch(0.75 0.183 55.9)` en oscuro | Mismo naranja que el logo, con contraste ≥ 4,5:1 frente a su texto |
 | Mapa | **maplibre-gl** + **react-map-gl** (`react-map-gl/maplibre`) | Código abierto, fluido en móviles |
 | Teselas del mapa | **OpenFreeMap** — estilo `https://tiles.openfreemap.org/styles/liberty` | Gratis, sin clave de API ni registro |
 
@@ -196,7 +197,7 @@ El modelo de chat es una constante en `src/lib/ai/config.ts`; alternativas de ta
 **Cómo lo usa cada funcionalidad**
 
 - **Aviso de eventos parecidos (F9).** Primero una sugerencia instantánea (misma categoría, mismo día, a menos de 5 km: sin modelo ni descarga). Cuando el modelo ha cargado: calcula el embedding de `título + descripción`, compáralo por similitud de coseno con el `embedding` de cada evento próximo cargado y muestra los 3 mejores por encima de un umbral. El embedding se guarda en el evento nuevo al publicarlo.
-- **Asistente (F16).** Primero buscar, después redactar:
+- **xatsí (F16).** Hoy busca **por palabras** (sin modelo ni descarga: responde al instante en cualquier móvil; ignora tildes y mayúsculas). El modelo de embeddings, cuando se conecte, reordenará esos mismos resultados por significado. Primero buscar, después redactar:
   1. Construir la consulta: el texto del usuario o, para "Sugiéreme algo", una frase hecha a partir de su perfil.
   2. Calcular su embedding y tomar los eventos más cercanos (prefiltrados por isla, fecha e idiomas).
   3. Mostrar esos eventos como tarjetas. **Este paso por sí solo ya responde.**

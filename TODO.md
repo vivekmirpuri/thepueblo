@@ -16,7 +16,7 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 
 - [ ] **Prueba de IA**: Transformers.js en un Web Worker con Next 16, calcular el embedding de una frase.
 - [x] `src/lib/auth.tsx` real (`AuthProvider`, `useUser`) y pantalla `/login/`.
-- [x] Alta (`/onboarding/`) y perfil (`/profile/`), con burbujas de intereses, idiomas y pronombres.
+- [x] Alta (`/onboarding/`) en pasos cortos con progreso y perfil (`/profile/`), con burbujas de intereses, idiomas y pronombres.
 - [x] `getProfile` y `saveProfile` en `src/lib/db.ts`.
 - [x] Funciones de eventos: `listUpcomingEvents`, `getEvent`, `createEvent`.
 - [x] `EventCard` completa, con el icono de la categoría.
@@ -60,9 +60,9 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 - [ ] **Nuevo** — Sumar intercambio de saberes (lo que yo quiero aprender y la otra persona enseña).
 
 ### Apartado IA
-- [ ] C3 Worker de IA y embeddings.
-- [ ] C4 Asistente: búsqueda libre → tarjetas.
-- [ ] C5 Asistente: "Sugiéreme algo" según el perfil.
+- [ ] C3 Worker de IA y embeddings: que xatsí reordene por significado ("moverme" → "caminata").
+- [x] C4 xatsí: búsqueda libre → tarjetas (por palabras, sin descargar nada).
+- [x] C5 xatsí: "Sugiéreme algo" según el perfil.
 - [ ] C6 Redacción con el modelo de chat (opcional).
 
 ## 3. Desarrollo transversal
@@ -72,6 +72,7 @@ Los identificadores (A1, B4, F17…) son los de [PLAN.md](PLAN.md) y [CONTEXT.md
 - [x] B3 Banderas en tarjetas y detalle.
 
 ### Lectura fácil / lenguaje inclusivo — **nuevo**
+- [x] Tipografía Atkinson Hyperlegible Next, hecha para personas con baja visión.
 - [ ] Textos de la interfaz cortos, frases simples, sin tecnicismos (criterios de lectura fácil).
 - [x] Idioma de la interfaz: **español** (`<html lang="es">`, etiquetas y navegación ya traducidas).
 - [ ] Revisar todos los textos con lenguaje inclusivo.

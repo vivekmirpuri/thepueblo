@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 const TABS = [
   { href: "/", label: "Mapa", icon: MapIcon },
   { href: "/chats/", label: "Chats", icon: MessageCircleIcon },
-  { href: "/assistant/", label: "Asistente", icon: SparklesIcon },
+  { href: "/assistant/", label: "xatsí", icon: SparklesIcon },
   { href: "/people/", label: "Gente", icon: UsersIcon },
   { href: "/profile/", label: "Perfil", icon: UserIcon },
 ] as const;
