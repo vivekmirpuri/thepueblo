@@ -14,7 +14,7 @@ Lee antes de editar: `CONTEXT.md` (qué y por qué), `ARCHITECTURE.md` (cómo) y
 
 - La documentación (`*.md`) se escribe en español. El código y sus comentarios, en inglés.
 - Los archivos compartidos (`package.json`, `src/app/layout.tsx`, `globals.css`, `src/lib/*` salvo `src/lib/ai`, `src/components/ui`, `src/components/shared`, configuraciones, workflows) solo se cambian con el visto bueno explícito del usuario.
-- Sal de `develop` y abre el PR hacia `develop`. Nunca hagas commit directo en `main` ni en `develop`.
+- Se trabaja directamente en `develop` y se hace push sin pull request. Antes de cada push: `git pull --rebase origin develop` y `npm run lint && npm run build`. `main` solo recibe `develop` (`git push origin develop:main`) cuando el usuario lo pida.
 - Solo exportación estática: sin rutas de API, server actions, APIs de servidor en tiempo de petición ni segmentos dinámicos (`[id]`); usa parámetros `?id=`.
 - Interfaz: usa los componentes de `src/components/ui/` (shadcn/ui, preset `base-nova`, sobre Base UI: no hay `asChild`, usa la prop `render`). Añade los que falten con `npx shadcn@latest add <nombre>`. Iconos: `lucide-react`. Animación: `motion/react`, con moderación. Avisos: `sonner`. Mapa: `react-map-gl/maplibre`. Estilos con tokens del tema (`bg-background`, `text-muted-foreground`), nunca colores hexadecimales. No añadas otro kit de interfaz.
 - Los archivos marcados PLACEHOLDER empiezan con un comentario que dice qué construir y con qué librerías; síguelo y borra la palabra PLACEHOLDER cuando el archivo sea real. Las funciones que llaman a `todo()` aún no existen.

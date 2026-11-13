@@ -86,7 +86,7 @@ Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rut
 - [ ] Fusionar todo en `develop` y probar en el entorno de pruebas con un móvil real y un portátil.
 - [ ] Ejecutar el script de datos de ejemplo; crear dos cuentas de prueba con idiomas distintos.
 - [ ] Abrir el asistente una vez en el portátil de la demo antes de empezar, para que los modelos ya estén en caché.
-- [ ] PR de `develop` → `main`.
+- [ ] Pasar `develop` a `main`: `git push origin develop:main`.
 - [ ] Ensayar dos veces la demo de abajo.
 
 ## Guion de la demo (≈3 minutos)
@@ -111,4 +111,4 @@ Cada bloque agrupa tareas que tocan carpetas distintas (ver ARCHITECTURE → Rut
 
 ## Cómo trabajamos
 
-Ramas, pull requests y archivos compartidos: [README.md](README.md).
+Ramas, despliegues y archivos compartidos: [README.md](README.md).

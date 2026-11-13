@@ -4,7 +4,7 @@ Next.js (React + TypeScript + Tailwind) → exportación estática → Firebase 
 
 - **Producción** (`main`): https://thepueblo-6f94e.web.app
 - **Pruebas** (`develop`): https://thepueblo-6f94e--develop-1ttzfnbg.web.app
-- **Vistas previas:** cada pull request recibe su propia URL temporal, publicada como comentario en el PR.
+- **Vistas previas (opcional):** si abres un pull request, recibe su propia URL temporal, publicada como comentario en el PR.
 
 | Lee esto | Para |
 |---|---|
@@ -24,9 +24,10 @@ Firebase está listo para usar desde `src/lib/firebase.ts` (`auth`, `db`, `stora
 
 ## Cómo trabajamos sin pisarnos
 
-1. **Sal de `develop` y nunca hagas push a `main` ni a `develop`.** `git switch develop && git pull && git switch -c <nombre>/<funcionalidad>` → push → abre un PR hacia `develop` → revisa la URL de vista previa → fusiona con "Squash and merge". Cuando el entorno de pruebas funcione, `develop` pasa a `main` con un PR (merge commit, no squash). Las dos ramas exigen un PR y la compilación en verde.
-2. **Archivos compartidos = PR pequeños, avisa antes en el chat:** `package.json`, `src/app/layout.tsx`, `src/app/globals.css`, `src/lib/*`, `src/components/ui/`, `src/components/shared/`, `next.config.ts`, `firebase.json`.
-3. **Actualiza a menudo:** `git pull --rebase origin develop` antes de empezar y antes de abrir un PR. Los PR pequeños se fusionan rápido y casi nunca chocan.
+1. **Trabaja en `develop` y haz push directo.** Cada push a `develop` se despliega solo en el entorno de pruebas. Cuando las pruebas vayan bien, pasa a producción con `git push origin develop:main`. No hace falta pull request; ábrelo solo si quieres una URL de vista previa o que alguien revise algo.
+2. **Archivos compartidos: cambios pequeños y avisa antes en el chat:** `package.json`, `src/app/layout.tsx`, `src/app/globals.css`, `src/lib/*`, `src/components/ui/`, `src/components/shared/`, `next.config.ts`, `firebase.json`.
+3. **Actualiza siempre antes de subir:** `git pull --rebase origin develop` antes de empezar y justo antes de cada `git push`. Commits pequeños y frecuentes casi nunca chocan.
+4. **Antes de hacer push, compila:** `npm run lint && npm run build`. Nada bloquea un push roto, así que comprobarlo es cosa de cada uno.
 
 ## Comandos útiles
 

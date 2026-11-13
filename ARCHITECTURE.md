@@ -109,7 +109,7 @@ firestore.rules           reglas de seguridad de la base de datos, se despliegan
 storage.rules             reglas de subida de imágenes, se despliegan A MANO
 ```
 
-Los archivos "compartidos" los usan todos los bloques: cámbialos con PR pequeños y avisa antes.
+Los archivos "compartidos" los usan todos los bloques: cámbialos con commits pequeños y avisa antes.
 
 ## Modelo de datos (Firestore)
 
@@ -208,9 +208,9 @@ Nota para los modelos e5: antepón `query: ` (búsquedas) o `passage: ` (eventos
 |---|---|---|
 | `main` | Lo que ve el jurado. Solo recibe fusiones desde `develop`. | **Producción** — https://thepueblo-6f94e.web.app |
 | `develop` | Integración: aquí se junta el trabajo de todos. Rama por defecto. | **Pruebas** — https://thepueblo-6f94e--develop-1ttzfnbg.web.app |
-| `<nombre>/<funcionalidad>` | Una persona, una funcionalidad. | Una URL de vista previa temporal por pull request |
+| Cualquier rama con pull request (opcional) | Para revisar algo antes de subirlo. | Una URL de vista previa temporal por pull request |
 
-Un único workflow, [.github/workflows/deploy.yml](.github/workflows/deploy.yml), ejecuta lint + build y luego despliega. `main` y `develop` exigen un pull request con la compilación en verde. La clave de la cuenta de servicio es el secreto de GitHub `FIREBASE_SERVICE_ACCOUNT`; nunca está en el repositorio. Bórrala en la consola de Firebase después del hackathon.
+Un único workflow, [.github/workflows/deploy.yml](.github/workflows/deploy.yml), ejecuta lint + build y luego despliega. No hay protección de ramas: se hace push directo a `develop`, y `develop` pasa a `main` con `git push origin develop:main`. Un push con la compilación rota no se despliega, pero tampoco se bloquea. La clave de la cuenta de servicio es el secreto de GitHub `FIREBASE_SERVICE_ACCOUNT`; nunca está en el repositorio. Bórrala en la consola de Firebase después del hackathon.
 
 **Imágenes.** El formulario de crear evento sube el archivo con `uploadEventImage(uid, file)` (`src/lib/db.ts`), que lo guarda en `events/{uid}/…` y devuelve un enlace de descarga; ese enlace se guarda en el evento como `imageUrl`. Storage necesita el plan de pago por uso (Blaze) y crear el bucket una vez en la consola.
 
