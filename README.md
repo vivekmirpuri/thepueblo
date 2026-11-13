@@ -11,7 +11,7 @@ Next.js (React + TypeScript + Tailwind) → exportación estática → Firebase 
 | [CONTEXT.md](CONTEXT.md) | Qué construimos y por qué |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Stack, paquetes, modelo de datos, IA local, hosting |
 | [TODO.md](TODO.md) | La lista de tareas pendientes, por apartado |
-| [marketing/carrusel/](marketing/carrusel/) | 9 imágenes 1080×1350 para redes, con capturas reales |
+| [marketing/carrusel/](marketing/carrusel/) | 10 imágenes 1080×1350 para redes: una por pantalla principal, con 3 detalles cada una |
 | [PLAN.md](PLAN.md) | Fases, los tres bloques de tareas, guion de la demo |
 
 ## Puesta en marcha (una vez)
