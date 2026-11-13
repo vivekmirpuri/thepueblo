@@ -7,6 +7,7 @@
  * of colour alone, and an optional line of explanation so nobody has to guess what it means.
  */
 import { Toggle } from "@/components/ui/toggle";
+import { Flag } from "@/components/shared/LanguageFlags";
 import { cn } from "@/lib/utils";
 
 export function Bubble({
@@ -38,7 +39,7 @@ export function Bubble({
     >
       <span className="flex items-center gap-2 font-medium">
         {typeof Icon === "string" ? (
-          <span aria-hidden className="text-base leading-none">{Icon}</span>
+          <Flag flag={Icon} className="text-base leading-none" />
         ) : Icon ? (
           <Icon className="size-4 shrink-0" aria-hidden />
         ) : null}

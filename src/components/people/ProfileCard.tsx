@@ -5,7 +5,9 @@
  * what you have in common: shared interests with their icons and shared languages with their flags.
  * Presentational: the page works out the match and passes it in.
  */
+import Link from "next/link";
 import { MapPinIcon } from "lucide-react";
+import { Flag } from "@/components/shared/LanguageFlags";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import { PersonName } from "@/components/shared/PersonName";
 import { Badge } from "@/components/ui/badge";
@@ -13,20 +15,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { findCategory } from "@/lib/categories";
 import { homeName } from "@/lib/islands";
 import { LANGUAGES } from "@/lib/languages";
-import type { Match } from "@/lib/people";
+import { profileHref, type Match } from "@/lib/people";
 
 export function ProfileCard({ match }: { match: Match }) {
   const { profile, interests, languages, sameIsland } = match;
   const common = interests.length + languages.length + (sameIsland ? 1 : 0);
 
   return (
-    <Card className="py-0">
+    <Card className="relative py-0 transition-colors hover:bg-muted/40">
       <CardContent className="space-y-3 p-4">
         <div className="flex items-center gap-3">
           <PersonAvatar name={profile.displayName} avatar={profile.avatar} className="size-14 text-base" />
           <div className="min-w-0 flex-1">
             <h2 className="truncate font-semibold">
-              <PersonName name={profile.displayName} pronouns={profile.pronouns} />
+              <Link href={profileHref(profile.uid)} className="after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-ring">
+                <PersonName name={profile.displayName} pronouns={profile.pronouns} />
+              </Link>
             </h2>
             <p className="flex items-center gap-1 text-sm text-muted-foreground">
               <MapPinIcon className="size-3.5 shrink-0" aria-hidden />
@@ -50,7 +54,7 @@ export function ProfileCard({ match }: { match: Match }) {
                 return (
                   <li key={code}>
                     <Badge variant="outline">
-                      <span aria-hidden>{language?.flag}</span> {language?.name ?? code}
+                      <Flag flag={language?.flag} /> {language?.name ?? code}
                     </Badge>
                   </li>
                 );

@@ -9,7 +9,8 @@
  *   read Spanish yet. `name` is the Spanish name, shown underneath for everyone else.
  * - `code` is ISO 639-1, or ISO 639-3 when a language has no two-letter code (zgh, ssp).
  * - `flag` is only a visual hint for the language (F11), never a nationality. Languages with no
- *   country of their own get a symbol instead: ⵣ for Tamazight, 🤟 for sign language.
+ *   country of their own get a symbol instead: ⵣ for Tamazight, 🤟 for sign language. Catalan,
+ *   Galician and Basque have no emoji flag, so theirs is a path to an SVG in public/flags/ (see <Flag>).
  *
  * shortcut: emoji flags show as two letters on Windows; switch to the `flag-icons` package if that matters.
  */
@@ -17,9 +18,9 @@ export const LANGUAGES = [
   // Spain
   { code: "es", label: "Español", name: "Español", flag: "🇪🇸" },
   { code: "ssp", label: "Lengua de signos", name: "Lengua de signos española", flag: "🤟" },
-  { code: "ca", label: "Català", name: "Catalán", flag: "🇪🇸" },
-  { code: "gl", label: "Galego", name: "Gallego", flag: "🇪🇸" },
-  { code: "eu", label: "Euskara", name: "Euskera", flag: "🇪🇸" },
+  { code: "ca", label: "Català", name: "Catalán", flag: "/flags/ca.svg" },
+  { code: "gl", label: "Galego", name: "Gallego", flag: "/flags/gl.svg" },
+  { code: "eu", label: "Euskara", name: "Euskera", flag: "/flags/eu.svg" },
   // Europe
   { code: "en", label: "English", name: "Inglés", flag: "🇬🇧" },
   { code: "de", label: "Deutsch", name: "Alemán", flag: "🇩🇪" },

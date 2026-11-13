@@ -9,6 +9,8 @@
  * Presentational: messages come in as props and new ones go out through `onSend`; the page
  * subscribes to Firestore and unsubscribes when it closes.
  */
+import { profileHref } from "@/lib/people";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { SendHorizontalIcon } from "lucide-react";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
@@ -66,10 +68,13 @@ export function ChatThread({
             return (
               <li key={message.id} className={cn("flex flex-col", mine ? "items-end" : "items-start")}>
                 {!mine && first && (
-                  <span className="flex items-center gap-1.5 px-1 pb-0.5 text-xs font-medium">
+                  <Link
+                    href={profileHref(message.uid)}
+                    className="flex min-h-6 items-center gap-1.5 px-1 pb-0.5 text-xs font-medium rounded-sm underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+                  >
                     <PersonAvatar name={message.name} avatar={message.avatar} className="size-6 text-[10px]" />
                     <PersonName name={message.name} pronouns={message.pronouns} />
-                  </span>
+                  </Link>
                 )}
                 <div
                   className={cn(

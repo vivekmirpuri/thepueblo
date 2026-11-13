@@ -32,3 +32,6 @@ export function matchPeople(me: UserProfile, people: UserProfile[]): Match[] {
     .filter((match) => match.interests.length > 0 || match.languages.length > 0)
     .sort((a, b) => b.score - a.score || a.profile.displayName.localeCompare(b.profile.displayName, "es"));
 }
+
+/** Link to anyone's profile page (yours too: /profile/ without uid shows your own). */
+export const profileHref = (uid: string) => `/profile/?uid=${encodeURIComponent(uid)}`;

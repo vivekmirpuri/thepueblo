@@ -7,6 +7,7 @@
  * The id comes from `?id=` and is read inside a <Suspense>, because a static export has no
  * dynamic routes like /event/[id].
  */
+import { profileHref } from "@/lib/people";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -110,7 +111,11 @@ function EventDetail() {
       </div>
 
       <h1 className="text-2xl font-semibold">{event.title}</h1>
-      <p className="text-sm text-muted-foreground">Lo organiza {event.organizerName}</p>
+      <p className="text-sm text-muted-foreground">Lo organiza{" "}
+        <Link href={profileHref(event.organizerId)} className="font-medium text-foreground underline rounded-sm underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring">
+          {event.organizerName}
+        </Link>
+      </p>
 
       <p className="flex items-center gap-2 text-sm">
         <CalendarDaysIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />

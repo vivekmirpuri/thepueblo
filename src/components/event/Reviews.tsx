@@ -8,6 +8,8 @@
  *
  * Presentational: reviews come in as props and mine goes out through `onSave`.
  */
+import { profileHref } from "@/lib/people";
+import Link from "next/link";
 import { useState } from "react";
 import { StarIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -128,9 +130,9 @@ export function Reviews({
           {reviews.map((review) => (
             <li key={review.uid} className="space-y-1 rounded-xl bg-muted/50 p-3">
               <div className="flex flex-wrap items-center gap-2 text-sm">
-                <span className="font-medium">
+                <Link href={profileHref(review.uid)} className="font-medium rounded-sm underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring">
                   <PersonName name={review.name} />
-                </span>
+                </Link>
                 <Stars value={review.rating} />
                 <span className="sr-only">{review.rating} de 5 estrellas</span>
                 {review.createdAt && (
