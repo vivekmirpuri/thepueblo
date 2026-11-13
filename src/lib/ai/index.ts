@@ -28,8 +28,20 @@ export interface ScoredEvent {
 const plain = (text: string) =>
   text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
-/** Words worth matching on: three letters or more, so "de", "la" and "en" do not count. */
-const words = (text: string) => plain(text).split(/[^\p{L}\p{N}]+/u).filter((word) => word.length > 2);
+/**
+ * Filler words that say nothing about the activity. Without this list "algo al aire libre este
+ * fin de semana" matched a café only because its description says "este café".
+ * shortcut: time words ("semana", "hoy") are ignored, not used as a date filter; add one if asked.
+ */
+const FILLER = new Set(
+  "algo este esta estos estas ese esa para con una uno unos unas que por los las del mas muy fin semana hoy manana plan planes quiero busco gustaria hacer cerca sitio".split(" "),
+);
+
+/** Words worth matching on: three letters or more and not filler. */
+const words = (text: string) =>
+  plain(text)
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter((word) => word.length > 2 && !FILLER.has(word));
 
 const haystack = (event: Meetup) =>
   plain(
