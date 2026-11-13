@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>flejethepueblo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;800&family=Geist:wght@400;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: oklch(0.985 0.008 70);
+  --fg: oklch(0.22 0.02 40);
+  --muted: oklch(0.48 0.02 45);
+  --card: oklch(1 0 0);
+  --border: oklch(0.9 0.015 60);
+  --soft: oklch(0.955 0.03 60);
+  --primary: oklch(0.553 0.195 38.4);
+  --primary-fg: oklch(0.99 0 0);
+  --brand-text: oklch(0.553 0.195 38.4);
+  --sea: oklch(0.93 0.035 225);
+  --land: oklch(0.88 0.05 120);
+  --land-edge: oklch(0.8 0.06 120);
+  --c1: oklch(0.6 0.15 250);
+  --c2: oklch(0.62 0.15 150);
+  --c3: oklch(0.6 0.17 320);
+  --shadow: 0 1px 2px oklch(0.3 0.02 40 / 0.06), 0 8px 28px oklch(0.3 0.02 40 / 0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: oklch(0.17 0.012 45); --fg: oklch(0.96 0.01 70); --muted: oklch(0.72 0.02 60);
+    --card: oklch(0.22 0.014 45); --border: oklch(0.32 0.02 45); --soft: oklch(0.26 0.03 50);
+    --primary: oklch(0.75 0.183 55.9); --primary-fg: oklch(0.2 0.03 40); --brand-text: oklch(0.78 0.16 55.9);
+    --sea: oklch(0.26 0.035 235); --land: oklch(0.36 0.04 130); --land-edge: oklch(0.45 0.05 130);
+    --shadow: 0 1px 2px oklch(0 0 0 / 0.3), 0 8px 28px oklch(0 0 0 / 0.35);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: oklch(0.17 0.012 45); --fg: oklch(0.96 0.01 70); --muted: oklch(0.72 0.02 60);
+  --card: oklch(0.22 0.014 45); --border: oklch(0.32 0.02 45); --soft: oklch(0.26 0.03 50);
+  --primary: oklch(0.75 0.183 55.9); --primary-fg: oklch(0.2 0.03 40); --brand-text: oklch(0.78 0.16 55.9);
+  --sea: oklch(0.26 0.035 235); --land: oklch(0.36 0.04 130); --land-edge: oklch(0.45 0.05 130);
+  --shadow: 0 1px 2px oklch(0 0 0 / 0.3), 0 8px 28px oklch(0 0 0 / 0.35);
+}
+
+* { box-sizing: border-box; margin: 0; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  font-size: 18px; line-height: 1.45; -webkit-font-smoothing: antialiased;
+}
+.ic { width: 1.15em; height: 1.15em; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── Slide frame ───────────────────────────── */
+.slide {
+  min-height: 100svh; scroll-snap-align: start;
+  display: grid; align-items: center;
+  padding: clamp(24px, 4vw, 56px) clamp(16px, 6vw, 96px) clamp(64px, 6vw, 80px);
+  position: relative; overflow: hidden;
+}
+.wrap { width: 100%; max-width: 1180px; margin: 0 auto; display: grid; gap: clamp(28px, 4vw, 56px); }
+.two { grid-template-columns: 1.05fr 0.95fr; align-items: center; }
+@media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
+
+.kicker {
+  display: inline-flex; align-items: center; gap: 8px; width: fit-content;
+  font-size: 14px; font-weight: 600; letter-spacing: 0.02em; color: var(--brand-text);
+  background: var(--soft); padding: 6px 12px; border-radius: 999px;
+}
+h1, h2 { font-weight: 800; letter-spacing: -0.025em; line-height: 1.05; text-wrap: balance; }
+h1 { font-size: clamp(40px, 7vw, 88px); }
+h2 { font-size: clamp(32px, 4.6vw, 60px); }
+.lead { font-size: clamp(18px, 1.8vw, 23px); color: var(--muted); max-width: 40ch; text-wrap: pretty; }
+.accent { color: var(--brand-text); }
+.stack { display: grid; gap: 18px; align-content: start; }
+
+/* ── Feature list ──────────────────────────── */
+.feats { display: grid; gap: 8px; list-style: none; padding: 0; }
+.feat {
+  display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: center;
+  padding: 9px 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--border);
+}
+.feat .bub { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--soft); color: var(--brand-text); }
+.feat b { display: block; font-size: 17px; }
+.feat span { font-size: 15.5px; color: var(--muted); }
+.tag { font-size: 11px; font-weight: 600; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 1px 6px; margin-left: 6px; vertical-align: 2px; }
+
+/* ── Generic UI bits ───────────────────────── */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow); }
+.chip { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 13px; font-weight: 600; padding: 7px 11px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); }
+.chip.on { background: var(--primary); color: var(--primary-fg); border-color: transparent; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--primary); color: var(--primary-fg); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: inherit; font-weight: 700; font-size: 15px; padding: 11px 16px; border-radius: 12px; border: 0; background: var(--primary); color: var(--primary-fg); }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+.row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ── Slide 1: cover ────────────────────────── */
+.cover { text-align: left; }
+.logo { height: clamp(40px, 5vw, 60px); width: auto; }
+.logo .t1 { fill: var(--brand-text); }
+.logo .t2 { fill: var(--fg); }
+.archi { width: 100%; height: auto; border-radius: 28px; background: var(--sea); box-shadow: var(--shadow); }
+.archi .isle { fill: var(--land); stroke: var(--land-edge); stroke-width: 2; }
+.pin { fill: var(--primary); stroke: var(--card); stroke-width: 3; }
+.pulse { fill: var(--primary); opacity: 0.35; transform-box: fill-box; transform-origin: center; animation: pulse 2.4s ease-out infinite; }
+@keyframes pulse { from { transform: scale(0.6); opacity: 0.45; } to { transform: scale(2.6); opacity: 0; } }
+.isle-label { font: 600 13px "Atkinson Hyperlegible Next", sans-serif; fill: var(--muted); }
+
+/* ── Slide 2: problem ──────────────────────── */
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (max-width: 860px) { .trio { grid-template-columns: 1fr; } }
+.pain { padding: 26px; display: grid; gap: 12px; }
+.pain .big { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; background: var(--soft); color: var(--brand-text); font-size: 26px; }
+.pain b { font-size: 21px; line-height: 1.2; }
+
+/* ── Slide 3: two sides ────────────────────── */
+.sides { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 760px) { .sides { grid-template-columns: 1fr; } }
+.side { padding: 28px; display: grid; gap: 14px; align-content: start; }
+.side h3 { font-size: 26px; display: flex; align-items: center; gap: 10px; }
+.side.inst { background: var(--soft); }
+.side ul { padding-left: 1.1em; display: grid; gap: 6px; color: var(--muted); }
+.strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 760px) { .strip { grid-template-columns: 1fr; } }
+.strip .feat { background: transparent; }
+
+/* ── Phone mock ────────────────────────────── */
+.phone {
+  width: min(330px, 100%); margin: 0 auto; aspect-ratio: 9 / 18.5; border-radius: 42px;
+  background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow);
+  padding: 12px; display: grid; grid-template-rows: auto auto 1fr auto; gap: 10px; overflow: hidden;
+}
+.phone .bar { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px 0; }
+.chips { display: flex; gap: 6px; overflow: hidden; mask-image: linear-gradient(90deg, #000 85%, transparent); }
+.minimap { position: relative; border-radius: 22px; background: var(--sea); overflow: hidden; }
+.minimap svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.peek { padding: 12px; border-radius: 18px; display: grid; gap: 6px; }
+.nav { display: flex; justify-content: space-around; color: var(--muted); font-size: 11px; padding-top: 4px; }
+.nav div { display: grid; justify-items: center; gap: 2px; }
+.nav .on { color: var(--brand-text); font-weight: 700; }
+
+/* ── Slide 5: event card ───────────────────── */
+.event { overflow: hidden; }
+.event .cover-img { height: 130px; background: linear-gradient(135deg, color-mix(in oklch, var(--primary) 55%, var(--soft)), var(--sea)); position: relative; display: grid; place-items: center; color: var(--card); }
+.event .cover-img > .ic { width: 64px; height: 64px; opacity: 0.85; }
+.event .cover-img .badge { position: absolute; top: 14px; left: 14px; }
+.event .body { padding: 18px; display: grid; gap: 12px; }
+.event h4 { font-size: 22px; line-height: 1.15; }
+.flags { display: flex; gap: 6px; flex-wrap: wrap; }
+.flag { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--soft); }
+.incl { display: flex; gap: 6px; }
+.incl span { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; border: 1px solid var(--border); color: var(--muted); }
+.stars { color: var(--primary); display: inline-flex; gap: 1px; }
+.stars .ic { fill: currentColor; width: 16px; height: 16px; }
+.toast { display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-radius: 18px; background: var(--fg); color: var(--bg); box-shadow: var(--shadow); font-size: 15px; }
+.toast b { color: inherit; }
+.toast .go { margin-left: auto; font-weight: 700; color: var(--primary); white-space: nowrap; }
+
+/* ── Slide 6: chat ─────────────────────────── */
+.chat { padding: 18px; display: grid; gap: 10px; }
+.msg { max-width: 82%; padding: 10px 14px; border-radius: 18px; background: var(--soft); font-size: 15.5px; }
+.msg .who { display: block; font-size: 12.5px; font-weight: 700; color: var(--brand-text); }
+.msg .pr { font-weight: 400; color: var(--muted); }
+.msg.me { justify-self: end; background: var(--primary); color: var(--primary-fg); border-bottom-right-radius: 6px; }
+.msg:not(.me) { border-bottom-left-radius: 6px; }
+.person { display: flex; gap: 12px; align-items: center; padding: 14px 16px; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: var(--soft); color: var(--brand-text); flex: none; }
+.match { margin-left: auto; font-weight: 800; color: var(--brand-text); }
+
+/* ── Slide 7: xatsí ────────────────────────── */
+.xatsi { padding: 18px; display: grid; gap: 12px; }
+.ask { justify-self: end; background: var(--primary); color: var(--primary-fg); padding: 10px 14px; border-radius: 18px 18px 6px 18px; max-width: 85%; font-size: 15.5px; }
+.say { display: flex; gap: 10px; align-items: flex-start; font-size: 15.5px; }
+.say .spark { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); color: var(--brand-text); flex: none; }
+.result { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: center; padding: 10px; border-radius: 16px; border: 1px solid var(--border); }
+.result .thumb { width: 52px; height: 52px; border-radius: 12px; display: grid; place-items: center; background: var(--soft); color: var(--brand-text); }
+.result b { display: block; font-size: 15.5px; }
+.modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mode { padding: 14px; border-radius: 16px; border: 1px solid var(--border); background: var(--card); display: grid; gap: 4px; }
+.mode b { display: flex; gap: 8px; align-items: center; }
+
+/* ── Slide 8: inclusion ────────────────────── */
+.icons6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 520px) { .icons6 { grid-template-columns: repeat(2, 1fr); } }
+.i6 { padding: 18px 14px; display: grid; gap: 10px; justify-items: start; font-weight: 600; font-size: 15px; line-height: 1.25; }
+.i6 .ic { width: 30px; height: 30px; color: var(--brand-text); }
+
+/* ── Slide 9: trust ────────────────────────── */
+.pillars { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 760px) { .pillars { grid-template-columns: 1fr; } }
+.pillar { padding: 26px; display: grid; gap: 14px; align-content: start; }
+.pillar h3 { font-size: 24px; display: flex; gap: 10px; align-items: center; }
+.check { display: grid; gap: 10px; list-style: none; padding: 0; }
+.check li { display: grid; grid-template-columns: 24px 1fr; gap: 10px; }
+.check .ic { color: var(--brand-text); margin-top: 3px; }
+.strike { display: flex; gap: 6px; align-items: center; }
+.strike i { width: 26px; height: 8px; border-radius: 99px; background: var(--primary); display: block; }
+.strike i.off { background: var(--border); }
+
+/* ── Slide 10: tech + close ────────────────── */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 760px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+.stat { padding: 20px; }
+.stat b { display: block; font-size: clamp(34px, 4vw, 52px); font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: var(--brand-text); }
+.stat span { font-size: 15px; color: var(--muted); }
+.flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 10px; align-items: stretch; }
+@media (max-width: 760px) { .flow { grid-template-columns: 1fr; } .flow .arrow { transform: rotate(90deg); justify-self: center; } }
+.box { padding: 18px; display: grid; gap: 8px; align-content: start; }
+.box b { display: flex; gap: 8px; align-items: center; }
+.box .row .chip { font-size: 12px; padding: 4px 9px; }
+.arrow { display: grid; place-items: center; color: var(--muted); }
+.close { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; padding: 22px 26px; background: var(--primary); color: var(--primary-fg); border-radius: 22px; }
+.close b { font-size: clamp(24px, 3vw, 34px); font-weight: 800; letter-spacing: -0.02em; }
+.close a { color: inherit; font-weight: 700; font-size: 18px; text-underline-offset: 4px; }
+
+/* ── Deck chrome ───────────────────────────── */
+.hud { position: fixed; right: 16px; bottom: 16px; display: flex; align-items: center; gap: 6px; z-index: 10; padding: 6px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow); }
+.hud button { width: 40px; height: 40px; border-radius: 50%; border: 0; background: transparent; color: var(--fg); display: grid; place-items: center; cursor: pointer; }
+.hud button:hover { background: var(--soft); }
+.hud button:focus-visible { outline: 3px solid var(--primary); outline-offset: 1px; }
+.hud .count { font-size: 14px; font-weight: 700; min-width: 52px; text-align: center; font-variant-numeric: tabular-nums; }
+.progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--primary); width: 10%; transition: width 0.3s; z-index: 10; }
+.num { position: absolute; left: clamp(16px, 6vw, 96px); bottom: 24px; font-size: 13px; color: var(--muted); font-weight: 600; }
+
+/* Entrance */
+.slide .wrap > * { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.slide.in .wrap > * { opacity: 1; transform: none; }
+.slide.in .wrap > *:nth-child(2) { transition-delay: 0.1s; }
+.slide.in .wrap > *:nth-child(3) { transition-delay: 0.2s; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .slide .wrap > * { opacity: 1; transform: none; transition: none; }
+  .pulse { animation: none; opacity: 0; }
+}
+@media print {
+  html { scroll-snap-type: none; }
+  .hud, .progress { display: none; }
+  .slide { break-after: page; min-height: 100vh; }
+  .slide .wrap > * { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<main id="deck">
+
+<!-- 1 · Portada -->
+<section class="slide cover" aria-label="Portada">
+  <div class="wrap two">
+    <div class="stack">
+      <svg class="logo" viewBox="0 0 344 64" role="img" aria-label="flejethepueblo">
+        <rect width="64" height="64" rx="16" fill="#E0572F"/>
+        <g fill="#fff"><path d="M5 32 11 24 17 32V49H5Z"/><path d="M19 28 25.5 18 32 28V49H19Z"/><path d="M34 33 39.5 25 45 33V49H34Z"/><path d="M47 30 52.5 22 58 30V49H47Z"/></g>
+        <g fill="#E0572F"><path d="M23 49v-7a2.5 2.5 0 0 1 5 0v7Z"/><rect x="9" y="36" width="4" height="4" rx="1"/><rect x="37.5" y="37" width="4" height="4" rx="1"/><rect x="50.5" y="34" width="4" height="4" rx="1"/></g>
+        <text x="78" y="45" font-family="Geist, system-ui, sans-serif" font-size="38" letter-spacing="-1.5"><tspan class="t1" font-weight="400">flejethe</tspan><tspan class="t2" font-weight="800" dx="1">pueblo</tspan></text>
+      </svg>
+      <h1>Conoce a la gente <span class="accent">de tu isla.</span></h1>
+      <p class="lead">Un mapa de las Islas Canarias lleno de encuentros pequeños. Cualquiera los crea, cualquiera se une. En persona o en línea, y en tu idioma.</p>
+      <div class="row"><span class="kicker"><i data-i="sparkles"></i> Hackathon TechLab II · Grupo 3</span></div>
+    </div>
+    <svg class="archi" viewBox="0 0 600 340" role="img" aria-label="Mapa de las ocho islas con encuentros marcados">
+      <ellipse class="isle" cx="52" cy="262" rx="20" ry="15" transform="rotate(-20 52 262)"/>
+      <ellipse class="isle" cx="78" cy="118" rx="17" ry="38" transform="rotate(8 78 118)"/>
+      <ellipse class="isle" cx="148" cy="208" rx="19" ry="17"/>
+      <path class="isle" d="M188 196c14-30 52-52 92-56 14-2 18 10 8 18-20 18-46 40-70 52-18 8-36 2-30-14z"/>
+      <circle class="isle" cx="342" cy="232" r="38"/>
+      <path class="isle" d="M445 238c18-36 52-80 92-104 12-8 22 2 14 14-24 40-60 84-92 102-12 6-20-2-14-12z"/>
+      <path class="isle" d="M500 96c14-20 38-38 62-44 10-2 14 8 6 14-16 16-38 36-58 42-10 2-16-4-10-12z"/>
+      <ellipse class="isle" cx="560" cy="36" rx="9" ry="6"/>
+      <text class="isle-label" x="34" y="300">El Hierro</text>
+      <text class="isle-label" x="44" y="70">La Palma</text>
+      <text class="isle-label" x="116" y="248">La Gomera</text>
+      <text class="isle-label" x="214" y="124">Tenerife</text>
+      <text class="isle-label" x="300" y="296">Gran Canaria</text>
+      <text class="isle-label" x="418" y="288">Fuerteventura</text>
+      <text class="isle-label" x="480" y="140">Lanzarote</text>
+      <g>
+        <circle class="pulse" cx="238" cy="172" r="9"/><circle class="pin" cx="238" cy="172" r="9"/>
+        <circle class="pulse" cx="342" cy="226" r="9" style="animation-delay:.6s"/><circle class="pin" cx="342" cy="226" r="9"/>
+        <circle class="pulse" cx="534" cy="78" r="9" style="animation-delay:1.2s"/><circle class="pin" cx="534" cy="78" r="9"/>
+        <circle class="pin" cx="80" cy="120" r="7"/><circle class="pin" cx="150" cy="206" r="7"/>
+        <circle class="pin" cx="270" cy="152" r="7"/><circle class="pin" cx="360" cy="246" r="7"/>
+        <circle class="pin" cx="492" cy="196" r="7"/><circle class="pin" cx="54" cy="262" r="7"/>
+      </g>
+    </svg>
+  </div>
+  <span class="num">01</span>
+</section>
+
+<!-- 2 · Problema -->
+<section class="slide" aria-label="El problema">
+  <div class="wrap">
+    <div class="stack">
+      <span class="kicker"><i data-i="triangle-alert"></i> El problema</span>
+      <h2>Llegar es fácil.<br><span class="accent">Conocer gente, no.</span></h2>
+    </div>
+    <div class="trio">
+      <div class="card pain"><div class="big"><i data-i="map-pin"></i></div><b>No sabes qué pasa cerca de ti.</b><span class="muted">Los planes están dispersos en grupos, carteles y webs.</span></div>
+      <div class="card pain"><div class="big"><i data-i="languages"></i></div><b>No sabes si allí hablarán tu idioma.</b><span class="muted">Y eso frena a muchas personas antes de dar el paso.</span></div>
+      <div class="card pain"><div class="big"><i data-i="building-2"></i></div><b>Lo oficial y lo informal no se juntan.</b><span class="muted">Ayuntamientos y vecindario publican en sitios distintos.</span></div>
+    </div>
+  </div>
+  <span class="num">02</span>
+</section>
+
+<!-- 3 · La idea -->
+<section class="slide" aria-label="La idea">
+  <div class="wrap">
+    <div class="stack">
+      <span class="kicker"><i data-i="lightbulb"></i> La idea</span>
+      <h2>Un mapa. Muchos encuentros. <span class="accent">Dos lados.</span></h2>
+    </div>
+    <div class="sides">
+      <div class="card side">
+        <h3><i data-i="users"></i> Personas</h3>
+        <ul><li>Crean su perfil con idiomas e intereses.</li><li>Encuentran planes cerca y se unen.</li><li>Crean los suyos en un minuto.</li><li>Chatean con el grupo y conocen gente parecida.</li></ul>
+      </div>
+      <div class="card side inst">
+        <h3><i data-i="badge-check"></i> Instituciones</h3>
+        <ul><li>Ayuntamientos, cabildos, ONG y centros culturales.</li><li>Publican encuentros oficiales.</li><li>Llevan la insignia <span class="badge"><i data-i="badge-check"></i> Oficial</span></li></ul>
+      </div>
+    </div>
+    <div class="strip">
+      <div class="feat"><div class="bub"><i data-i="mail"></i></div><div><b>Cuenta <span class="tag">F1</span></b><span>Entra con correo y contraseña.</span></div></div>
+      <div class="feat"><div class="bub"><i data-i="list-checks"></i></div><div><b>Alta en 7 pasos <span class="tag">F2</span></b><span>Una pregunta por pantalla, con barra de progreso.</span></div></div>
+      <div class="feat"><div class="bub"><i data-i="building-2"></i></div><div><b>Cuenta de institución <span class="tag">F3</span></b><span>Verificada para publicar como oficial.</span></div></div>
+    </div>
+  </div>
+  <span class="num">03</span>
+</section>
+
+<!-- 4 · Descubrir -->
+<section class="slide" aria-label="Descubrir">
+  <div class="wrap two">
+    <div class="stack">
+      <span class="kicker"><i data-i="map"></i> Descubrir</span>
+      <h2>Mira qué pasa <span class="accent">cerca de ti.</span></h2>
+      <ul class="feats">
+        <li class="feat"><div class="bub"><i data-i="map-pin"></i></div><div><b>Mapa de las 8 islas <span class="tag">F4</span></b><span>Un pin por encuentro, con el color de su tema.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="layers"></i></div><div><b>Botones de categoría <span class="tag">F5</span></b><span>14 temas: deporte, idiomas, música, comida…</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="filter"></i></div><div><b>Cerca de mí, orden y filtros <span class="tag">F6</span></b><span>Oficiales, en línea, hablan mis idiomas, accesible para mí.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="list"></i></div><div><b>Lista de encuentros <span class="tag">F7</span></b><span>Las mismas actividades, como tarjetas.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="zap"></i></div><div><b>Conecta ahora <span class="tag">F20</span></b><span>Lo que empieza en las próximas 2 horas, cerca.</span></div></li>
+      </ul>
+    </div>
+    <div class="phone" aria-hidden="true">
+      <div class="bar"><b style="font-family:Geist,sans-serif;font-size:15px"><span class="accent" style="font-weight:400">flejethe</span>pueblo</b><span class="chip" style="padding:5px 9px"><i data-i="locate-fixed"></i> Cerca</span></div>
+      <div class="chips"><span class="chip">⚽ Deporte</span><span class="chip on">💬 Idiomas</span><span class="chip">🎶 Música</span><span class="chip">🍲 Comida</span></div>
+      <div class="minimap">
+        <svg viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice">
+          <path class="isle" style="fill:var(--land);stroke:var(--land-edge);stroke-width:3" d="M30 250c40-90 140-160 230-170 30-3 40 22 20 40-50 44-110 96-170 126-44 20-96 6-80-0z"/>
+          <circle cx="150" cy="190" r="34" style="fill:var(--primary);opacity:.15"/>
+          <circle class="pin" cx="150" cy="190" r="11"/>
+          <circle class="pin" cx="96" cy="230" r="9"/>
+          <circle class="pin" cx="214" cy="140" r="9"/>
+          <circle cx="182" cy="210" r="7" style="fill:var(--c1);stroke:var(--card);stroke-width:3"/>
+          <circle cx="240" cy="110" r="7" style="fill:var(--c2);stroke:var(--card);stroke-width:3"/>
+        </svg>
+      </div>
+      <div class="card peek">
+        <div class="row" style="justify-content:space-between"><b style="font-size:15px">Intercambio de idiomas</b><span class="small muted">1,2 km</span></div>
+        <div class="row small muted"><i data-i="clock"></i> Hoy, 19:00 · La Laguna</div>
+        <div class="flags"><span class="flag">🇪🇸 4</span><span class="flag">🇬🇧 3</span><span class="flag">🇫🇷 1</span></div>
+      </div>
+      <div class="nav"><div class="on"><i data-i="map"></i>Mapa</div><div><i data-i="sparkles"></i>xatsí</div><div><i data-i="messages-square"></i>Chats</div><div><i data-i="user"></i>Perfil</div></div>
+    </div>
+  </div>
+  <span class="num">04</span>
+</section>
+
+<!-- 5 · Encuentros -->
+<section class="slide" aria-label="Encuentros">
+  <div class="wrap two">
+    <div class="stack">
+      <span class="kicker"><i data-i="calendar-plus"></i> Encuentros</span>
+      <h2>Crea o únete <span class="accent">en un toque.</span></h2>
+      <ul class="feats">
+        <li class="feat"><div class="bub"><i data-i="calendar-plus"></i></div><div><b>Crear encuentro <span class="tag">F8</span></b><span>Tema, hora, lugar en el mapa o enlace, aforo y foto.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="copy-check"></i></div><div><b>Aviso de parecidos <span class="tag">F9</span></b><span>Antes de publicar, te sugiere unirte a uno que ya existe.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="user-plus"></i></div><div><b>Unirse y salir <span class="tag">F10</span></b><span>Un toque, y el aforo se respeta.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="flag"></i></div><div><b>Banderas de idiomas <span class="tag">F11</span></b><span>Ves qué idiomas habla la gente que va.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="star"></i></div><div><b>Reseñas <span class="tag">F12</span></b><span>Estrellas y comentario de quien asistió.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="badge-check"></i></div><div><b>Encuentros oficiales <span class="tag">F13</span></b><span>Insignia para instituciones verificadas.</span></div></li>
+      </ul>
+    </div>
+    <div class="stack" aria-hidden="true">
+      <div class="toast"><i data-i="copy-check"></i><span>Ya hay uno <b>parecido a 2 km</b>.</span><span class="go">Unirme</span></div>
+      <div class="card event">
+        <div class="cover-img"><span class="badge"><i data-i="badge-check"></i> Oficial</span><i data-i="languages"></i></div>
+        <div class="body">
+          <div class="row small muted"><i data-i="languages"></i> Idiomas · Sáb 19:00 · Plaza del Adelantado</div>
+          <h4>Intercambio de idiomas en la plaza</h4>
+          <div class="flags"><span class="flag">🇪🇸 6</span><span class="flag">🇬🇧 4</span><span class="flag">🇩🇪 2</span><span class="flag">🇸🇳 1</span><span class="flag">🇲🇦 1</span></div>
+          <div class="row" style="justify-content:space-between">
+            <div class="incl"><span title="Silla de ruedas"><i data-i="accessibility"></i></span><span title="Lengua de signos"><i data-i="hand"></i></span><span title="Lenguaje inclusivo"><i data-i="speech"></i></span></div>
+            <div class="row small"><span class="stars"><i data-i="star"></i><i data-i="star"></i><i data-i="star"></i><i data-i="star"></i><i data-i="star"></i></span><b>4,8</b></div>
+          </div>
+          <button class="btn" tabindex="-1"><i data-i="user-plus"></i> Unirme · 14 de 20</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="num">05</span>
+</section>
+
+<!-- 6 · Juntos -->
+<section class="slide" aria-label="Juntos">
+  <div class="wrap two">
+    <div class="stack">
+      <span class="kicker"><i data-i="users"></i> Juntos</span>
+      <h2>Del mapa <span class="accent">a la mesa.</span></h2>
+      <ul class="feats">
+        <li class="feat"><div class="bub"><i data-i="messages-square"></i></div><div><b>Chat de grupo <span class="tag">F14</span></b><span>En directo, solo para quien se apunta. Como un grupo de mensajería.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="heart-handshake"></i></div><div><b>Gente como tú <span class="tag">F15</span></b><span>Perfiles con tus intereses, tus idiomas y tu isla.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="graduation-cap"></i></div><div><b>Intercambio de saberes <span class="tag">F19</span></b><span>Yo enseño guitarra, tú me enseñas alemán.</span></div></li>
+      </ul>
+    </div>
+    <div class="stack" aria-hidden="true">
+      <div class="card chat">
+        <div class="row small muted" style="justify-content:space-between"><b style="color:var(--fg)">Caminata por Anaga</b><span>12 personas</span></div>
+        <div class="msg"><span class="who">Amina <span class="pr">(ella)</span></span>¿Quedamos en la parada de la guagua?</div>
+        <div class="msg"><span class="who">Jonas <span class="pr">(él)</span></span>Yes! I'll bring water for everyone 💧</div>
+        <div class="msg me">¡Perfecto! Allí a las 17:45 🙌</div>
+      </div>
+      <div class="card person">
+        <div class="avatar">LM</div>
+        <div><b>Lucía M. <span class="muted" style="font-weight:400">(elle)</span></b><div class="small muted">Gran Canaria · 🇪🇸 🇮🇹 · Música, Arte</div></div>
+        <span class="match">92%</span>
+      </div>
+    </div>
+  </div>
+  <span class="num">06</span>
+</section>
+
+<!-- 7 · xatsí -->
+<section class="slide" aria-label="xatsí, el asistente">
+  <div class="wrap two">
+    <div class="stack">
+      <span class="kicker"><i data-i="sparkles"></i> Asistente <span class="tag" style="margin-left:2px">F16</span></span>
+      <h2>Pregúntale a <span class="accent">xatsí.</span></h2>
+      <p class="lead">Tu asistente de planes. Vive en tu móvil, no en un servidor.</p>
+      <div class="modes">
+        <div class="mode"><b><i data-i="sparkles"></i> Sugiéreme algo</b><span class="small muted">Usa tu perfil para proponerte planes.</span></div>
+        <div class="mode"><b><i data-i="search"></i> Pregunta libre</b><span class="small muted">Escribe lo que te apetece, como hablas.</span></div>
+      </div>
+      <ul class="check">
+        <li><i data-i="cpu"></i><span><b>Entiende el significado:</b> "moverme" encuentra "caminata".</span></li>
+        <li><i data-i="wifi-off"></i><span><b>Funciona sin conexión.</b> Lo que escribes no sale del dispositivo.</span></li>
+        <li><i data-i="shield-check"></i><span><b>Nunca inventa:</b> cada tarjeta es un encuentro real.</span></li>
+      </ul>
+    </div>
+    <div class="card xatsi" aria-hidden="true">
+      <div class="ask">Algo al aire libre este fin de semana en Tenerife, en inglés</div>
+      <div class="say"><span class="spark"><i data-i="sparkles"></i></span><span>He encontrado dos planes. En los dos va gente que habla inglés 🇬🇧</span></div>
+      <div class="result"><div class="thumb"><i data-i="mountain"></i></div><div><b>Caminata al atardecer por Anaga</b><span class="small muted">Sáb 18:00 · 🇬🇧 3 · 🇪🇸 5</span></div></div>
+      <div class="result"><div class="thumb"><i data-i="heart-handshake"></i></div><div><b>Limpieza de playa en Las Teresitas</b><span class="small muted">Dom 10:00 · 🇬🇧 2 · 🇩🇪 1</span></div></div>
+      <div class="row" style="margin-top:4px"><span class="chip">Para practicar español</span><span class="chip">Un plan con niños</span></div>
+    </div>
+  </div>
+  <span class="num">07</span>
+</section>
+
+<!-- 8 · Inclusión -->
+<section class="slide" aria-label="Inclusión">
+  <div class="wrap two">
+    <div class="stack">
+      <span class="kicker"><i data-i="accessibility"></i> Diversidad e inclusión</span>
+      <h2>La inclusión <span class="accent">se ve.</span></h2>
+      <ul class="feats">
+        <li class="feat"><div class="bub"><i data-i="accessibility"></i></div><div><b>Iconos de accesibilidad <span class="tag">F17</span></b><span>Quien organiza marca lo que ofrece. Se puede filtrar.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="user"></i></div><div><b>Pronombres <span class="tag">F18</span></b><span>Opcionales, junto al nombre en todas partes.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="book-open"></i></div><div><b>Lectura fácil y pictogramas <span class="tag">F23</span></b><span>Letra para baja visión, frases cortas, un icono por tema.</span></div></li>
+        <li class="feat"><div class="bub"><i data-i="lightbulb"></i></div><div><b>Píldoras informativas <span class="tag">F22</span></b><span>Consejos cortos de trato respetuoso, en el momento justo.</span></div></li>
+      </ul>
+    </div>
+    <div class="icons6">
+      <div class="card i6"><i data-i="accessibility"></i>Accesible en silla de ruedas</div>
+      <div class="card i6"><i data-i="hand"></i>Lengua de signos</div>
+      <div class="card i6"><i data-i="eye-off"></i>Para personas ciegas o con baja visión</div>
+      <div class="card i6"><i data-i="captions"></i>Subtítulos o bucle magnético</div>
+      <div class="card i6"><i data-i="speech"></i>Lenguaje inclusivo</div>
+      <div class="card i6"><i data-i="venus-and-mars"></i>Perspectiva de género</div>
+    </div>
+  </div>
+  <span class="num">08</span>
+</section>
+
+<!-- 9 · Confianza -->
+<section class="slide" aria-label="Seguridad y privacidad">
+  <div class="wrap">
+    <div class="stack">
+      <span class="kicker"><i data-i="shield-check"></i> Seguridad y privacidad</span>
+      <h2>Segura para la comunidad. <span class="accent">Privada para ti.</span></h2>
+    </div>
+    <div class="pillars">
+      <div class="card pillar">
+        <h3><i data-i="shield-check"></i> Comunidad <span class="tag">F21</span></h3>
+        <ul class="check">
+          <li><i data-i="triangle-alert"></i><span>Aviso antes de publicar un texto que parece ofensivo.</span></li>
+          <li><i data-i="flag"></i><span>Botón para reportar encuentros, mensajes y perfiles.</span></li>
+          <li><i data-i="lock"></i><span>Tres strikes y esa cuenta ya no publica.</span></li>
+        </ul>
+        <div class="strike" aria-label="Dos de tres strikes"><i></i><i></i><i class="off"></i><span class="small muted" style="margin-left:6px">2 de 3</span></div>
+      </div>
+      <div class="card pillar">
+        <h3><i data-i="lock"></i> Tus datos <span class="tag">F24</span></h3>
+        <ul class="check">
+          <li><i data-i="map-pin"></i><span>Solo guardamos tu isla, <b>nunca tu ubicación exacta</b>.</span></li>
+          <li><i data-i="eye-off"></i><span>Nunca guardamos una discapacidad: el filtro se usa y se olvida.</span></li>
+          <li><i data-i="messages-square"></i><span>El chat solo lo leen quienes se apuntan.</span></li>
+          <li><i data-i="trash-2"></i><span>Consentimiento claro y borrar tu cuenta en un toque.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <span class="num">09</span>
+</section>
+
+<!-- 10 · Cómo está hecha + cierre -->
+<section class="slide" aria-label="Cómo está hecha">
+  <div class="wrap">
+    <div class="stack">
+      <span class="kicker"><i data-i="cpu"></i> Cómo está hecha</span>
+      <h2>Ligera, rápida <span class="accent">y sin servidor propio.</span></h2>
+    </div>
+    <div class="flow">
+      <div class="card box"><b><i data-i="globe"></i> Web estática</b><span class="small muted">Funciona en móvil, tableta y portátil.</span><div class="row"><span class="chip">Next.js 16</span><span class="chip">React 19</span><span class="chip">shadcn/ui</span><span class="chip">MapLibre</span></div></div>
+      <div class="arrow"><i data-i="arrow-right"></i></div>
+      <div class="card box"><b><i data-i="sparkles"></i> IA en tu dispositivo</b><span class="small muted">Modelos que corren en el navegador.</span><div class="row"><span class="chip">Transformers.js</span><span class="chip">WebGPU</span><span class="chip">~100 idiomas</span></div></div>
+      <div class="arrow"><i data-i="arrow-right"></i></div>
+      <div class="card box"><b><i data-i="database"></i> Firebase</b><span class="small muted">Datos en Madrid, protegidos con reglas.</span><div class="row"><span class="chip">Auth</span><span class="chip">Firestore</span><span class="chip">Storage</span><span class="chip">Hosting</span></div></div>
+    </div>
+    <div class="stats">
+      <div class="card stat"><b>24</b><span>funcionalidades</span></div>
+      <div class="card stat"><b>14</b><span>categorías de encuentro</span></div>
+      <div class="card stat"><b>8</b><span>islas en el mapa</span></div>
+      <div class="card stat"><b>0</b><span>servidores propios</span></div>
+    </div>
+    <div class="close">
+      <b>Gracias. ¿Nos vemos en el pueblo?</b>
+      <a href="https://thepueblo-6f94e.web.app">thepueblo-6f94e.web.app</a>
+    </div>
+  </div>
+  <span class="num">10</span>
+</section>
+
+</main>
+
+<nav class="hud" aria-label="Navegación de la presentación">
+  <button type="button" id="prev" aria-label="Diapositiva anterior"><i data-i="arrow-left"></i></button>
+  <span class="count" id="count" aria-live="polite">1 / 10</span>
+  <button type="button" id="next" aria-label="Diapositiva siguiente"><i data-i="arrow-right"></i></button>
+  <button type="button" id="full" aria-label="Pantalla completa"><i data-i="maximize"></i></button>
+</nav>
+
+<script>
+const ICONS = {"sparkles":"<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\"/><path d=\"M20 2v4\"/><path d=\"M22 4h-4\"/><circle cx=\"4\" cy=\"20\" r=\"2\"/>","triangle-alert":"<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><path d=\"M12 9v4\"/><path d=\"M12 17h.01\"/>","map-pin":"<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/>","languages":"<path d=\"m5 8 6 6\"/><path d=\"m4 14 6-6 2-3\"/><path d=\"M2 5h12\"/><path d=\"M7 2h1\"/><path d=\"m22 22-5-10-5 10\"/><path d=\"M14 18h6\"/>","building-2":"<path d=\"M10 12h4\"/><path d=\"M10 8h4\"/><path d=\"M14 21v-3a2 2 0 0 0-4 0v3\"/><path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\"/><path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\"/>","lightbulb":"<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5\"/><path d=\"M9 18h6\"/><path d=\"M10 22h4\"/>","users":"<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><path d=\"M16 3.128a4 4 0 0 1 0 7.744\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/>","badge-check":"<path d=\"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z\"/><path d=\"m16 9-5.5 5.5L8 12\"/>","mail":"<path d=\"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7\"/><rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\"/>","list-checks":"<path d=\"M13 5h8\"/><path d=\"M13 12h8\"/><path d=\"M13 19h8\"/><path d=\"m3 17 2 2 4-4\"/><path d=\"m3 7 2 2 4-4\"/>","map":"<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\"/><path d=\"M15 5.764v15\"/><path d=\"M9 3.236v15\"/>","layers":"<path d=\"M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z\"/><path d=\"M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12\"/><path d=\"M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17\"/>","filter":"<path d=\"M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z\"/>","list":"<path d=\"M3 5h.01\"/><path d=\"M3 12h.01\"/><path d=\"M3 19h.01\"/><path d=\"M8 5h13\"/><path d=\"M8 12h13\"/><path d=\"M8 19h13\"/>","zap":"<path d=\"M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z\"/>","locate-fixed":"<line x1=\"2\" x2=\"5\" y1=\"12\" y2=\"12\"/><line x1=\"19\" x2=\"22\" y1=\"12\" y2=\"12\"/><line x1=\"12\" x2=\"12\" y1=\"2\" y2=\"5\"/><line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\"/><circle cx=\"12\" cy=\"12\" r=\"7\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/>","clock":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 6v6l4 2\"/>","messages-square":"<path d=\"M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z\"/><path d=\"M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1\"/>","user":"<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>","calendar-plus":"<path d=\"M16 18h6\"/><path d=\"M16 2v3\"/><path d=\"M19 15v6\"/><path d=\"M21 11.5V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h8.3\"/><path d=\"M3 9h18\"/><path d=\"M8 2v3\"/>","copy-check":"<path d=\"m12 15 2 2 4-4\"/><rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"/><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"/>","user-plus":"<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><line x1=\"19\" x2=\"19\" y1=\"8\" y2=\"14\"/><line x1=\"22\" x2=\"16\" y1=\"11\" y2=\"11\"/>","flag":"<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\"/>","star":"<path d=\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\"/>","accessibility":"<circle cx=\"16\" cy=\"4\" r=\"1\"/><path d=\"m18 19 1-7-6 1\"/><path d=\"m5 8 3-3 5.5 3-2.36 3.5\"/><path d=\"M4.24 14.5a5 5 0 0 0 6.88 6\"/><path d=\"M13.76 17.5a5 5 0 0 0-6.88-6\"/>","hand":"<path d=\"M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2\"/><path d=\"M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2\"/><path d=\"M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8\"/><path d=\"M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15\"/>","speech":"<path d=\"M8.8 20v-4.1l1.9.2a2.3 2.3 0 0 0 2.164-2.1V8.3A5.37 5.37 0 0 0 2 8.25c0 2.8.656 3.054 1 4.55a5.77 5.77 0 0 1 .029 2.758L2 20\"/><path d=\"M19.8 17.8a7.5 7.5 0 0 0 .003-10.603\"/><path d=\"M17 15a3.5 3.5 0 0 0-.025-4.975\"/>","heart-handshake":"<path d=\"M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762\"/>","graduation-cap":"<path d=\"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z\"/><path d=\"M22 10v6\"/><path d=\"M6 12.5V16a6 3 0 0 0 12 0v-3.5\"/>","search":"<path d=\"m21 21-4.34-4.34\"/><circle cx=\"11\" cy=\"11\" r=\"8\"/>","cpu":"<path d=\"M12 20v2\"/><path d=\"M12 2v2\"/><path d=\"M17 20v2\"/><path d=\"M17 2v2\"/><path d=\"M2 12h2\"/><path d=\"M2 17h2\"/><path d=\"M2 7h2\"/><path d=\"M20 12h2\"/><path d=\"M20 17h2\"/><path d=\"M20 7h2\"/><path d=\"M7 20v2\"/><path d=\"M7 2v2\"/><rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"/><rect x=\"8\" y=\"8\" width=\"8\" height=\"8\" rx=\"1\"/>","wifi-off":"<path d=\"M12 20h.01\"/><path d=\"M8.5 16.429a5 5 0 0 1 7 0\"/><path d=\"M5 12.859a10 10 0 0 1 5.17-2.69\"/><path d=\"M19 12.859a10 10 0 0 0-2.007-1.523\"/><path d=\"M2 8.82a15 15 0 0 1 4.177-2.643\"/><path d=\"M22 8.82a15 15 0 0 0-11.288-3.764\"/><path d=\"m2 2 20 20\"/>","shield-check":"<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/><path d=\"m9 12 2 2 4-4\"/>","mountain":"<path d=\"m8 3 4 8 5-5 5 15H2L8 3z\"/>","book-open":"<path d=\"M12 5v16\"/><path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\"/>","eye-off":"<path d=\"M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49\"/><path d=\"M14.084 14.158a3 3 0 0 1-4.242-4.242\"/><path d=\"M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143\"/><path d=\"m2 2 20 20\"/>","captions":"<rect width=\"18\" height=\"14\" x=\"3\" y=\"5\" rx=\"2\" ry=\"2\"/><path d=\"M7 15h4M15 15h2M7 11h2M13 11h4\"/>","venus-and-mars":"<path d=\"M10 20h4\"/><path d=\"M12 16v6\"/><path d=\"M17 2h4v4\"/><path d=\"m21 2-5.46 5.46\"/><circle cx=\"12\" cy=\"11\" r=\"5\"/>","lock":"<rect width=\"18\" height=\"11\" x=\"3\" y=\"11\" rx=\"2\" ry=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/>","trash-2":"<path d=\"M10 11v6\"/><path d=\"M14 11v6\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"/><path d=\"M3 6h18\"/><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/>","globe":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\"/><path d=\"M2 12h20\"/>","arrow-right":"<path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/>","database":"<ellipse cx=\"12\" cy=\"5\" rx=\"9\" ry=\"3\"/><path d=\"M3 5V19A9 3 0 0 0 21 19V5\"/><path d=\"M3 12A9 3 0 0 0 21 12\"/>","arrow-left":"<path d=\"m12 19-7-7 7-7\"/><path d=\"M19 12H5\"/>","maximize":"<path d=\"M8 3H5a2 2 0 0 0-2 2v3\"/><path d=\"M21 8V5a2 2 0 0 0-2-2h-3\"/><path d=\"M3 16v3a2 2 0 0 0 2 2h3\"/><path d=\"M16 21h3a2 2 0 0 0 2-2v-3\"/>"};
+document.querySelectorAll("[data-i]").forEach((el) => {
+  el.outerHTML = `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[el.dataset.i] ?? ""}</svg>`;
+});
+
+const slides = [...document.querySelectorAll(".slide")];
+const count = document.getElementById("count");
+const bar = document.querySelector(".progress");
+let current = 0;
+
+const go = (i) => slides[Math.max(0, Math.min(slides.length - 1, i))].scrollIntoView({ behavior: "smooth" });
+
+const seen = new IntersectionObserver((entries) => {
+  for (const entry of entries) {
+    if (!entry.isIntersecting) continue;
+    entry.target.classList.add("in");
+    current = slides.indexOf(entry.target);
+    count.textContent = `${current + 1} / ${slides.length}`;
+    bar.style.width = `${((current + 1) / slides.length) * 100}%`;
+  }
+}, { rootMargin: "-45% 0px -45% 0px" }); // the slide crossing the middle of the screen, whatever its height
+slides.forEach((slide) => seen.observe(slide));
+
+document.getElementById("prev").onclick = () => go(current - 1);
+document.getElementById("next").onclick = () => go(current + 1);
+document.getElementById("full").onclick = () =>
+  document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.();
+
+addEventListener("keydown", (e) => {
+  if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(e.key)) { e.preventDefault(); go(current + 1); }
+  if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); go(current - 1); }
+  if (e.key === "Home") { e.preventDefault(); go(0); }
+  if (e.key === "End") { e.preventDefault(); go(slides.length - 1); }
+  if (e.key === "f" || e.key === "F") document.getElementById("full").click();
+});
+</script>
+</body>
+</html>
