@@ -16,8 +16,8 @@ What we are building: [CONTEXT.md](CONTEXT.md). Who builds what: [PLAN.md](PLAN.
  └──────────────┬────────────────────────────────────────────┘
                 │ Firebase web SDK (no server of our own)
  ┌──────────────▼────────────────────────────────────────────┐
- │ Firebase project thepueblo-6f94e                          │
- │  Auth (Google) · Firestore (data + realtime chat)         │
+ │ Firebase project thepueblo-6f94e (free Spark plan)        │
+ │  Auth (email + password) · Firestore (data + chat)        │
  │  Hosting (static files, CDN)                              │
  └───────────────────────────────────────────────────────────┘
 ```
@@ -32,7 +32,7 @@ Versions checked on npm on 2026-11-12. All support React 19.
 |---|---|---|
 | Framework | **Next.js 16** (already installed), static export | Already deployed; free hosting |
 | Styling | **Tailwind 4** (already installed) | — |
-| UI components | **shadcn/ui**, preset `base-nova` (built on **Base UI**) | The current shadcn default. Components are copied into `src/components/ui/`, so we own the code and the look stays minimal. Installed: button, input, textarea, label, field, card, badge, dialog, sheet, drawer, tabs, avatar, select, toggle, toggle-group, separator, skeleton, sonner. Add more with `npx shadcn@latest add <name>` |
+| UI components | **[shadcn/ui](https://ui.shadcn.com/docs/components)**, preset `base-nova` (built on **Base UI**) | The current shadcn default. Components are copied into `src/components/ui/`, so we own the code and the look stays minimal. Installed: button, input, textarea, label, field, card, badge, dialog, sheet, drawer, tabs, avatar, select, toggle, toggle-group, separator, skeleton, sonner. Add more with `npx shadcn@latest add <name>` |
 | Icons | **lucide-react** | Comes with shadcn |
 | Animation | **motion** (`import { motion } from "motion/react"`) | The standard React animation library (formerly Framer Motion). Use it for small touches only: list items appearing, sheet and card transitions |
 | Toasts | **sonner** | Via the shadcn `sonner` component |
@@ -53,7 +53,15 @@ Versions checked on npm on 2026-11-12. All support React 19.
 - Base UI is not Radix: there is no `asChild`; compose with the `render` prop.
 - For a showpiece element (landing hero, empty states) you may copy a single component from **Magic UI**, **Aceternity UI** or **React Bits** — they are copy-paste like shadcn. Do not install another full UI kit (MUI, Chakra, Mantine, HeroUI): two kits never look like one app.
 
-Deliberately **not** used: a state library (React state + Firestore listeners are enough), a chat UI kit, a geo-query library, Firebase Storage (needs the paid plan on new projects — so no image uploads; avatars come from the Google account).
+Deliberately **not** used: a state library (React state + Firestore listeners are enough), a chat UI kit, a geo-query library, Firebase Storage (needs the paid plan; we stay on the free Spark plan — so an event image is a **link** saved in `imageUrl`, not an upload).
+
+## Code pattern: containers and presentational components
+
+- **Pages are containers.** A file in `src/app/**/page.tsx` loads data (through `src/lib/db.ts`), holds the state, and passes plain props down.
+- **Components are presentational.** Files in `src/components/` receive props and draw. They never call Firestore.
+- **`src/lib/` is the only place that talks to Firebase or to the model.**
+
+Every placeholder file starts with a comment that says what it is, which track and feature it belongs to, and how to build it with the libraries above.
 
 ## Rules that come from the static export
 
@@ -81,19 +89,22 @@ src/
   app/                    one folder per route above
   components/
     ui/                   shadcn components        (shared — add via PR to develop)
-    shared/               AppShell, BottomNav, EventCard, LanguageFlags  (shared)
+    shared/               AppShell, BottomNav, LanguageFlags (built) · EventCard, Placeholder  (shared)
     map/  discover/       Track A
     event/  chat/         Track B
     people/  assistant/   Track C
   lib/
-    firebase.ts           Firebase app, auth, db                (shared)
-    types.ts              User, Event, Message, Review types    (shared)
-    db.ts                 Firestore read/write helpers          (shared)
-    auth.tsx              AuthProvider + useUser()              (shared)
-    categories.ts  languages.ts  islands.ts  geo.ts             (shared)
-    ai/                   Track C  (worker, embed, similar, chat)
-scripts/seed.mjs          sample events for the demo
-firestore.rules           security rules, deployed by CI
+    firebase.ts           Firebase app, auth, db                (shared, built)
+    firebase.config.json  public web config, also read by scripts
+    types.ts              UserProfile, Meetup, ChatMessage, Review  (shared, built)
+    db.ts                 Firestore read/write helpers          (shared; join/leave built, rest todo)
+    auth.tsx              AuthProvider + useUser()              (shared, placeholder)
+    categories.ts  languages.ts  islands.ts  geo.ts             (shared, built)
+    todo.ts               marks functions that are not built yet
+    ai/                   Track C  (config.ts built; index.ts is the contract, returns nothing yet)
+scripts/rules-check.mjs   tests the deployed security rules (built)
+scripts/seed.mjs          fake people and events for the demo (placeholder)
+firestore.rules           security rules, deployed BY HAND (see Hosting)
 ```
 
 "Shared" files are built once in the foundation phase and afterwards change only through small, announced PRs.
@@ -113,21 +124,22 @@ users/{uid}
   availability: string[]         // "weekday_evenings", "weekends"…
   createdAt
 
-events/{eventId}
+events/{eventId}                 // type `Meetup` in code (`Event` is a browser built-in)
   title, description
   category: string
+  imageUrl: string | null        // a link to an image hosted elsewhere (no uploads)
   official: boolean              // true only if the organiser is a verified institution
   organizerId, organizerName
   mode: "in_person" | "online"
   location: { lat, lng } | null  // null for online
   placeName, island
   onlineUrl: string | null
-  startsAt, endsAt
+  startsAt, endsAt               // endsAt is required (default: start + 2 h)
   capacity: number | null
   attendeeIds: string[]
-  languageCounts: { es: 4, en: 2 } // drives the flags; updated on join/leave
+  attendeeLanguages: { uid: ["es", "en"] } // drives the flags; counted in the browser
   ratingSum, ratingCount         // average = sum / count
-  embedding: number[]            // 384 numbers from the embedding model
+  embedding: number[] | null     // 384 numbers from the embedding model
   createdAt
 
 events/{eventId}/messages/{messageId}     // group chat
@@ -137,18 +149,18 @@ events/{eventId}/reviews/{uid}            // one review per attendee
   rating: 1..5, text, name, createdAt
 ```
 
-Join, leave and review each update two things at once (for example `attendeeIds` and `languageCounts`), so they run in a Firestore **transaction**.
+Join and leave are **one atomic update** each (`arrayUnion` / `arrayRemove` plus one map key), so no transaction is needed and there are no counters to drift. A review updates the review document and the rating totals together, so that one uses a transaction.
 
-**Queries.** The home screen loads all upcoming events (`startsAt >= now`, ordered by `startsAt`) once and filters, sorts and measures distance in the browser. "My chats" is `where("attendeeIds", "array-contains", uid)`.
-*Shortcut: fine up to a few thousand events. Beyond that, add geohash queries with `geofire-common`.*
+**Queries.** The home screen loads every event that has not ended (`endsAt >= now`, ordered by `endsAt`) once and filters, sorts and measures distance in the browser. "My chats" is `where("attendeeIds", "array-contains", uid)`.
+*Shortcut: fine up to a few hundred events (each carries ~4 KB of embedding). Beyond that, add geohash queries with `geofire-common` and move embeddings out of the event document.*
 
 ## Security rules (outline)
 
-Written for real in `firestore.rules` during the foundation phase.
+Live in `firestore.rules`, deployed, and covered by `node scripts/rules-check.mjs` (14 checks).
 
 - **users**: any signed-in user can read; you can write only your own document; you cannot set `verified` yourself.
-- **events**: anyone can read. Signed-in users can create with `organizerId == their uid`; `official: true` is allowed only when the creator's user document has `verified == true`. Only the organiser can edit or delete. Any signed-in user may update **only** `attendeeIds` and `languageCounts` (to join or leave), and only by adding or removing themselves.
-- **messages**: read and create only if your uid is in the event's `attendeeIds`.
+- **events**: anyone can read. Signed-in users can create with `organizerId == their uid`; `official: true` is allowed only when the creator's user document has `verified == true`. Only the organiser can edit or delete. Any signed-in user may update **only** `attendeeIds` and `attendeeLanguages` (to join or leave), only by adding or removing themselves, and never past `capacity`.
+- **messages**: read and create only if your uid is in the event's `attendeeIds`; you can delete your own.
 - **reviews**: anyone can read; create only as yourself, only if you are an attendee.
 
 ## Local AI
@@ -165,7 +177,7 @@ The chat model is one constant in `src/lib/ai/config.ts`; alternatives of simila
 
 **How each feature uses it**
 
-- **Similar-event check (F9).** While the user fills the form, embed `title + description`, compare by cosine similarity with the `embedding` of every loaded upcoming event, show the top 3 above a threshold. The embedding is saved on the new event when it is posted.
+- **Similar-event check (F9).** Show an instant guess first (same category, same day, within 5 km — no model, no download), then, once the model has loaded: embed `title + description`, compare by cosine similarity with the `embedding` of every loaded upcoming event, show the top 3 above a threshold. The embedding is saved on the new event when it is posted.
 - **Assistant (F16).** Retrieval first, wording second:
   1. Build the query — the user's text, or a sentence made from their profile for "Suggest for me".
   2. Embed it and take the closest events (pre-filtered by island, date, languages).
@@ -195,6 +207,14 @@ Note for e5 models: prefix texts with `query: ` (searches) or `passage: ` (store
 | `develop` | Integration. Everyone's work meets here. Default branch. | **Staging** — https://thepueblo-6f94e--develop-1ttzfnbg.web.app |
 | `<name>/<feature>` | One person, one feature. | A temporary preview URL per pull request |
 
-One workflow, [.github/workflows/deploy.yml](.github/workflows/deploy.yml), runs lint + build and then deploys. Both `main` and `develop` require a pull request with a green build. The service-account key is the GitHub secret `FIREBASE_SERVICE_ACCOUNT`; it is never in the repo.
+One workflow, [.github/workflows/deploy.yml](.github/workflows/deploy.yml), runs lint + build and then deploys. Both `main` and `develop` require a pull request with a green build. The service-account key is the GitHub secret `FIREBASE_SERVICE_ACCOUNT`; it is never in the repo. Delete that key in the Firebase console after the hackathon.
 
-Firestore: create the database in **`europe-southwest1` (Madrid)**, the closest region to the islands. The region cannot be changed later.
+**Security rules are not deployed by CI.** Live, staging and previews all share one database, so a rules change reaches everyone at once. The project owner deploys by hand and checks:
+
+```bash
+firebase deploy --only firestore && node scripts/rules-check.mjs
+```
+
+New rules can take a few minutes to become active everywhere; if the check fails right after a deploy, wait and run it again.
+
+Firestore: the `(default)` database is in **`europe-southwest1` (Madrid)**, the closest region to the islands.

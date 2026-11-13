@@ -1,11 +1,19 @@
 {
   "hosting": {
     "public": "out",
-    "ignore": ["firebase.json", "**/.*"],
-    "trailingSlash": true,
-    "cleanUrls": true
+    "ignore": [
+      "firebase.json",
+      "**/.*"
+    ],
+    "trailingSlash": true
   },
-  "firestore": { "rules": "firestore.rules", "location": "europe-southwest1" },
-  "storage": { "rules": "storage.rules" },
-  "auth": { "providers": { "emailPassword": true } }
+  "firestore": {
+    "rules": "firestore.rules",
+    "location": "europe-southwest1"
+  },
+  "auth": {
+    "providers": {
+      "emailPassword": true
+    }
+  }
 }

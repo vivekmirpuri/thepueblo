@@ -1,21 +1,22 @@
-// Web config is public by design; data is protected by Firestore/Storage security rules.
+/**
+ * Firebase entry point — SHARED file (change only through a small, announced PR).
+ *
+ * Exports the two services the app uses:
+ *   auth — Firebase Authentication (email + password; Google can be switched on in the console)
+ *   db   — Firestore (all app data and the realtime group chat)
+ *
+ * The config in firebase.config.json is public by design: data is protected by firestore.rules,
+ * not by hiding these values. No Storage: the project is on the free Spark plan, so an event
+ * image is a link saved in `event.imageUrl`.
+ *
+ * Use it only from "use client" components or from src/lib/db.ts.
+ */
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import config from "./firebase.config.json";
 
-const app =
-  getApps()[0] ??
-  initializeApp({
-    apiKey: "AIzaSyDrBLNIVDsrw8WXGI1lQNxQmnYP1uY_bNc",
-    authDomain: "thepueblo-6f94e.firebaseapp.com",
-    projectId: "thepueblo-6f94e",
-    storageBucket: "thepueblo-6f94e.firebasestorage.app",
-    messagingSenderId: "693660452286",
-    appId: "1:693660452286:web:54629dba136be8f68e65ef",
-    measurementId: "G-DVTRQ2JN2D",
-  });
+const app = getApps()[0] ?? initializeApp(config);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const storage = getStorage(app);

@@ -31,6 +31,16 @@ Firebase is ready to use from `src/lib/firebase.ts` (`auth`, `db`). Storage is n
 4. **Pull often:** `git pull --rebase origin develop` before you start and before you open a PR. Small PRs merge fast and rarely conflict.
 5. **Keep your `team/<name>.md` current** — what you're doing, what's done, what you need. Read the other two before starting something new.
 
+## Useful commands
+
+```bash
+npm run dev                      # local site
+npm run lint && npm run build    # what CI runs
+node scripts/rules-check.mjs     # test the deployed security rules
+```
+
+Security rules are deployed by hand by the project owner, never by CI: `firebase deploy --only firestore`.
+
 ## Rules of the static site
 
 This is a static export (`output: "export"`): no API routes, no server actions, no `cookies()`/`headers()`, no dynamic route segments like `[id]` (use `?id=`). Talk to Firebase from the browser (`"use client"` components). If we ever need server code, use Cloud Functions or switch to Firebase App Hosting.

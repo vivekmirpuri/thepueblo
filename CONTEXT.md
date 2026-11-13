@@ -25,7 +25,7 @@ People who arrive in the islands (and plenty who were born here) find it hard to
 Each feature has an ID so branches, PRs and team files can refer to it.
 
 ### Profile and onboarding
-- **F1 Account.** Sign in with Google.
+- **F1 Account.** Sign in with email and password (Google sign-in can be added later).
 - **F2 Onboarding.** Pick interests from the meetup categories, the **languages you speak** (required), your island, and a few short questions that help matching: in person / online / both, when you are usually free, one line about what you'd like to do with others.
 - **F3 Institution account.** At onboarding you can say "I represent an institution". It becomes able to publish official events once verified (done by hand for the hackathon).
 
@@ -36,7 +36,7 @@ Each feature has an ID so branches, PRs and team files can refer to it.
 - **F7 Event list.** The same events as cards under the map.
 
 ### Events
-- **F8 Create event.** Title, description, category, date/time, in person (place on map) or online (link), optional capacity.
+- **F8 Create event.** Title, description, category, date/time, in person (place on map) or online (link), optional capacity, optional image (a pasted link).
 - **F9 Similar-event check.** Before posting, a small model running **on the device** looks for similar existing events and suggests joining one instead of creating a duplicate.
 - **F10 Join / leave.**
 - **F11 Language flags.** Every event shows the flags of the languages spoken by the people who joined, with counts, so you can see whether someone there speaks your language.

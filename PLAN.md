@@ -2,42 +2,41 @@
 
 Product: [CONTEXT.md](CONTEXT.md) (feature IDs F1–F16). Design: [ARCHITECTURE.md](ARCHITECTURE.md).
 
-## Phase 0 — Foundation (one person, before anyone else starts)
+## Phase 0 — Foundation
 
-Everything three people would otherwise fight over is laid down once, in one PR to `develop`.
+Everything three people would otherwise fight over is laid down once.
 
-**Console steps (project owner, by hand)**
-- [ ] Authentication → enable **Google** sign-in.
-- [ ] Firestore → create database, region **europe-southwest1**, production mode.
-- [ ] Add `thepueblo-6f94e.web.app` staging/preview domains to Authentication → Settings → Authorized domains if sign-in fails on previews.
+**Done**
+- [x] Firestore database created (Madrid), email + password sign-in enabled.
+- [x] `firestore.rules` deployed and tested (`node scripts/rules-check.mjs`, 14 checks).
+- [x] shadcn/ui, `motion`, `maplibre-gl`, `react-map-gl`, `@huggingface/transformers` installed.
+- [x] `src/lib/`: `types.ts`, `categories.ts`, `languages.ts`, `islands.ts`, `geo.ts`, `firebase.ts`; `joinEvent` / `leaveEvent` in `db.ts`.
+- [x] `AppShell`, `BottomNav`, `LanguageFlags`.
+- [x] A placeholder page for every route and a placeholder component for every track, each with a header comment that says what to build.
 
-**Code**
-- [ ] **AI spike first** (30 min, biggest unknown): load Transformers.js in a Web Worker under Next 16, embed one sentence, generate one reply. If the chat model won't run, keep embeddings only and ship the assistant without generated wording.
-- [x] shadcn/ui initialised and components added (see ARCHITECTURE).
-- [x] `motion`, `maplibre-gl`, `react-map-gl` installed.
-- [ ] Install `@huggingface/transformers` with the AI spike.
-- [ ] `src/lib/`: `types.ts`, `db.ts`, `auth.tsx`, `categories.ts`, `languages.ts`, `islands.ts`, `geo.ts` (haversine).
-- [ ] `src/lib/ai/index.ts` with the **contract** below, returning empty results until Track C fills it in.
-- [ ] `src/components/shared/`: `AppShell`, `BottomNav` (Map · Chats · Assistant · People · Profile), `EventCard`, `LanguageFlags`.
-- [ ] `/login/` and a redirect to `/onboarding/` when the profile is incomplete.
-- [ ] Empty placeholder page for every route, so the navigation works from day one.
-- [ ] `firestore.rules` + deploy step for rules in the workflow.
-- [ ] `scripts/seed.mjs`: ~30 sample events across the islands, with embeddings.
+**Still to do before the tracks split (one person)**
+- [ ] **AI spike first** (30 min, biggest unknown): load Transformers.js in a Web Worker under Next 16, embed one sentence. If the chat model won't run, keep embeddings only.
+- [ ] `src/lib/auth.tsx` (real `AuthProvider` / `useUser`) and `/login/`.
+- [ ] The read functions in `src/lib/db.ts` that every track needs: `listUpcomingEvents`, `getEvent`, `getProfile`, `saveProfile`.
+- [ ] `EventCard` (all three tracks use it).
+- [ ] `scripts/seed.mjs`, once the data model has settled.
+- [ ] Optional, in the Firebase console: Google sign-in; add preview domains to Authentication → Settings → Authorized domains if sign-in fails on a preview URL.
 
 **Contracts between tracks** (agree once, then don't change without telling the others)
 
 ```ts
 // src/lib/ai — owned by Track C, used by Track B (create event) and Track A (search)
-embed(text: string, kind: "query" | "passage"): Promise<number[]>
-findSimilarEvents(text: string, events: Event[], limit?: number): Promise<{ event: Event; score: number }[]>
+findSimilarEvents(text: string, events: Meetup[], limit?: number): Promise<ScoredEvent[]>
+searchEvents(query: string, events: Meetup[], limit?: number): Promise<ScoredEvent[]>
+recommendEvents(profile: UserProfile, events: Meetup[], limit?: number): Promise<ScoredEvent[]>
 
-// src/components/shared — owned by Foundation, used by everyone
+// src/components/shared — used by everyone
 <EventCard event={event} distanceKm={number | undefined} />
-<LanguageFlags counts={{ es: 4, en: 2 }} />
+<LanguageFlags languages={event.attendeeLanguages} />
 
-// src/lib/db.ts — owned by Foundation
-listUpcomingEvents(): Promise<Event[]>
-joinEvent(eventId, user) / leaveEvent(eventId, user)   // transactions
+// src/lib/db.ts
+listUpcomingEvents(): Promise<Meetup[]>
+joinEvent(eventId, me) / leaveEvent(eventId, uid)   // built
 ```
 
 ## Phase 1 — Three tracks in parallel
@@ -58,7 +57,7 @@ Each track owns its folders (see ARCHITECTURE → Routes and folders) and never 
 |---|---|---|
 | B1 | Create-event form, place picked by tapping the map | F8 |
 | B2 | Event detail page: info, join / leave | F10 |
-| B3 | Language flags on detail and cards (data via `languageCounts`) | F11 |
+| B3 | Language flags on detail and cards (`LanguageFlags` is built) | F11 |
 | B4 | Group chat per event + "my chats" list | F14 |
 | B5 | Show similar events in the form (calls `findSimilarEvents`) | F9 |
 | B6 | Reviews: stars + comment, average on the event | F12 |
@@ -107,7 +106,4 @@ Each track owns its folders (see ARCHITECTURE → Routes and folders) and never 
 
 ## How we work
 
-- Branch from `develop`: `git switch -c <name>/<task-id>-<short>` e.g. `ana/b4-group-chat`.
-- PR into `develop` → wait for the green check → open the preview URL → **Squash and merge**.
-- `develop` → `main` only when staging works; use **Create a merge commit** (not squash) so the two branches don't drift.
-- Tick tasks and write blockers in your own `team/<name>.md`.
+Branches, pull requests and who may edit what: [README.md](README.md).

@@ -1,0 +1,79 @@
+/**
+ * Data shapes — SHARED file. These mirror the Firestore documents described in
+ * ARCHITECTURE.md → "Data model" and enforced by firestore.rules. Change all three together,
+ * then run `node scripts/rules-check.mjs`.
+ *
+ * The event type is called `Meetup` because `Event` is already a browser built-in.
+ */
+import type { Timestamp } from "firebase/firestore";
+import type { CategoryId } from "./categories";
+import type { IslandId } from "./islands";
+import type { LanguageCode } from "./languages";
+
+/** users/{uid} */
+export interface UserProfile {
+  uid: string;
+  displayName: string;
+  photoURL: string | null;
+  role: "user" | "institution";
+  /** Institutions only. Set by hand in the Firebase console; the rules stop users changing it. */
+  verified: boolean;
+  bio: string;
+  interests: CategoryId[];
+  languages: LanguageCode[];
+  /** The only location stored for a person. Never an exact position. */
+  island: IslandId;
+  prefers: "in_person" | "online" | "both";
+  availability: string[];
+  createdAt: Timestamp;
+}
+
+/** events/{id} */
+export interface Meetup {
+  id: string;
+  title: string;
+  description: string;
+  category: CategoryId;
+  /** A link to an image hosted elsewhere. No uploads: the project is on the free Spark plan. */
+  imageUrl: string | null;
+  /** True only when the organiser is a verified institution (F13). */
+  official: boolean;
+  organizerId: string;
+  organizerName: string;
+  mode: "in_person" | "online";
+  /** null for online events. */
+  location: { lat: number; lng: number } | null;
+  placeName: string;
+  island: IslandId | null;
+  onlineUrl: string | null;
+  startsAt: Timestamp;
+  /** Required: the home screen lists events until they END, so a running event stays visible. */
+  endsAt: Timestamp;
+  capacity: number | null;
+  attendeeIds: string[];
+  /** uid → languages that person speaks. The flag row (F11) is counted from this in the browser. */
+  attendeeLanguages: Record<string, LanguageCode[]>;
+  ratingSum: number;
+  ratingCount: number;
+  /** 384 numbers from the local embedding model; null until Track C's model has run on it. */
+  embedding: number[] | null;
+  createdAt: Timestamp;
+}
+
+/** events/{id}/messages/{id} — the group chat (F14) */
+export interface ChatMessage {
+  id: string;
+  uid: string;
+  name: string;
+  text: string;
+  createdAt: Timestamp;
+}
+
+/** events/{id}/reviews/{uid} — one per attendee (F12) */
+export interface Review {
+  uid: string;
+  name: string;
+  rating: 1 | 2 | 3 | 4 | 5;
+  text: string;
+  createdAt: Timestamp;
+}

@@ -16,5 +16,8 @@ Read before editing: `CONTEXT.md` (what and why), `ARCHITECTURE.md` (how), `PLAN
 - Branch from `develop`, PR into `develop`. Never commit to `main` or `develop` directly.
 - Static export only: no API routes, server actions, request-time server APIs, or dynamic route segments (`[id]`); use `?id=` query params.
 - UI: use the components in `src/components/ui/` (shadcn/ui, preset `base-nova`, built on Base UI — no `asChild`, use the `render` prop). Add missing ones with `npx shadcn@latest add <name>`. Icons: `lucide-react`. Animation: `motion/react`, sparingly. Toasts: `sonner`. Map: `react-map-gl/maplibre`. Style with theme tokens (`bg-background`, `text-muted-foreground`), never hex colours. Do not add another UI kit.
+- Files marked PLACEHOLDER start with a comment that says what to build and with which libraries; follow it, and delete the PLACEHOLDER word when the file is real. Functions that call `todo()` are not built yet.
+- Pages (`src/app/**/page.tsx`) are containers that load data and hold state; components in `src/components/` only receive props; only `src/lib/` talks to Firebase or the model.
+- shadcn component reference: https://ui.shadcn.com/docs/components
 - Keep the contracts in `PLAN.md` stable; if one must change, say so before changing it.
 - Never commit service-account keys or read them into the conversation.
