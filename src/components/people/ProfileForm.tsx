@@ -122,6 +122,7 @@ export function ProfileForm({
               key={language.code}
               icon={language.flag}
               label={language.label}
+              description={language.name !== language.label ? language.name : undefined}
               pressed={draft.languages.includes(language.code)}
               onPressedChange={() => change({ languages: flip(draft.languages, language.code) as LanguageCode[] })}
             />

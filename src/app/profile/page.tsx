@@ -67,7 +67,7 @@ function ProfileView({ profile, onEdit }: { profile: UserProfile; onEdit: () => 
             return (
               <li key={code}>
                 <Badge variant="outline">
-                  <span aria-hidden>{language?.flag}</span> {language?.label ?? code}
+                  <span aria-hidden>{language?.flag}</span> {language?.name ?? code}
                 </Badge>
               </li>
             );

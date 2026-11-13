@@ -16,9 +16,9 @@ export function LanguageFlags({ languages }: { languages: Record<string, Languag
       {[...counts].sort((a, b) => b[1] - a[1]).map(([code, count]) => {
         const language = LANGUAGES.find((l) => l.code === code);
         return (
-          <li key={code} title={language?.label ?? code}>
+          <li key={code} title={language?.name ?? code}>
             <span aria-hidden>{language?.flag ?? code}</span>
-            <span className="sr-only">{language?.label ?? code}</span> {count}
+            <span className="sr-only">{language?.name ?? code}</span> {count}
           </li>
         );
       })}
