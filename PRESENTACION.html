@@ -98,6 +98,11 @@ h2 { font-size: clamp(32px, 4.6vw, 60px); }
 
 /* ── Slide 1: cover ────────────────────────── */
 .cover { text-align: left; }
+.cover .wrap { justify-items: center; }
+.cover .logo-hero { height: clamp(80px, 14vw, 170px); width: auto; max-width: 100%; }
+.slide.in .logo-hero { animation: hero .9s cubic-bezier(.2,1.4,.4,1) both; }
+@keyframes hero { from { opacity: 0; transform: scale(.85) translateY(20px); } }
+@media (prefers-reduced-motion: reduce) { .slide.in .logo-hero { animation: none; } }
 .logo { height: clamp(40px, 5vw, 60px); width: auto; }
 .logo .t1 { fill: var(--brand-text); }
 .logo .t2 { fill: var(--fg); }
@@ -254,6 +259,8 @@ h2 { font-size: clamp(32px, 4.6vw, 60px); }
 .qr-side { display: grid; gap: 16px; }
 .techline { padding: 14px 20px; display: grid; gap: 10px; }
 .techline .nums { gap: 18px; font-size: 15px; color: var(--muted); }
+.techline .nums span { display: inline-flex; align-items: center; gap: 6px; }
+.techline .nums .ic { width: 20px; height: 20px; color: var(--brand-text); }
 .techline .nums b { color: var(--brand-text); font-size: 22px; font-weight: 800; margin-right: 4px; }
 .donate { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: start; padding: 22px 26px; }
 .lecheleche { width: clamp(72px, 8vw, 96px); height: auto; overflow: visible; }
@@ -285,6 +292,7 @@ h2 { font-size: clamp(32px, 4.6vw, 60px); }
 .tag.soon { color: var(--primary); border-color: color-mix(in oklch, var(--primary) 45%, transparent); background: color-mix(in oklch, var(--primary) 8%, transparent); }
 .ph { display: inline-block; font-size: 13px; font-weight: 600; color: var(--muted); border: 1.5px dashed var(--border); border-radius: 8px; padding: 2px 8px; }
 .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.fact { place-items: center; }
 .fact b { display: block; font-size: clamp(30px, 4vw, 46px); font-weight: 800; letter-spacing: -0.03em; color: var(--brand-text); line-height: 1.05; }
 .fact span { font-size: 15px; }
 .src { font-size: 12px; color: var(--muted); }
@@ -367,35 +375,13 @@ h2 { font-size: clamp(32px, 4.6vw, 60px); }
 
 <!-- 1 · Portada -->
 <section class="slide cover" aria-label="Portada">
-  <div class="wrap two">
-    <div class="stack">
-      <svg class="logo" viewBox="0 0 358 64" role="img" aria-label="FlejeThePueblo">
+  <div class="wrap">
+    <svg class="logo logo-hero" viewBox="0 0 358 64" role="img" aria-label="FlejeThePueblo">
         <rect width="64" height="64" rx="16" fill="#E0572F"/>
         <g fill="#fff"><path d="M5 32 11 24 17 32V49H5Z"/><path d="M19 28 25.5 18 32 28V49H19Z"/><path d="M34 33 39.5 25 45 33V49H34Z"/><path d="M47 30 52.5 22 58 30V49H47Z"/></g>
         <g fill="#E0572F"><path d="M23 49v-7a2.5 2.5 0 0 1 5 0v7Z"/><rect x="9" y="36" width="4" height="4" rx="1"/><rect x="37.5" y="37" width="4" height="4" rx="1"/><rect x="50.5" y="34" width="4" height="4" rx="1"/></g>
         <text x="78" y="45" font-family="Geist, system-ui, sans-serif" font-size="38" letter-spacing="-1.5"><tspan class="t1" font-weight="400">FlejeThe</tspan><tspan class="t2" font-weight="800" dx="1">Pueblo</tspan></text>
       </svg>
-      <h1>Entérate de lo que hay <span class="accent">en la isla.</span></h1>
-      <div class="row"><span class="kicker"><i data-i="sparkles"></i> Hackathon TechLab II · Grupo 3</span></div>
-    </div>
-    <svg class="archi" viewBox="0 0 600 340" role="img" aria-label="Mapa de las ocho islas Canarias con encuentros marcados">
-      <path class="isle" d="M49.0 249.1L53.2 250.7L55.3 254.0L49.8 263.6L49.8 266.1L45.2 271.0L44.8 275.2L43.5 276.8L39.4 275.5L35.2 270.3L26.4 269.2L24.3 268.1L22.6 266.3L21.8 261.6L25.1 260.0L34.7 261.8L41.0 256.0L42.3 252.9L49.0 249.1Z"/>
-      <path class="isle" d="M121.4 202.2L127.3 200.6L132.7 202.4L144.0 210.2L146.1 216.3L138.6 223.6L136.1 225.4L130.6 227.0L127.7 226.3L121.4 222.5L117.6 216.5L118.1 206.9L121.4 202.2Z"/>
-      <path class="isle" d="M566.0 59.7L567.3 61.9L565.6 65.1L562.7 67.3L559.7 66.9L559.7 66.0L563.5 59.0L566.0 59.7Z"/>
-      <path class="isle" d="M344.5 225.4L347.9 228.3L346.2 235.0L347.9 238.2L345.8 239.9L344.5 242.8L345.8 244.6L346.2 249.1L342.9 250.9L337.4 257.1L327.4 260.5L324.4 264.1L322.8 264.7L319.4 262.5L314.4 262.3L310.2 260.7L303.9 255.4L302.7 253.1L298.9 250.2L295.1 242.6L294.7 239.9L295.1 230.1L303.1 224.8L307.7 218.7L307.3 215.6L309.0 212.0L308.1 207.3L314.4 207.8L320.7 210.0L329.5 210.0L336.6 211.8L339.5 210.9L339.1 206.4L342.5 205.8L343.7 207.8L341.6 210.9L342.5 219.6L344.5 225.4Z"/>
-      <path class="isle" d="M224.0 209.8L213.1 221.9L210.2 226.3L206.4 225.4L195.1 229.9L193.4 229.4L191.7 226.5L192.2 225.0L190.1 223.6L189.2 219.2L182.9 212.7L181.3 207.6L177.5 203.5L175.4 194.8L172.1 189.2L168.3 185.2L167.5 182.5L176.2 177.9L182.9 181.2L196.8 176.5L198.9 177.2L206.0 176.5L208.1 174.5L214.8 173.4L224.8 164.7L226.5 160.7L231.5 157.8L236.1 156.4L237.0 154.0L250.3 154.9L257.5 152.4L260.0 154.0L259.1 157.5L247.0 164.9L244.9 168.5L239.5 174.3L232.3 179.2L231.1 181.7L232.3 187.9L225.2 201.5L224.0 209.8Z"/>
-      <path class="isle" d="M509.5 132.3L514.1 130.3L518.3 129.8L522.0 131.2L525.4 135.0L526.7 139.4L526.2 156.6L522.9 166.2L522.9 172.0L524.6 175.6L521.6 179.6L516.6 192.8L514.1 197.3L510.3 199.3L497.8 201.3L488.6 205.8L484.0 206.9L481.9 208.2L471.4 220.5L466.4 222.7L463.4 222.7L456.7 220.1L447.5 220.1L448.8 216.0L455.9 216.3L466.8 211.8L475.2 206.2L480.2 200.6L482.3 195.9L483.1 189.2L486.5 183.0L489.4 173.6L502.4 151.7L505.3 141.2L505.7 136.5L509.5 132.3Z"/>
-      <path class="isle" d="M69.5 121.4L70.3 126.9L71.2 129.2L73.7 130.5L73.7 133.0L68.7 139.9L70.8 147.3L69.1 153.3L66.6 156.9L61.1 169.4L56.9 166.7L55.3 157.5L54.0 156.0L45.6 140.8L44.0 133.2L41.0 130.3L41.4 126.3L44.8 122.0L51.5 116.4L54.0 118.0L59.9 119.1L64.5 117.1L68.7 119.8L69.5 121.4Z"/>
-      <path class="isle" d="M566.4 65.5L568.5 65.1L574.0 69.5L571.9 76.2L569.4 77.8L568.9 79.8L570.2 85.8L568.5 89.6L568.5 94.1L566.8 97.2L559.7 102.4L554.3 103.7L552.2 106.2L540.1 108.6L537.1 110.9L532.1 118.4L530.8 116.7L522.9 115.8L521.2 113.5L520.8 112.0L524.6 107.7L525.8 97.2L533.4 87.4L542.6 85.2L546.3 81.8L550.9 79.8L560.1 78.9L563.1 74.2L566.4 65.5Z"/>
-      <text class="isle-label" x="57" y="109" text-anchor="middle">La Palma</text>
-      <text class="isle-label" x="39" y="292" text-anchor="middle">El Hierro</text>
-      <text class="isle-label" x="132" y="242" text-anchor="middle">La Gomera</text>
-      <text class="isle-label" x="214" y="145" text-anchor="middle">Tenerife</text>
-      <text class="isle-label" x="321" y="280" text-anchor="middle">Gran Canaria</text>
-      <text class="isle-label" x="487" y="238" text-anchor="middle">Fuerteventura</text>
-      <text class="isle-label" x="515" y="96" text-anchor="end">Lanzarote</text>
-      <g><circle class="pulse" cx="237.2" cy="165.1" r="9"/><circle class="pin" cx="237.2" cy="165.1" r="9"/><circle class="pulse" cx="340.1" cy="213.2" r="9" style="animation-delay:.6s"/><circle class="pin" cx="340.1" cy="213.2" r="9"/><circle class="pulse" cx="558.7" cy="102.1" r="9" style="animation-delay:1.2s"/><circle class="pin" cx="558.7" cy="102.1" r="9"/><circle class="pin" cx="68.7" cy="139.1" r="7"/><circle class="pin" cx="144.8" cy="217.6" r="7"/><circle class="pin" cx="51.1" cy="255.2" r="7"/><circle class="pin" cx="522.7" cy="163.4" r="7"/><circle class="pin" cx="322.7" cy="261.3" r="7"/><circle class="pin" cx="210.5" cy="174.6" r="7"/></g>
-    </svg>
   </div>
   <span class="num">01</span>
 </section>
@@ -424,13 +410,9 @@ h2 { font-size: clamp(32px, 4.6vw, 60px); }
       <h2>Una de cada tres personas jóvenes <span class="accent">se siente sola.</span></h2>
     </div>
     <div class="facts">
-      <div class="card fact"><b>34,6 %</b><span>de 18 a 24 años se siente sola</span></div>
-      <div class="card fact"><b>27,1 %</b><span>de 25 a 34 años</span></div>
-      <div class="card fact"><b>157</b><span>países de origen en Canarias</span></div>
-    </div>
-    <div class="card goal">
-      <span class="kicker"><i data-i="target"></i> Objetivo inicial</span>
-      <h3>Conectar a la juventud con lo que sucede en la comunidad.</h3>
+      <div class="card fact"><b>34,6 %</b></div>
+      <div class="card fact"><b>27,1 %</b></div>
+      <div class="card fact"><b>157</b></div>
     </div>
     <p class="src">Fuentes: Barómetro de la Soledad No Deseada en España 2024 (Observatorio Estatal SoledadES, Fundación ONCE y Fundación AXA); RTVC, julio de 2025, a partir de datos del ISTAC.</p>
   </div>
@@ -703,9 +685,9 @@ h2 { font-size: clamp(32px, 4.6vw, 60px); }
       <h2>Qué cuesta <span class="accent">y cuándo.</span></h2>
     </div>
     <div class="trio costs">
-      <div class="card cost"><div class="big"><i data-i="cpu"></i></div><b>Tecnología</b><span class="amount">≈ 0 €</span><span class="per">al mes al empezar</span></div>
-      <div class="card cost"><div class="big"><i data-i="users"></i></div><b>Dinamización</b><span class="amount">≈ 1.000 €</span><span class="per">al mes</span></div>
-      <div class="card cost"><div class="big"><i data-i="accessibility"></i></div><b>Accesibilidad</b><span class="amount">≈ 150 €</span><span class="per">al mes</span></div>
+      <div class="card cost"><div class="big"><i data-i="cpu"></i></div><b>Tecnología</b><span class="amount">≈ 0 €</span></div>
+      <div class="card cost"><div class="big"><i data-i="users"></i></div><b>Dinamización</b><span class="amount">≈ 1.000 €</span></div>
+      <div class="card cost"><div class="big"><i data-i="accessibility"></i></div><b>Accesibilidad</b><span class="amount">≈ 150 €</span></div>
     </div>
     <div class="tl">
       <div class="card"><span class="when"><i data-i="sparkles"></i> Hackathon</span><b>MVP publicado</b><span class="grow">Primeras pruebas</span></div>
@@ -775,7 +757,7 @@ h2 { font-size: clamp(32px, 4.6vw, 60px); }
         <div class="card techline">
       <span class="kicker"><i data-i="cpu"></i> Cómo está hecha</span>
       <div class="row"><span class="chip">Web estática · Next.js 16 · React 19</span><span class="chip">MapLibre</span><span class="chip">Firebase, datos en Madrid</span><span class="chip">xatsí: Cloudflare Workers AI · Llama 3.2</span></div>
-      <div class="row nums"><span><b>24</b> funcionalidades</span><span><b>14</b> categorías</span><span><b>8</b> islas</span><span><b>29</b> idiomas, con lengua de signos</span></div>
+      <div class="row nums"><span title="funcionalidades"><i data-i="list-checks"></i><b>24</b></span><span title="categorías"><i data-i="layers"></i><b>14</b></span><span title="islas"><i data-i="map"></i><b>8</b></span><span title="idiomas, con lengua de signos"><i data-i="languages"></i><b>29</b></span></div>
     </div>
       </div>
     </div>
